@@ -248,7 +248,18 @@
  <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="91"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <Grid>
    <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="77" MaxWidth="148" VerticalAlignment="Top"/>
-   <TextBlock Text="{Binding FallbackName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Foreground="{DynamicResource FgBrush}" FontSize="12" FontWeight="Bold" TextWrapping="Wrap"/>
+   <TextBlock Text="{Binding FallbackName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Foreground="{DynamicResource FgBrush}" FontSize="12" FontWeight="Bold" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="170">
+    <TextBlock.Style>
+      <Style TargetType="TextBlock">
+        <Style.Triggers>
+          <DataTrigger Binding="{Binding Id}" Value="vocal-remover-x">
+            <Setter Property="FontSize" Value="10.5"/>
+            <Setter Property="TextWrapping" Value="NoWrap"/>
+          </DataTrigger>
+        </Style.Triggers>
+      </Style>
+    </TextBlock.Style>
+   </TextBlock>
    <Border HorizontalAlignment="Right" VerticalAlignment="Top" Width="24" Height="24" CornerRadius="12"
            Background="{DynamicResource PanelBrush}" BorderBrush="{Binding BadgeBrush}" BorderThickness="2"
            ToolTip="{Binding BadgeTip}" Panel.ZIndex="10">
