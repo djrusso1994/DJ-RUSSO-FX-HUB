@@ -27,7 +27,7 @@ on:
 # Cancel older builds on the same branch when a new commit arrives.
 # Manual runs are kept separate from branch push runs.
 concurrency:
-  group: fx-hub-${{ github.workflow }}-${{ github.ref }}
+  group: fx-hub-${{ github.workflow }}-${{ github.ref }}-${{ github.event_name }}
   cancel-in-progress: true
 
 permissions:
@@ -99,7 +99,7 @@ jobs:
   release:
     name: Publish approved public release
     needs: build
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_release == true }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -114,6 +114,18 @@ jobs:
           VERSION=$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' DJRussoFXHub.csproj | head -n 1)
           test -n "$VERSION" || { echo "Project version missing"; exit 1; }
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Allow only v0.8.13 automatic preview
+        id: policy
+        shell: bash
+        env:
+          VERSION: ${{ steps.version.outputs.value }}
+          EVENT: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT" = push ] && [ "$VERSION" != 0.8.13 ]; then
+            echo 'Only the approved v0.8.13 preview may be auto-published.'
+            exit 1
+          fi
 
       - name: Download tested installer
         uses: actions/download-artifact@v5
@@ -137,9 +149,11 @@ jobs:
             echo "Release $TAG already exists. Refusing to overwrite a published version."
             exit 1
           fi
+          EXTRA_ARGS=()
+          if [ "${{ github.event_name }}" = push ]; then EXTRA_ARGS+=(--prerelease); else EXTRA_ARGS+=(--latest); fi
           gh release create "$TAG" "release-assets/DJ_RUSSO_FX_HUB_Setup_v$VERSION.exe" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
             --title "DJ RUSSO FX HUB $TAG - Neon Ghost" \
             --generate-notes \
-            --latest
+            "${EXTRA_ARGS[@]}"
