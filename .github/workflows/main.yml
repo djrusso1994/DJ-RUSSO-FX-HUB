@@ -76,13 +76,13 @@ jobs:
           if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
           & $iscc "installer\\DJ_RUSSO_FX_HUB.iss"
           if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed." }
-          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.13.exe")) { throw "Installer output missing." }
+          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.14.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v5
         with:
-          name: DJ_RUSSO_FX_HUB_Setup_v0.8.13
-          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.13.exe
+          name: DJ_RUSSO_FX_HUB_Setup_v0.8.14
+          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.14.exe
           if-no-files-found: error
 
       - name: Create ZIP
@@ -99,7 +99,7 @@ jobs:
   release:
     name: Publish approved public release
     needs: build
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true) }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_release == true }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -115,17 +115,14 @@ jobs:
           test -n "$VERSION" || { echo "Project version missing"; exit 1; }
           echo "value=$VERSION" >> "$GITHUB_OUTPUT"
 
-      - name: Allow only v0.8.13 automatic preview
+      - name: Validate manual release approval
         id: policy
         shell: bash
         env:
           VERSION: ${{ steps.version.outputs.value }}
           EVENT: ${{ github.event_name }}
         run: |
-          if [ "$EVENT" = push ] && [ "$VERSION" != 0.8.13 ]; then
-            echo 'Only the approved v0.8.13 preview may be auto-published.'
-            exit 1
-          fi
+          echo "Manual release approval received for v$VERSION"
 
       - name: Download tested installer
         uses: actions/download-artifact@v5
