@@ -368,10 +368,17 @@ public partial class MainWindow : Window
   MessageBox.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
- private static System.Net.Http.HttpClient CreateUpdateClient(){var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromSeconds(12)};c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.13");c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");return c;}
+ private static System.Net.Http.HttpClient CreateUpdateClient(){
+   var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.15");
+   c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
+   return c;
+ }
+ private bool hubUpdateInProgress;
  private async void CheckUpdates_Click(object sender,RoutedEventArgs e){await CheckHubReleaseAsync(true);}
  private async System.Threading.Tasks.Task CheckHubReleaseAsync(bool interactive){
    const string releasesUrl="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases";
+   if(hubUpdateInProgress)return;
    try{
      using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases?per_page=30");
      response.EnsureSuccessStatusCode();
@@ -380,22 +387,76 @@ public partial class MainWindow : Window
      Version? newest=null;
      foreach(var release in doc.RootElement.EnumerateArray()){
        if(release.TryGetProperty("draft",out var draft) && draft.GetBoolean())continue;
-       var releaseTag=release.GetProperty("tag_name").GetString()??"";
-       if(!Version.TryParse(releaseTag.TrimStart('v','V'),out var parsed))continue;
+       var tagName=release.GetProperty("tag_name").GetString()??"";
+       if(!Version.TryParse(tagName.TrimStart('v','V'),out var parsed))continue;
        if(newest==null || parsed>newest){newest=parsed;root=release;}
      }
      if(newest==null){if(interactive)MessageBox.Show(this,Index==1?"Nessuna versione pubblicata su GitHub.":"No GitHub releases are available.","DJ RUSSO FX HUB");return;}
      var tag=root.GetProperty("tag_name").GetString()??"";
      var page=root.GetProperty("html_url").GetString()??releasesUrl;
      if(!page.StartsWith(releasesUrl,StringComparison.OrdinalIgnoreCase))page=releasesUrl;
-     var current=typeof(MainWindow).Assembly.GetName().Version??new Version(0,8,13);
-     var raw=tag.TrimStart('v','V');
-     if(!Version.TryParse(raw,out var available)){if(interactive)MessageBox.Show(this,"Unable to read the GitHub release version.","DJ RUSSO FX HUB");return;}
-     if(available>current){
-       var message=Index==1?$"È disponibile DJ RUSSO FX HUB v{available}. Aprire la Release ufficiale per scaricare l'installer?":$"DJ RUSSO FX HUB v{available} is available. Open the official release to download the installer?";
-       if(MessageBox.Show(this,message,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Information)==MessageBoxResult.Yes)
+     var current=typeof(MainWindow).Assembly.GetName().Version??new Version(0,8,15);
+     if(!Version.TryParse(tag.TrimStart('v','V'),out var available))return;
+     if(available<=current){if(interactive)MessageBox.Show(this,Index==1?"Hai già l'ultima versione pubblicata su GitHub.":"You already have the latest GitHub release.","DJ RUSSO FX HUB");return;}
+     var expectedName="DJ_RUSSO_FX_HUB_Setup_v"+available.ToString(3)+".exe";
+     string? assetUrl=null,sha256=null;
+     if(root.TryGetProperty("assets",out var assets)){
+       foreach(var asset in assets.EnumerateArray()){
+         if(!string.Equals(asset.GetProperty("name").GetString(),expectedName,StringComparison.OrdinalIgnoreCase))continue;
+         assetUrl=asset.GetProperty("browser_download_url").GetString();
+         if(asset.TryGetProperty("digest",out var digest) && digest.ValueKind==JsonValueKind.String){
+           var value=digest.GetString()??"";
+           if(value.StartsWith("sha256:",StringComparison.OrdinalIgnoreCase))sha256=value.Substring(7);
+         }
+         break;
+       }
+     }
+     // No unverified executable is ever launched. Older releases without a SHA-256 digest
+     // remain available through the normal GitHub download page.
+     if(assetUrl==null || sha256==null || sha256.Length!=64 ||
+        !sha256.All(c=>Uri.IsHexDigit(c)) ||
+        !Uri.TryCreate(assetUrl,UriKind.Absolute,out var assetUri) ||
+        assetUri.Scheme!="https" || assetUri.Host!="github.com" ||
+        !assetUri.AbsolutePath.StartsWith("/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/",StringComparison.OrdinalIgnoreCase)){
+       var prompt=Index==1?$"È disponibile la v{available}. Per sicurezza questa Release richiede il download manuale da GitHub. Aprire la pagina?":$"Version {available} is available. This release requires manual download for security. Open GitHub?";
+       if(MessageBox.Show(this,prompt,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Information)==MessageBoxResult.Yes)
          Process.Start(new ProcessStartInfo(page){UseShellExecute=true});
-     }else if(interactive)MessageBox.Show(this,Index==1?"Hai già l'ultima versione pubblicata su GitHub.":"You already have the latest GitHub release.","DJ RUSSO FX HUB");
+       return;
+     }
+     var confirm=Index==1?$"DJ RUSSO FX HUB v{available} disponibile.\nScaricare l'installer ufficiale, verificare SHA-256 e avviare l'aggiornamento?\nWindows potrebbe chiedere autorizzazione amministratore.":$"DJ RUSSO FX HUB v{available} available.\nDownload and verify the official installer, then launch the update?\nWindows may request administrator permission.";
+     if(MessageBox.Show(this,confirm,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+     hubUpdateInProgress=true;
+     UpdatesButton.IsEnabled=false;
+     var updateDir=Path.Combine(Path.GetTempPath(),"DJRussoFXHub","Updates");
+     Directory.CreateDirectory(updateDir);
+     var installer=Path.Combine(updateDir,expectedName);
+     var partial=installer+".download";
+     try{
+       StatusText.Text=Index==1?"Download aggiornamento in corso...":"Downloading update...";
+       using(var download=await UpdateClient.GetAsync(assetUri,System.Net.Http.HttpCompletionOption.ResponseHeadersRead)){
+         download.EnsureSuccessStatusCode();
+         await using var source=await download.Content.ReadAsStreamAsync();
+         await using var target=new FileStream(partial,FileMode.Create,FileAccess.Write,FileShare.None,81920,true);
+         await source.CopyToAsync(target);
+       }
+       string actual;
+       using(var input=File.OpenRead(partial)){
+         var hash=await System.Security.Cryptography.SHA256.HashDataAsync(input);
+         actual=Convert.ToHexString(hash);
+       }
+       if(!string.Equals(actual,sha256,StringComparison.OrdinalIgnoreCase))
+         throw new InvalidDataException("Installer SHA-256 verification failed.");
+       File.Move(partial,installer,true);
+       Process.Start(new ProcessStartInfo(installer){UseShellExecute=true,WorkingDirectory=updateDir});
+       Application.Current.Shutdown();
+     }catch(Exception ex){
+       try{if(File.Exists(partial))File.Delete(partial);}catch{}
+       MessageBox.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+     }finally{
+       hubUpdateInProgress=false;
+       UpdatesButton.IsEnabled=true;
+       StatusText.Text=T("ready");
+     }
    }catch(Exception ex){if(interactive)MessageBox.Show(this,(Index==1?"Impossibile controllare GitHub: ":"Could not check GitHub: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void OpenFolder_Click(object sender,RoutedEventArgs e){var path=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");if(Directory.Exists(path))Process.Start(new ProcessStartInfo{FileName=path,UseShellExecute=true});else MessageBox.Show(T("missingfolder")+path);}
