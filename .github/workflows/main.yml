@@ -79,7 +79,7 @@ jobs:
           if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.15.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: DJ_RUSSO_FX_HUB_Setup_v0.8.15
           path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.15.exe
@@ -91,7 +91,7 @@ jobs:
           Compress-Archive -Path publish/* -DestinationPath DJ_RUSSO_FX_HUB_Windows_x64.zip -Force
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: DJ_RUSSO_FX_HUB_Windows_x64
           path: DJ_RUSSO_FX_HUB_Windows_x64.zip
@@ -125,7 +125,7 @@ jobs:
           echo "Manual release approval received for v$VERSION"
 
       - name: Download tested installer
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: DJ_RUSSO_FX_HUB_Setup_v${{ steps.version.outputs.value }}
           path: release-assets
