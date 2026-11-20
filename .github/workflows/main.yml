@@ -76,13 +76,13 @@ jobs:
           if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
           & $iscc "installer\\DJ_RUSSO_FX_HUB.iss"
           if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed." }
-          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.16.exe")) { throw "Installer output missing." }
+          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.17.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: DJ_RUSSO_FX_HUB_Setup_v0.8.16
-          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.16.exe
+          name: DJ_RUSSO_FX_HUB_Setup_v0.8.17
+          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.17.exe
           if-no-files-found: error
 
       - name: Create ZIP
@@ -99,7 +99,7 @@ jobs:
   release:
     name: Publish approved public release
     needs: build
-    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_release == true }}
+    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -122,7 +122,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.value }}
           EVENT: ${{ github.event_name }}
         run: |
-          echo "Manual release approval received for v$VERSION"
+          echo "Publishing a preview on push, or approved stable release on manual dispatch, for v$VERSION"
 
       - name: Download tested installer
         uses: actions/download-artifact@v6
@@ -143,8 +143,8 @@ jobs:
         run: |
           TAG="v$VERSION"
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-            echo "Release $TAG already exists. Refusing to overwrite a published version."
-            exit 1
+            echo "Release $TAG already exists; leaving it unchanged."
+            exit 0
           fi
           EXTRA_ARGS=()
           if [ "${{ github.event_name }}" = push ]; then EXTRA_ARGS+=(--prerelease); else EXTRA_ARGS+=(--latest); fi
