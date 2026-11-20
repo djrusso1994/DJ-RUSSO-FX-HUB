@@ -431,14 +431,55 @@ public partial class MainWindow : Window
      Directory.CreateDirectory(updateDir);
      var installer=Path.Combine(updateDir,expectedName);
      var partial=installer+".download";
+     var progressWindow=new Window{
+       Title="DJ RUSSO FX HUB • UPDATE",Width=490,Height=220,
+       WindowStartupLocation=WindowStartupLocation.CenterOwner,Owner=this,
+       ResizeMode=ResizeMode.NoResize,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
+       Foreground=System.Windows.Media.Brushes.White,ShowInTaskbar=false
+     };
+     var progressLayout=new StackPanel{Margin=new Thickness(24)};
+     var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
+     var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
+     var progressBar=new System.Windows.Controls.ProgressBar{Height=14,Minimum=0,Maximum=100,IsIndeterminate=true,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246))};
+     var progressDetails=new TextBlock{Text="",Margin=new Thickness(0,10,0,0),FontSize=12};
+     progressLayout.Children.Add(progressHeading);
+     progressLayout.Children.Add(progressStatus);
+     progressLayout.Children.Add(progressBar);
+     progressLayout.Children.Add(progressDetails);
+     progressWindow.Content=progressLayout;
+     progressWindow.Show();
      try{
        StatusText.Text=Index==1?"Download aggiornamento in corso...":"Downloading update...";
        using(var download=await UpdateClient.GetAsync(assetUri,System.Net.Http.HttpCompletionOption.ResponseHeadersRead)){
          download.EnsureSuccessStatusCode();
+         var total=download.Content.Headers.ContentLength;
+         progressBar.IsIndeterminate=!total.HasValue || total.Value<=0;
          await using var source=await download.Content.ReadAsStreamAsync();
          await using var target=new FileStream(partial,FileMode.Create,FileAccess.Write,FileShare.None,81920,true);
-         await source.CopyToAsync(target);
+         var buffer=new byte[81920];
+         long received=0;
+         var timer=System.Diagnostics.Stopwatch.StartNew();
+         int count;
+         while((count=await source.ReadAsync(buffer.AsMemory(0,buffer.Length)))>0){
+           await target.WriteAsync(buffer.AsMemory(0,count));
+           received+=count;
+           var mb=received/1048576.0;
+           var speed=timer.Elapsed.TotalSeconds>0?mb/timer.Elapsed.TotalSeconds:0;
+           if(total.HasValue && total.Value>0){
+             var percent=Math.Min(100,received*100.0/total.Value);
+             progressBar.Value=percent;
+             progressStatus.Text=(Index==1?"Download installer":"Downloading installer")+" • "+percent.ToString("F0")+"%";
+             progressDetails.Text=$"{mb:F1} / {total.Value/1048576.0:F1} MB   •   {speed:F1} MB/s";
+           }else{
+             progressStatus.Text=Index==1?"Download installer...":"Downloading installer...";
+             progressDetails.Text=$"{mb:F1} MB   •   {speed:F1} MB/s";
+           }
+         }
        }
+       progressBar.IsIndeterminate=true;
+       progressStatus.Text=Index==1?"Verifica sicurezza SHA-256...":"Verifying SHA-256...";
+       progressDetails.Text=Index==1?"Download completato. Verifica dell'installer.":"Download complete. Verifying installer.";
+       await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
        string actual;
        using(var input=File.OpenRead(partial)){
          var hash=await System.Security.Cryptography.SHA256.HashDataAsync(input);
@@ -447,12 +488,15 @@ public partial class MainWindow : Window
        if(!string.Equals(actual,sha256,StringComparison.OrdinalIgnoreCase))
          throw new InvalidDataException("Installer SHA-256 verification failed.");
        File.Move(partial,installer,true);
+       progressStatus.Text=Index==1?"Avvio installazione...":"Launching installer...";
+       await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
        Process.Start(new ProcessStartInfo(installer){UseShellExecute=true,WorkingDirectory=updateDir});
        Application.Current.Shutdown();
      }catch(Exception ex){
        try{if(File.Exists(partial))File.Delete(partial);}catch{}
        MessageBox.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
      }finally{
+       progressWindow.Close();
        hubUpdateInProgress=false;
        UpdatesButton.IsEnabled=true;
        StatusText.Text=T("ready");
