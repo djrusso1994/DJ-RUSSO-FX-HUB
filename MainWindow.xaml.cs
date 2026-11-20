@@ -370,7 +370,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.17");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.18");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -553,6 +553,40 @@ public partial class MainWindow : Window
   MeterPanelLaunchButton.IsEnabled=meter && installed;
   MeterPanelRemoveButton.Visibility=meter||shell?Visibility.Visible:Visibility.Collapsed;
   MeterPanelState.Text=installed?(Index==1?"● Installato":"● Installed"):meter||shell?(Index==1?"○ Non installato":"○ Not installed"):(Index==1?"◌ In arrivo":"◌ Coming soon");
+ }
+ private async void CheckPluginUpdates_Click(object sender,RoutedEventArgs e){
+   if(hubUpdateInProgress)return;
+   PluginUpdatesButton.IsEnabled=false;
+   try{
+     var id=selectedProductId;
+     var packageId=IsShellProduct(id)?"fx-shell":id;
+     var installed=packageId=="fx-shell"
+       ? ShellInstaller.GetState() is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary
+       : packageId=="meter-x" && File.Exists(MeterExePath);
+     if(!installed){
+       MessageBox.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.","DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+       return;
+     }
+     using var response=await UpdateClient.GetAsync("https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/main/plugin-updates.json");
+     response.EnsureSuccessStatusCode();
+     using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+     if(document.RootElement.GetProperty("schemaVersion").GetInt32()!=1)throw new InvalidDataException("Unsupported plugin catalog schema.");
+     var entries=document.RootElement.GetProperty("packages").EnumerateArray();
+     JsonElement found=default;
+     foreach(var entry in entries){
+       if(entry.GetProperty("id").GetString()==packageId){found=entry;break;}
+     }
+     if(found.ValueKind==JsonValueKind.Undefined)throw new InvalidDataException("Plugin not found in official catalog.");
+     var version=found.GetProperty("version").GetString()??"";
+     var available=found.GetProperty("downloadAvailable").GetBoolean();
+     var installedVersion=packageId=="fx-shell"?ShellInstaller.VersionLabel:"1.2.6";
+     var message=Index==1
+       ? $"Pacchetto: {packageId}\\nVersione inclusa di riferimento: {installedVersion}\\nUltima versione nel catalogo: {version}\\n\\n"+(available?"Pacchetto pubblicato: l'installazione automatica richiede ancora verifica di integrità e compatibilità.":"Nessun aggiornamento autonomo del plugin disponibile. I file installati non saranno modificati.")
+       : $"Package: {packageId}\\nBundled reference version: {installedVersion}\\nCatalog version: {version}\\n\\n"+(available?"Published package: automatic installation requires integrity and compatibility validation.":"No standalone plugin update available. Installed files will not be modified.");
+     MessageBox.Show(this,message,"DJ RUSSO FX HUB • PLUGIN UPDATES",MessageBoxButton.OK,MessageBoxImage.Information);
+   }catch(Exception ex){
+     MessageBox.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+   }finally{PluginUpdatesButton.IsEnabled=true;}
  }
  private void SelectedProductInstall_Click(object sender,RoutedEventArgs e){
   if(selectedProductId=="meter-x"){MeterImport_Click(sender,e);return;}
