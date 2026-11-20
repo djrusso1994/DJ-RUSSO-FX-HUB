@@ -42,6 +42,15 @@ jobs:
           dotnet publish $project.FullName -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableWindowsTargeting=true -o "$env:GITHUB_WORKSPACE/publish"
           if ($LASTEXITCODE -ne 0) { throw "Publish failed." }
 
+      - name: Verify bundled plugin payloads
+        shell: pwsh
+        run: |
+          $meter = "publish/Payload/DJ RUSSO METER X.exe"
+          $shell = "publish/Payload/DJ RUSSO FX SHELL.vst3"
+          if (-not (Test-Path -LiteralPath $meter -PathType Leaf)) { throw "METER X executable missing from publish output." }
+          if (-not (Test-Path -LiteralPath $shell -PathType Leaf)) { throw "FX SHELL VST3 missing from publish output." }
+          Write-Host "METER X and FX SHELL payloads verified."
+
       - name: Install Inno Setup
         shell: pwsh
         run: |
