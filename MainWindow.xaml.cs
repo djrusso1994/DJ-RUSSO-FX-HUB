@@ -68,14 +68,14 @@ public partial class MainWindow : Window
   ["completed"]=["Operation completed. Restart your DAW to rescan plugins.","Operazione completata. Riavvia la DAW per rilevare i plugin.","Operación completada. Reinicia la DAW.","Opération terminée. Redémarrez la DAW.","Fertig. DAW für Plugin-Scan neu starten."],
   ["settings"]=["SETTINGS","IMPOSTAZIONI","AJUSTES","PARAMÈTRES","EINSTELLUNGEN"],
   ["settingshint"]=["Interface language","Lingua dell'interfaccia","Idioma de la interfaz","Langue de l’interface","Sprache der Oberfläche"],
-  ["source"]=["Update source: GitHub Releases (not configured)","Fonte aggiornamenti: GitHub Releases (non configurata)","Fuente: GitHub Releases (sin configurar)","Source : GitHub Releases (non configurée)","Quelle: GitHub Releases (nicht konfiguriert)"],
+  ["source"]=["Update source: official GitHub Releases","Fonte aggiornamenti: GitHub Releases ufficiali","Fuente: GitHub Releases (sin configurar)","Source : GitHub Releases (non configurée)","Quelle: GitHub Releases (nicht konfiguriert)"],
   ["shellfound"]=["FX SHELL detected; individual effects not verified","FX SHELL rilevato; singoli effetti non verificati","FX SHELL detectado; efectos individuales sin verificar","FX SHELL détecté ; effets individuels non vérifiés","FX SHELL erkannt; einzelne Effekte nicht geprüft"],
   ["subtitle"]=["14 PLUGINS • ONE CREATIVE ECOSYSTEM","14 PLUGIN • UN UNICO ECOSISTEMA CREATIVO","14 PLUGINS • UN ECOSISTEMA CREATIVO","14 PLUGINS • UN ÉCOSYSTÈME CRÉATIF","14 PLUGINS • EIN KREATIVES ÖKOSYSTEM"],
   ["updates"]=["CHECK UPDATES","CONTROLLA AGGIORNAMENTI","BUSCAR ACTUALIZACIONES","VÉRIFIER LES MISES À JOUR","UPDATES PRÜFEN"],
   ["folder"]=["OPEN VST3 FOLDER","APRI CARTELLA VST3","ABRIR CARPETA VST3","OUVRIR DOSSIER VST3","VST3-ORDNER ÖFFNEN"],
   ["scan"]=["SCAN INSTALLED SOFTWARE","RILEVA SOFTWARE INSTALLATI","BUSCAR SOFTWARE INSTALADO","DÉTECTER LES LOGICIELS INSTALLÉS","INSTALLIERTE SOFTWARE SUCHEN"],
   ["language"]=["Language","Lingua","Idioma","Langue","Sprache"],
-  ["ready"]=["Ready • Local FX SHELL install available; GitHub updates are not configured.","Pronto • Installazione locale FX SHELL disponibile; aggiornamenti GitHub non configurati.","Listo • Instalación local de FX SHELL disponible; GitHub pendiente.","Prêt • Installation locale de FX SHELL disponible ; GitHub à configurer.","Bereit • Lokale FX SHELL-Installation verfügbar; GitHub noch nicht eingerichtet."],
+  ["ready"]=["Ready • Local FX SHELL install available; GitHub release check enabled.","Pronto • Installazione locale FX SHELL disponibile; controllo aggiornamenti GitHub attivo.","Listo • Instalación local de FX SHELL disponible; GitHub pendiente.","Prêt • Installation locale de FX SHELL disponible ; GitHub à configurer.","Bereit • Lokale FX SHELL-Installation verfügbar; GitHub noch nicht eingerichtet."],
   ["planned"]=["COMING SOON","IN ARRIVO","PRÓXIMAMENTE","PROCHAINEMENT","DEMNÄCHST"],
   ["available"]=["READY FOR TESTING","PRONTO PER I TEST","LISTO PARA PRUEBAS","PRÊT POUR LES TESTS","TESTBEREIT"],
   ["installed"]=["INSTALLED (FILE FOUND)","INSTALLATO (FILE TROVATO)","INSTALADO (ARCHIVO ENCONTRADO)","INSTALLÉ (FICHIER TROUVÉ)","INSTALLIERT (DATEI GEFUNDEN)"],
@@ -118,7 +118,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.12";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.12";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  private void Social_Click(object sender,RoutedEventArgs e){if(sender is Button b && b.Tag is string url){try{Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}catch(Exception ex){MessageBox.Show(ex.Message,"DJ RUSSO FX HUB");}}}
  private void LoadPlugins(){try {var path=Path.Combine(AppContext.BaseDirectory,"plugins.json");plugins=JsonSerializer.Deserialize<List<PluginInfo>>(File.ReadAllText(path),new JsonSerializerOptions{PropertyNameCaseInsensitive=true})??new();}catch(Exception ex){StatusText.Text=ex.Message;}}
  // Frozen, shared WPF bitmaps avoid repeated decoding and per-card allocations.
@@ -367,8 +367,29 @@ public partial class MainWindow : Window
   var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{T("diagReadOnly")}";
   MessageBox.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
- private void CheckUpdates_Click(object sender,RoutedEventArgs e){MessageBox.Show(this,(Index==1?"Aggiornamenti automatici: nessun repository GitHub Releases verificato configurato. Per sicurezza non scarico né eseguo pacchetti non autenticati. Configura prima repository e manifest firmato.":"Automatic updates: no verified GitHub Releases repository is configured. For safety, untrusted packages will not be downloaded or executed. Configure a repository and signed release manifest first."),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);}
-
+ private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
+ private static System.Net.Http.HttpClient CreateUpdateClient(){var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromSeconds(12)};c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.13");c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");return c;}
+ private async void CheckUpdates_Click(object sender,RoutedEventArgs e){await CheckHubReleaseAsync(true);}
+ private async System.Threading.Tasks.Task CheckHubReleaseAsync(bool interactive){
+   const string releasesUrl="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases";
+   try{
+     using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest");
+     response.EnsureSuccessStatusCode();
+     using var doc=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+     var root=doc.RootElement;
+     var tag=root.GetProperty("tag_name").GetString()??"";
+     var page=root.GetProperty("html_url").GetString()??releasesUrl;
+     if(!page.StartsWith(releasesUrl,StringComparison.OrdinalIgnoreCase))page=releasesUrl;
+     var current=typeof(MainWindow).Assembly.GetName().Version??new Version(0,8,13);
+     var raw=tag.TrimStart('v','V');
+     if(!Version.TryParse(raw,out var available)){if(interactive)MessageBox.Show(this,"Unable to read the GitHub release version.","DJ RUSSO FX HUB");return;}
+     if(available>current){
+       var message=Index==1?$"È disponibile DJ RUSSO FX HUB v{available}. Aprire la Release ufficiale per scaricare l'installer?":$"DJ RUSSO FX HUB v{available} is available. Open the official release to download the installer?";
+       if(MessageBox.Show(this,message,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Information)==MessageBoxResult.Yes)
+         Process.Start(new ProcessStartInfo(page){UseShellExecute=true});
+     }else if(interactive)MessageBox.Show(this,Index==1?"Hai già l'ultima versione pubblicata su GitHub.":"You already have the latest GitHub release.","DJ RUSSO FX HUB");
+   }catch(Exception ex){if(interactive)MessageBox.Show(this,(Index==1?"Impossibile controllare GitHub: ":"Could not check GitHub: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
+ }
  private void OpenFolder_Click(object sender,RoutedEventArgs e){var path=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");if(Directory.Exists(path))Process.Start(new ProcessStartInfo{FileName=path,UseShellExecute=true});else MessageBox.Show(T("missingfolder")+path);}
 
  private static readonly string[] MeterImportLabels={"IMPORT EXE","IMPORTA EXE","IMPORTAR EXE","IMPORTER EXE","EXE IMPORTIEREN"};
