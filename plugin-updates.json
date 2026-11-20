@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "id": "fx-shell",
+      "version": "3.0.3",
+      "effectIds": [
+        "sidechain-x",
+        "reverse-fx",
+        "stutter-fx"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
+    },
+    {
+      "id": "meter-x",
+      "version": "1.2.6",
+      "effectIds": [
+        "meter-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-user-settings"
+    }
+  ]
+}
