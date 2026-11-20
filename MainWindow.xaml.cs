@@ -373,10 +373,18 @@ public partial class MainWindow : Window
  private async System.Threading.Tasks.Task CheckHubReleaseAsync(bool interactive){
    const string releasesUrl="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases";
    try{
-     using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest");
+     using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases?per_page=30");
      response.EnsureSuccessStatusCode();
      using var doc=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
-     var root=doc.RootElement;
+     JsonElement root=default;
+     Version? newest=null;
+     foreach(var release in doc.RootElement.EnumerateArray()){
+       if(release.TryGetProperty("draft",out var draft) && draft.GetBoolean())continue;
+       var releaseTag=release.GetProperty("tag_name").GetString()??"";
+       if(!Version.TryParse(releaseTag.TrimStart('v','V'),out var parsed))continue;
+       if(newest==null || parsed>newest){newest=parsed;root=release;}
+     }
+     if(newest==null){if(interactive)MessageBox.Show(this,Index==1?"Nessuna versione pubblicata su GitHub.":"No GitHub releases are available.","DJ RUSSO FX HUB");return;}
      var tag=root.GetProperty("tag_name").GetString()??"";
      var page=root.GetProperty("html_url").GetString()??releasesUrl;
      if(!page.StartsWith(releasesUrl,StringComparison.OrdinalIgnoreCase))page=releasesUrl;
