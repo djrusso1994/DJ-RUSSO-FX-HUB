@@ -2,6 +2,12 @@ name: DJ RUSSO FX HUB - Windows Build
 
 on:
   workflow_dispatch:
+    inputs:
+      publish_release:
+        description: 'Publish the tested installer publicly after approval'
+        type: boolean
+        required: true
+        default: false
   push:
     branches: [main]
     paths:
@@ -89,3 +95,51 @@ jobs:
         with:
           name: DJ_RUSSO_FX_HUB_Windows_x64
           path: DJ_RUSSO_FX_HUB_Windows_x64.zip
+
+  release:
+    name: Publish approved public release
+    needs: build
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.publish_release == true }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout release source
+        uses: actions/checkout@v5
+
+      - name: Determine version
+        id: version
+        shell: bash
+        run: |
+          VERSION=$(sed -n 's/.*<Version>\([^<]*\)<\/Version>.*/\1/p' DJRussoFXHub.csproj | head -n 1)
+          test -n "$VERSION" || { echo "Project version missing"; exit 1; }
+          echo "value=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download tested installer
+        uses: actions/download-artifact@v5
+        with:
+          name: DJ_RUSSO_FX_HUB_Setup_v${{ steps.version.outputs.value }}
+          path: release-assets
+
+      - name: Verify installer before publishing
+        shell: bash
+        run: |
+          test -s "release-assets/DJ_RUSSO_FX_HUB_Setup_v${{ steps.version.outputs.value }}.exe"
+
+      - name: Publish new GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+        run: |
+          TAG="v$VERSION"
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists. Refusing to overwrite a published version."
+            exit 1
+          fi
+          gh release create "$TAG" "release-assets/DJ_RUSSO_FX_HUB_Setup_v$VERSION.exe" \
+            --repo "$GITHUB_REPOSITORY" \
+            --target "$GITHUB_SHA" \
+            --title "DJ RUSSO FX HUB $TAG - Neon Ghost" \
+            --generate-notes \
+            --latest
