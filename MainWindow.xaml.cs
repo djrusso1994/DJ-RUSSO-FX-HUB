@@ -370,7 +370,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.15");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.17");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -431,6 +431,7 @@ public partial class MainWindow : Window
      Directory.CreateDirectory(updateDir);
      var installer=Path.Combine(updateDir,expectedName);
      var partial=installer+".download";
+     using var downloadCancel=new System.Threading.CancellationTokenSource();
      var progressWindow=new Window{
        Title="DJ RUSSO FX HUB • UPDATE",Width=490,Height=220,
        WindowStartupLocation=WindowStartupLocation.CenterOwner,Owner=this,
@@ -446,11 +447,15 @@ public partial class MainWindow : Window
      progressLayout.Children.Add(progressStatus);
      progressLayout.Children.Add(progressBar);
      progressLayout.Children.Add(progressDetails);
+     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",Width=105,Height=31,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,14,0,0)};
+     cancelButton.Click+=(_,__)=>{cancelButton.IsEnabled=false;downloadCancel.Cancel();};
+     progressLayout.Children.Add(cancelButton);
      progressWindow.Content=progressLayout;
+     progressWindow.Closing+=(_,e)=>{if(!downloadCancel.IsCancellationRequested && cancelButton.IsEnabled){e.Cancel=true;downloadCancel.Cancel();cancelButton.IsEnabled=false;}};
      progressWindow.Show();
      try{
        StatusText.Text=Index==1?"Download aggiornamento in corso...":"Downloading update...";
-       using(var download=await UpdateClient.GetAsync(assetUri,System.Net.Http.HttpCompletionOption.ResponseHeadersRead)){
+       using(var download=await UpdateClient.GetAsync(assetUri,System.Net.Http.HttpCompletionOption.ResponseHeadersRead,downloadCancel.Token)){
          download.EnsureSuccessStatusCode();
          var total=download.Content.Headers.ContentLength;
          progressBar.IsIndeterminate=!total.HasValue || total.Value<=0;
@@ -460,8 +465,8 @@ public partial class MainWindow : Window
          long received=0;
          var timer=System.Diagnostics.Stopwatch.StartNew();
          int count;
-         while((count=await source.ReadAsync(buffer.AsMemory(0,buffer.Length)))>0){
-           await target.WriteAsync(buffer.AsMemory(0,count));
+         while((count=await source.ReadAsync(buffer.AsMemory(0,buffer.Length),downloadCancel.Token))>0){
+           await target.WriteAsync(buffer.AsMemory(0,count),downloadCancel.Token);
            received+=count;
            var mb=received/1048576.0;
            var speed=timer.Elapsed.TotalSeconds>0?mb/timer.Elapsed.TotalSeconds:0;
@@ -476,6 +481,7 @@ public partial class MainWindow : Window
            }
          }
        }
+       cancelButton.IsEnabled=false;
        progressBar.IsIndeterminate=true;
        progressStatus.Text=Index==1?"Verifica sicurezza SHA-256...":"Verifying SHA-256...";
        progressDetails.Text=Index==1?"Download completato. Verifica dell'installer.":"Download complete. Verifying installer.";
@@ -492,10 +498,14 @@ public partial class MainWindow : Window
        await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
        Process.Start(new ProcessStartInfo(installer){UseShellExecute=true,WorkingDirectory=updateDir});
        Application.Current.Shutdown();
+     }catch(OperationCanceledException){
+       try{if(File.Exists(partial))File.Delete(partial);}catch{}
+       StatusText.Text=Index==1?"Download annullato":"Download cancelled";
      }catch(Exception ex){
        try{if(File.Exists(partial))File.Delete(partial);}catch{}
        MessageBox.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
      }finally{
+       progressWindow.Closing+=(_,__)=>{};
        progressWindow.Close();
        hubUpdateInProgress=false;
        UpdatesButton.IsEnabled=true;
