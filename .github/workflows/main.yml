@@ -18,6 +18,12 @@ on:
       - 'plugins.json'
       - 'effect-packages.json'
 
+# Cancel older builds on the same branch when a new commit arrives.
+# Manual runs are kept separate from branch push runs.
+concurrency:
+  group: fx-hub-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
