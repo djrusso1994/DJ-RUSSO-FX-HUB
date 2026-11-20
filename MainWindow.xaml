@@ -278,7 +278,9 @@
    <Border Grid.Column="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1.7" CornerRadius="13" Margin="0,0,0,10" Padding="16">
  <ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel>
   <TextBlock Text="DJ RUSSO" FontSize="17" FontWeight="Bold" FontStyle="Italic" HorizontalAlignment="Center" Foreground="{DynamicResource FgBrush}"/>
-  <TextBlock x:Name="ProductPanelTitle" Text="METER X" FontSize="32" FontWeight="ExtraBold" FontStyle="Italic" HorizontalAlignment="Center" Foreground="{DynamicResource HeadingBrush}"/>
+  <Viewbox Width="210" MaxHeight="42" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center" ClipToBounds="True">
+   <TextBlock x:Name="ProductPanelTitle" Text="METER X" FontSize="32" FontWeight="ExtraBold" FontStyle="Italic" TextAlignment="Center" Foreground="{DynamicResource HeadingBrush}"/>
+  </Viewbox>
   <TextBlock x:Name="ProductPanelVersion" Text="v1.2.6  •  NEON GHOST" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,12"/>
   <Image x:Name="ProductPanelLogo" Source="Assets/meter-x.png" Height="132" Stretch="Uniform" Margin="0,0,0,9"/>
   <TextBlock x:Name="ProductPanelDescription" Text="Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource InfoBrush}" Margin="0,5,0,13"/>
