@@ -1,0 +1,8 @@
+{
+  "schema_version": 1,
+  "channel": "stable",
+  "generated_at": "2026-11-20",
+  "hub": null,
+  "plugins": [],
+  "notes": "No releases published. Empty feed is intentional until packages and updater are tested."
+}
