@@ -15,19 +15,17 @@
 
 ---
 
-## Interface preview
+## Interface gallery
 
-The **Neon Ghost** interface provides a searchable plugin catalog, installed-software detection, language and theme settings, and a dedicated product information panel.
+Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it at full resolution.
 
-> **Screenshots:** Real interface screenshots from the v0.8.13 preview are being prepared for this gallery. They will be added here after the image files are uploaded to the repository.
-
-| Dashboard | Installed audio tools |
+| **Main Dashboard** | **Installed Plugins** |
 |:---:|:---:|
-| Product catalog and quick actions | Sidechain X, Reverse FX, Stutter FX and METER X |
+| [![DJ RUSSO FX HUB — Main Dashboard](screenshots/01-main-dashboard.png)](screenshots/01-main-dashboard.png) | [![DJ RUSSO FX HUB — Installed Plugins](screenshots/02-installed-plugins.png)](screenshots/02-installed-plugins.png) |
 
-| METER X monitoring | Interface customization |
+| **METER X Monitoring** | **Dark Professional Theme** |
 |:---:|:---:|
-| Audio analysis and monitoring | Neon Ghost and Dark Professional themes |
+| [![DJ RUSSO METER X](screenshots/03-meter-x.png)](screenshots/03-meter-x.png) | [![DJ RUSSO FX HUB — Dark Professional](screenshots/04-dark-professional.png)](screenshots/04-dark-professional.png) |
 
 ## Included tools
 
