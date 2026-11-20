@@ -1,43 +1,92 @@
-## v0.8.9 — Diagnostics translations
+<div align="center">
 
-The Diagnostics dialog now translates every status, including the five FX SHELL installation states, across all five supported UI languages. It is still a read-only check, not a validation that FL Studio successfully loads plugins.
+<img src="Assets/hub.png" alt="DJ RUSSO FX HUB logo" width="140" />
 
-# DJ RUSSO FX HUB v0.8.8 — NEON GHOST / Visual Studio
+# DJ RUSSO FX HUB
+### NEON GHOST · Audio Tools Manager for Windows
 
-This archive contains the **v0.8.8 WPF/.NET 8 x64** HUB project AND one user-supplied compiled Windows x64 `DJ RUSSO FX SHELL.vst3` file in `Payload/`.
+**Manage DJ RUSSO audio tools in one place.**
 
-## Important architecture
-The existing FX SHELL code builds **one VST3 module exposing three different effects**: Sidechain X, Reverse FX and Stutter FX. The HUB must install ONE file, not three duplicates. These plugin classes still need verification by FL Studio after installation. The 11 planned effects are not bundled or installable yet.
+[**Download latest public version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-The uploaded compiled file embeds **version 3.0.3**. The earlier FX SHELL 3.0.2 source archive is distinct; this HUB does not compile or change JUCE DSP.
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) ![Status](https://img.shields.io/badge/v0.8.14-testing-BA68FF)
 
-## v0.8.8 display corrections
-Theme and language names remain readable in the drop-down lists and selected states. Dropdowns are more compact without using the custom WPF template previously associated with a startup exception. The header and window version are read from assembly metadata. The installer payload is unchanged.
+</div>
 
-## Build once in Windows Visual Studio
-1. Extract the ENTIRE ZIP to a normal folder (not inside the ZIP).
-2. Open `DJRussoFXHub.slnx` with Visual Studio 2022+ and the **.NET desktop development** workload.
-3. Select **Release / x64** and build. `.NET 8` Windows Desktop SDK is required.
-4. Start the resulting `DJRussoFXHub.exe`; keep its `Payload` folder alongside the EXE (Visual Studio copies it automatically).
+---
 
-## Install and test in FL Studio
-1. Close FL Studio completely, including all running instances.
-2. In HUB, click **INSTALL FX SHELL** and accept the Windows UAC administrator prompt.
-3. The only destination is `C:\Program Files\Common Files\VST3\DJ RUSSO FX SHELL.vst3` (resolved from Windows CommonProgramFiles for x64).
-4. The installed file must match SHA-256 `8bd68722de231324d10aa8fd767538828dac81bebc9d3bc6bc19f95884be7de5`.
-5. Open FL Studio > Plugin Manager > **Find installed plugins** (enable **Verify plugins** / rescan previously verified plug-ins if needed).
-6. Confirm all THREE entries: Sidechain X, Reverse FX, Stutter FX. Test open, audio, removal, closing FL Studio (especially Sidechain X stability).
-7. Close FL Studio, click **UNINSTALL FX SHELL** in HUB, approve UAC, then rescan in FL Studio. All three should disappear if they came only from that shared SHELL.
+## Interface preview
 
-## Protections and boundaries
-- The installer refuses to overwrite an existing destination, even if it has the same name. **Back up your old plugin first**, and do not delete other VST3s.
-- The HUB registers installation ownership in `%LOCALAPPDATA%\DJRusso\FXHub\shell-install.json` after verifying the copied file.
-- Uninstallation is enabled ONLY for an installation the HUB recorded and whose content matches the bundled file; a changed or different file is never removed.
-- Installation/disinstallation of VST3 directory bundles or other plugin versions is NOT implemented here.
-- Updating an existing version, automatic downloads, GitHub Releases publication, signing, digital certificates, rollback, installer packaging and elevation error recovery require further testing/development.
-- Windows administrator authorization is needed for the system VST3 directory.
-- A Windows desktop shortcut can be created from the compiled EXE: right-click > Send to > Desktop (create shortcut). The EXE includes the FX HUB icon.
-- Theme and language selections persist; settings start collapsed.
+The **Neon Ghost** interface provides a searchable plugin catalog, installed-software detection, language and theme settings, and a dedicated product information panel.
 
-## Test status
-The code has been statically checked, and the ZIP was verified. No Windows build, UAC invocation or FL Studio test was performed by the assistant. Please send the exact Visual Studio error if compilation fails, or screenshots/status after the install and uninstall trials.
+> **Screenshots:** Real interface screenshots from the v0.8.13 preview are being prepared for this gallery. They will be added here after the image files are uploaded to the repository.
+
+| Dashboard | Installed audio tools |
+|:---:|:---:|
+| Product catalog and quick actions | Sidechain X, Reverse FX, Stutter FX and METER X |
+
+| METER X monitoring | Interface customization |
+|:---:|:---:|
+| Audio analysis and monitoring | Neon Ghost and Dark Professional themes |
+
+## Included tools
+
+- **DJ RUSSO METER X** — Windows audio monitoring application.
+- **DJ RUSSO FX SHELL** — a single VST3 module providing **Sidechain X**, **Reverse FX**, and **Stutter FX**.
+- **More audio tools** — shown as *Coming Soon*; not yet available for installation.
+
+The FX HUB itself is a Windows application, **not a VST3 plugin**.
+
+## Features
+
+- Install and remove supported DJ RUSSO tools.
+- View installation status and launch supported applications.
+- Search and filter the audio-tool catalog.
+- Choose interface language and visual theme.
+- Check GitHub Releases for newer versions, including preview releases.
+- Open diagnostics, backup tools and the VST3 directory.
+- Neon Ghost visual design and mini chip player.
+
+## Download and install
+
+1. Open [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases).
+2. Download the Windows x64 **Setup .exe** from the latest published release.
+3. Run the installer and launch **DJ RUSSO FX HUB**.
+4. Close your DAW before installing or removing VST3 effects.
+5. Open FL Studio's Plugin Manager and rescan plugins after installation.
+
+**Current development build:** v0.8.14 — awaiting Windows testing. The newest public download may still be v0.8.13 until this build is approved.
+
+## Compatibility and important notes
+
+- Windows x64; developed with WPF and .NET 8.
+- FL Studio is the primary testing DAW; other VST3 hosts are not yet fully validated.
+- FX SHELL contains three effects in **one shared VST3 file**. Do not manually split or duplicate it.
+- Installation may require Windows administrator permission.
+- Always back up important projects and plugins before testing.
+- The update checker **notifies and opens GitHub Releases**; it does not silently download or install software.
+- The source project builds the HUB and bundles precompiled payloads. It does **not** build the JUCE audio DSP.
+
+## Development and release process
+
+Changes to the `main` branch trigger a Windows test build through GitHub Actions. **Public stable releases require approval after testing.** Build artifacts and public Releases are separate download channels.
+
+### Current changes under test (v0.8.14)
+
+- Correct GitHub update checking when only pre-releases exist (fixes the 404 response).
+- Fit long product titles inside the right-side details panel, including Vocal Remover X.
+- Refresh documentation and prepare the visual gallery.
+
+These changes have been committed to source; successful compilation and Windows behavior must still be verified.
+
+## Build from source
+
+Open `DJRussoFXHub.slnx` with Visual Studio 2022 or later and the **.NET desktop development** workload, then build for Windows x64. Keep the bundled `Payload` files alongside the published application.
+
+---
+
+<div align="center">
+
+**Created by DJ RUSSO** · [Official downloads](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases)
+
+</div>
