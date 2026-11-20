@@ -1,0 +1,71 @@
+v0.8.12 - Dropdown text readability fix
+- Restored high contrast dark text on native white WPF dropdown surfaces.
+- Explicit TextBlock foreground for language items to avoid global style override.
+- Retains all v0.8.11 changes.
+- Windows build and visual validation still required.
+
+v0.8.11 - cumulative visual corrections (requires Windows build verification)
+- Removed redundant sidebar HUB and edition captions; raised social panel.
+- Dark high-contrast ComboBox palette for language/theme/product filters.
+- Retains diagnostics localization from v0.8.9 and v0.8.10 fixes.
+- Vocal Remover X title graphic still needs a separate asset/layout verification.
+
+DJ RUSSO FX HUB • v0.8.10 NEON GHOST — Persistent settings selection (20 November 2026)
+- Settings in the left sidebar stays visibly selected (neon border, subtle glow and highlighted background) while the Settings panel is open.
+- Clicking Settings again closes the panel and returns the button to its normal appearance.
+- Selected background automatically adapts to Neon Ghost, Dark Professional and Light Modern themes, including theme changes while Settings is open.
+- Uses a derived WPF button Style and the existing navigation ControlTemplate to avoid prior XAML template startup regressions.
+- Guide dialog title also uses the current window/assembly version instead of a stale hardcoded release number.
+- All v0.8.9 localized diagnostics, dropdown fixes, plugin payloads and existing functions preserved.
+- QA: XAML/project XML parsed, style references and handlers inspected, ZIP integrity and complete file inventory checked. Windows WPF build/startup not verified in this environment.
+
+DJ RUSSO FX HUB • v0.8.9 NEON GHOST — Diagnostics localization fix (20 November 2026)
+- Fixed the unlocalized FX SHELL internal installer states shown as raw enum names (for example "Missing") in the Diagnostics dialog.
+- Diagnostics now translates all five possible FX SHELL states to English, Italian, Spanish, French and German.
+- Localized VST3 folder detection, METER X detection, packaged FX SHELL verification, FL Studio paths and the read-only diagnostic notice in all five languages.
+- Distinguishes "invalid or missing" package data from a mere missing installed plugin; no automatic installer actions have changed.
+- Preserved the v0.8.8 theme/dropdown legibility fixes and every preexisting plugin, payload and UI feature.
+- Updated the assembly version to 0.8.9; window/header read this value dynamically.
+- QA: translation keys, enum coverage, XML/XAML integrity and archive test performed. Windows WPF build/launch remain to be verified in Visual Studio.
+
+DJ RUSSO FX HUB • v0.8.8 NEON GHOST — Dropdown contrast and localization (20 November 2026)
+- Fixed the previously invisible Cyberpunk Neon / Dark Professional / Light Modern theme names: all three theme labels now use a dedicated high-contrast foreground independent of the selected HUB theme.
+- Fixed the five language labels (English, Italiano, Español, Français, Deutsch) in the same way.
+- Improved the dropdown menus with clearer border/hover/selection states, a smaller readable font, more compact item spacing and a capped popup height.
+- Intentionally preserved the built-in WPF ComboBox template: earlier custom ToggleButton/deferred templates caused startup XamlParseException in prior builds.
+- Localized search/filter headings and tooltips, diagnostics/backup buttons and product-count summary in all five supported languages.
+- Window title and header now derive the version from the assembly, controlled by the project <Version>0.8.8</Version>, avoiding stale hardcoded version labels in future releases.
+- Preserved all 14 plugin entries, plugin installers and SHA-256 verification, chip player, mini waveform, vector social links, settings persistence and languages/themes.
+- QA: XML/XAML/static content validation and ZIP integrity performed; Windows Visual Studio WPF compilation and application startup still require verification.
+
+DJ RUSSO FX HUB • v0.8.7 NEON GHOST — UI label cleanup (20 November 2026)
+- Removed both redundant “MY PRODUCTS” headings from sidebar and product browser.
+- Reclaimed vertical spacing so diagnostics/sidebar actions and search/filter move upward naturally.
+- Retained product cards, 14-product catalog, social vector art, player, themes and language support.
+- Updated Window title, hub version display and assembly version to 0.8.7.
+- Verified XAML/XML syntax and ZIP archive; Windows WPF startup not tested.
+
+DJ RUSSO FX HUB • v0.8.6 NEON GHOST — Vector Social + Product Card Fix (20 November 2026)
+- Replaced eight low-quality temporary social PNGs with resolution-independent WPF vector artwork: YouTube, Facebook, Spotify, Apple Music, Beatport, TikTok, YouTube Music and Email.
+- No colored square plates behind icons; maintained existing accessible tooltips, hover feedback, and all eight destination URLs.
+- Kept the confirmed FIX3 startup-safe ComboBox setup and avoided adding new deferred WPF templates.
+- Increased all 14 uniform product cards from 174×210 to 196×264 WPF units, with increased footer text space, slightly reduced image height, and proper word wrapping.
+- Improved category/footer text sizes and line height; fixed METER X status text clipping across language settings.
+- Updated Title, header version, and .csproj assembly version to 0.8.6.
+- Preserved installers, plugin catalog, scan/backup/updates, themes, language selection and 40-track chip player.
+- QA: XAML XML validated, social URLs and event hookups checked, ZIP archive integrity tested. Windows .NET/WPF build and runtime verification still required.
+
+v0.8.3 - UI corrections and audio-reactive mini waveform
+- Centered sidebar buttons; increased product card height and footer legibility
+- Improved social button dimensions and typography (platform symbols remain placeholders)
+- Added 40 per-track audio amplitude envelopes for low-cost visualizer
+- Localized diagnostic window labels in EN/IT/ES/FR/DE
+- Increased software panel text sizes
+- Preserved existing installers, 40 WAV/MIDI tracks, backup and update behavior
+
+Windows Release build and runtime verification required.
+
+
+v0.8.5: Social icon-only vector buttons; custom ComboBox selected-state styling for contrast. Logos are vector approximations, not official brand assets. Windows build pending.
+
+FIX1: Rebuilt ComboBox ToggleButton control template to avoid deferred XAML deserialization error at startup; retained social vector buttons. Requires Windows runtime verification.

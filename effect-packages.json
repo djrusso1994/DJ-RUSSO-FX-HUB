@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "packages": [
+    {
+      "id": "fx-shell",
+      "detector": "bundled-shell-sha256",
+      "effectIds": [
+        "sidechain-x",
+        "reverse-fx",
+        "stutter-fx"
+      ]
+    }
+  ]
+}

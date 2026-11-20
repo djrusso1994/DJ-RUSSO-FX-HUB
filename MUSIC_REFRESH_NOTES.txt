@@ -1,0 +1,1 @@
+40 distinct generated compositions, 8 musical families, 16 kHz mono PCM WAV + editable multi-track MIDI. Original procedural pieces; not based on copyrighted melodies. Length and instrumentation differ by track. Audio is pre-rendered for low CPU playback. Verify Windows MediaPlayer playback and volume in Release.

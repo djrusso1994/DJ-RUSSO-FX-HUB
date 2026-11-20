@@ -1,0 +1,10 @@
+DJ RUSSO FX HUB v0.7.4 - FIRMA AUTOMATICA GRATUITA
+
+Compila in Visual Studio con Release / x64 (Ctrl+Maiusc+B).
+Dopo una compilazione riuscita, MSBuild avvia automaticamente PowerShell e crea/riutilizza un certificato personale in Cert:\CurrentUser\My, CN=Giuseppe Russo - DJ RUSSO.
+La firma e applicata all EXE DJRussoFXHub.exe e alla copia Release di DJ RUSSO METER X.exe, senza modificare il payload sorgente.
+Non devi avviare alcun file CMD. La firma avviene solo in Release su Windows.
+Per la verifica, in PowerShell: Get-AuthenticodeSignature -FilePath "PERCORSO\DJRussoFXHub.exe"
+NOTA: certificato autofirmato non riconosciuto automaticamente su altri PC. SmartScreen puo ancora avvisare.
+La chiave privata non viene distribuita nello ZIP.
+La firma non e stata testata su Windows in questo ambiente.

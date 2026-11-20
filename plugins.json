@@ -1,0 +1,86 @@
+[
+  {
+    "id": "sidechain-x",
+    "name": "SIDECHAIN X",
+    "category": "Dynamics",
+    "status": "Ready for testing"
+  },
+  {
+    "id": "reverse-fx",
+    "name": "REVERSE FX",
+    "category": "Creative FX",
+    "status": "Ready for testing"
+  },
+  {
+    "id": "stutter-fx",
+    "name": "STUTTER FX",
+    "category": "Creative FX",
+    "status": "Ready for testing"
+  },
+  {
+    "id": "meter-x",
+    "name": "METER X",
+    "category": "Analysis",
+    "status": "Planned"
+  },
+  {
+    "id": "auto-master-x",
+    "name": "AUTO MASTER X",
+    "category": "Mastering",
+    "status": "Planned"
+  },
+  {
+    "id": "compressor-x",
+    "name": "COMPRESSOR X",
+    "category": "Dynamics",
+    "status": "Planned"
+  },
+  {
+    "id": "pitch-x",
+    "name": "PITCH X",
+    "category": "Vocal",
+    "status": "Planned"
+  },
+  {
+    "id": "eq-x",
+    "name": "EQ X",
+    "category": "EQ",
+    "status": "Planned"
+  },
+  {
+    "id": "reverb-x",
+    "name": "REVERB X",
+    "category": "Spatial",
+    "status": "Planned"
+  },
+  {
+    "id": "delay-x",
+    "name": "DELAY X",
+    "category": "Spatial",
+    "status": "Planned"
+  },
+  {
+    "id": "drive-x",
+    "name": "DRIVE X",
+    "category": "Saturation",
+    "status": "Planned"
+  },
+  {
+    "id": "stereo-x",
+    "name": "STEREO X",
+    "category": "Spatial",
+    "status": "Planned"
+  },
+  {
+    "id": "transient-x",
+    "name": "TRANSIENT X",
+    "category": "Dynamics",
+    "status": "Planned"
+  },
+  {
+    "id": "vocal-remover-x",
+    "name": "VOCAL REMOVER X",
+    "category": "AI Offline",
+    "status": "Planned"
+  }
+]

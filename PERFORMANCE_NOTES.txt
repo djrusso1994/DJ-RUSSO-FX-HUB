@@ -1,0 +1,7 @@
+v0.8.0 PERFORMANCE PATCH
+- Shared frozen BitmapImage cache with decoded width 360 for catalog icons.
+- Search debounce 250ms to avoid repeated disk verification and WPF list rebuild per keystroke.
+- Search timer disposed on window close.
+- No changes to VST3 payload, installation logic, product manifest, or DSP.
+- Requires Windows Visual Studio Release x64 build and real CPU/RAM profiling.
+- Further optimizations (async file verification, virtualization) need profiling and separate regression testing.

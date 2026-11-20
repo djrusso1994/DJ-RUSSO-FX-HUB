@@ -1,0 +1,1 @@
+FIX3 startup-safe isolation: removed custom ComboBox ControlTemplate and replaced social vector Path markup with lightweight local PNG icons. Preserved URLs, tooltip, layout, music and plugins. This is a diagnostic stability patch: icons are temporary and not official vectors. XML verified; Windows startup not tested.
