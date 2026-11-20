@@ -1,0 +1,48 @@
+name: DJ RUSSO FX HUB - Windows Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.cs'
+      - '**/*.xaml'
+      - '**/*.csproj'
+      - '**/*.sln'
+      - '**/*.slnx'
+      - '.github/workflows/main.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Find and publish FX HUB
+        shell: pwsh
+        run: |
+          $project = Get-ChildItem -Path . -Recurse -Filter DJRussoFXHub.csproj | Select-Object -First 1
+          if (-not $project) { throw "DJRussoFXHub.csproj not found. Upload the project source files first." }
+          dotnet publish $project.FullName -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableWindowsTargeting=true -o "$env:GITHUB_WORKSPACE/publish"
+          if ($LASTEXITCODE -ne 0) { throw "Publish failed." }
+
+      - name: Create ZIP
+        shell: pwsh
+        run: |
+          Compress-Archive -Path publish/* -DestinationPath DJ_RUSSO_FX_HUB_Windows_x64.zip -Force
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DJ_RUSSO_FX_HUB_Windows_x64
+          path: DJ_RUSSO_FX_HUB_Windows_x64.zip
