@@ -103,6 +103,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      actions: read
     steps:
       - name: Checkout release source
         uses: actions/checkout@v5
@@ -125,10 +126,17 @@ jobs:
           echo "Publishing a preview on push, or approved stable release on manual dispatch, for v$VERSION"
 
       - name: Download tested installer
-        uses: actions/download-artifact@v6
-        with:
-          name: DJ_RUSSO_FX_HUB_Setup_v${{ steps.version.outputs.value }}
-          path: release-assets
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.version.outputs.value }}
+          RUN_ID: ${{ github.run_id }}
+        run: |
+          mkdir -p release-assets
+          gh run download "$RUN_ID" \
+            --repo "$GITHUB_REPOSITORY" \
+            --name "DJ_RUSSO_FX_HUB_Setup_v$VERSION" \
+            --dir release-assets
 
       - name: Verify installer before publishing
         shell: bash
