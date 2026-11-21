@@ -179,6 +179,10 @@ public partial class MainWindow : Window
          if (ProductFilter.Items[i] is ComboBoxItem filterItem)
              filterItem.Content = filterLabels[Index][i];
 
+     SecurityHeading.Text=new[]{"Security & authenticity","Sicurezza e autenticità","Seguridad y autenticidad","Sécurité et authenticité","Sicherheit und Authentizität"}[Index];
+     SecurityExplanation.Text=new[]{"Official GitHub releases. SHA-256 checks file integrity, not malware safety. VirusTotal may have no report.","Release ufficiali GitHub. SHA-256 verifica l'integrità, non l'assenza di malware. VirusTotal potrebbe non avere un rapporto.","Versiones oficiales de GitHub. SHA-256 comprueba la integridad, no la ausencia de malware. Puede que VirusTotal no tenga informe.","Versions officielles GitHub. SHA-256 vérifie l'intégrité, pas l'absence de logiciels malveillants. Le rapport VirusTotal peut être absent.","Offizielle GitHub-Releases. SHA-256 prüft die Integrität, nicht die Malware-Freiheit. Ein VirusTotal-Bericht ist eventuell nicht verfügbar."}[Index];
+     VirusTotalReportButton.Content=new[]{"View installer on VirusTotal","Cerca installer su VirusTotal","Ver instalador en VirusTotal","Voir sur VirusTotal","Installer auf VirusTotal prüfen"}[Index];
+     CopyInstallerHashButton.Content=new[]{"Copy SHA-256","Copia SHA-256","Copiar SHA-256","Copier SHA-256","SHA-256 kopieren"}[Index];
      SourceText.Text=T("source");Subtitle.Text=T("subtitle");
      UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
      ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
@@ -1036,9 +1040,20 @@ public partial class MainWindow : Window
  }
 
  // No upload and no API key: look up the SHA-256 digest published by GitHub for this release's installer.
+ private string? verifiedInstallerSha256;
+ private void CopyInstallerHash_Click(object sender,RoutedEventArgs e)
+ {
+   if(verifiedInstallerSha256 is null)return;
+   try{
+     Clipboard.SetText(verifiedInstallerSha256);
+     SecurityStatus.Text="SHA-256: "+verifiedInstallerSha256+" • "+new[]{"Copied","Copiato","Copiado","Copié","Kopiert"}[Index];
+   }catch(Exception ex){SecurityStatus.Text=ex.Message;}
+ }
  private async void VirusTotalReport_Click(object sender,RoutedEventArgs e)
  {
   VirusTotalReportButton.IsEnabled=false;
+  verifiedInstallerSha256=null;
+  CopyInstallerHashButton.IsEnabled=false;
   SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
   try{
    var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.22";
@@ -1059,6 +1074,8 @@ public partial class MainWindow : Window
     SecurityStatus.Text=Index==1?"Impronta SHA-256 non disponibile nei metadati GitHub per questa versione. Nessuna scansione eseguita.":"SHA-256 digest is not available in GitHub metadata for this version. No scan performed.";
     return;
    }
+   verifiedInstallerSha256=digest;
+   CopyInstallerHashButton.IsEnabled=true;
    SecurityStatus.Text="SHA-256: "+digest+" — "+(Index==1?"Apertura ricerca VirusTotal (risultato non garantito).":"Opening VirusTotal lookup (a report may not exist).");
    Process.Start(new ProcessStartInfo("https://www.virustotal.com/gui/file/"+digest+"/detection"){UseShellExecute=true});
   }catch(Exception ex){
