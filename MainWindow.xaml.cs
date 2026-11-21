@@ -118,7 +118,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.12";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.12";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  private void Header_MouseLeftButtonDown(object sender,System.Windows.Input.MouseButtonEventArgs e){
    if(e.ChangedButton!=System.Windows.Input.MouseButton.Left)return;
    // Never drag from a control: window buttons retain their own click handling.
@@ -130,6 +130,49 @@ public partial class MainWindow : Window
    }
    if(e.ClickCount==2){ToggleWindowMaximized();e.Handled=true;return;}
    try{DragMove();}catch(System.InvalidOperationException){}
+ }
+ // Keep a borderless maximized window inside the current monitor's working area
+ // (taskbar excluded), including on multi-monitor and mixed-DPI systems.
+ [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+ private struct NativePoint { public int X,Y; }
+ [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+ private struct NativeRect { public int Left,Top,Right,Bottom; }
+ [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential)]
+ private struct NativeMinMaxInfo {
+   public NativePoint Reserved,MaxSize,MaxPosition,MinTrackSize,MaxTrackSize;
+ }
+ [System.Runtime.InteropServices.StructLayout(System.Runtime.InteropServices.LayoutKind.Sequential,CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+ private struct NativeMonitorInfo {
+   public int Size;
+   public NativeRect Monitor,Work;
+   public uint Flags;
+ }
+ [System.Runtime.InteropServices.DllImport("user32.dll")]
+ private static extern IntPtr MonitorFromWindow(IntPtr hwnd,uint flags);
+ [System.Runtime.InteropServices.DllImport("user32.dll",CharSet=System.Runtime.InteropServices.CharSet.Auto)]
+ [return:System.Runtime.InteropServices.MarshalAs(System.Runtime.InteropServices.UnmanagedType.Bool)]
+ private static extern bool GetMonitorInfo(IntPtr monitor,ref NativeMonitorInfo info);
+ private void ConfigureMaximizedWorkArea(){
+   SourceInitialized+=(_,_)=>{
+     if(System.Windows.Interop.HwndSource.FromHwnd(new System.Windows.Interop.WindowInteropHelper(this).Handle) is { } source)
+       source.AddHook(MaximizeWorkAreaHook);
+   };
+ }
+ private IntPtr MaximizeWorkAreaHook(IntPtr hwnd,int message,IntPtr wParam,IntPtr lParam,ref bool handled){
+   const int WM_GETMINMAXINFO=0x0024;
+   if(message!=WM_GETMINMAXINFO)return IntPtr.Zero;
+   var monitor=MonitorFromWindow(hwnd,2);
+   if(monitor==IntPtr.Zero)return IntPtr.Zero;
+   var info=new NativeMonitorInfo{Size=System.Runtime.InteropServices.Marshal.SizeOf<NativeMonitorInfo>()};
+   if(!GetMonitorInfo(monitor,ref info))return IntPtr.Zero;
+   var limits=System.Runtime.InteropServices.Marshal.PtrToStructure<NativeMinMaxInfo>(lParam);
+   limits.MaxPosition.X=Math.Abs(info.Work.Left-info.Monitor.Left);
+   limits.MaxPosition.Y=Math.Abs(info.Work.Top-info.Monitor.Top);
+   limits.MaxSize.X=info.Work.Right-info.Work.Left;
+   limits.MaxSize.Y=info.Work.Bottom-info.Work.Top;
+   System.Runtime.InteropServices.Marshal.StructureToPtr(limits,lParam,false);
+   handled=true;
+   return IntPtr.Zero;
  }
  private void ToggleWindowMaximized(){
    WindowState=WindowState==WindowState.Maximized?WindowState.Normal:WindowState.Maximized;
