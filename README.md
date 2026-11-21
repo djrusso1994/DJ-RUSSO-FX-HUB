@@ -62,20 +62,24 @@ The FX HUB itself is a Windows application, **not a VST3 plugin**.
 - FX SHELL contains three effects in **one shared VST3 file**. Do not manually split or duplicate it.
 - Installation may require Windows administrator permission.
 - Always back up important projects and plugins before testing.
-- The update checker **notifies and opens GitHub Releases**; it does not silently download or install software.
+- The HUB checks official GitHub Releases for updates. When a compatible installer includes a SHA-256 digest, it can offer a user-confirmed download, integrity check and installer launch; otherwise it opens the release in the browser. Updates are never installed silently.
 - The source project builds the HUB and bundles precompiled payloads. It does **not** build the JUCE audio DSP.
 
 ## Development and release process
 
-Changes to the `main` branch trigger a Windows test build through GitHub Actions. **Public stable releases require approval after testing.** Build artifacts and public Releases are separate download channels.
+The latest published version is displayed automatically by the release badge at the top of this page. See [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) for the current installer, release notes and whether a release is marked as a pre-release.
 
-### Current changes under test (v0.8.15)
+GitHub Actions builds the Windows application from source. A successful build verifies compilation, **not** correct behavior on every Windows PC. Stable releases require approval after Windows testing. GitHub Actions artifacts and published GitHub Releases are separate download channels.
 
-- Correct GitHub update checking when only pre-releases exist (fixes the 404 response).
-- Fit long product titles inside the right-side details panel, including Vocal Remover X.
-- Refresh documentation and prepare the visual gallery.
+### Update and security behavior
 
-These changes have been committed to source; successful compilation and Windows behavior must still be verified.
+- **HUB updates:** check official releases, offer guided installer download when supported, verify the published SHA-256 digest and request confirmation before launch.
+- **VirusTotal:** provide a link to the report for the exact published installer digest when available; this does not upload files or guarantee that a build is malware-free.
+- **Installed tools:** detect supported VST3 installations and distinguish managed files from conflicting or modified installations where verification is available.
+- **Diagnostics and backups:** offer local diagnostic and backup utilities.
+- **Plugin updates:** automatic VST3 plugin updates are not yet implemented. Do not confuse HUB application updates with plugin updates.
+
+The development branch may contain unreleased changes. For confirmed downloads and release-specific details, always refer to the [published release notes](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases).
 
 ## Build from source
 
@@ -88,7 +92,3 @@ Open `DJRussoFXHub.slnx` with Visual Studio 2022 or later and the **.NET desktop
 **Created by DJ RUSSO** · [Official downloads](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases)
 
 </div>
-
-### Guided HUB updates (v0.8.15 test build)
-
-When a newer official GitHub Release includes an installer with a published SHA-256 digest, the HUB can offer to download, verify and launch the installer. Installation requires user confirmation and may request Windows administrator permission. Older releases without a digest open in the browser instead. Plugin auto-updates are **not** yet implemented. Test on Windows before publishing as stable.
