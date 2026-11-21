@@ -246,6 +246,14 @@
       <ComboBoxItem><StackPanel Orientation="Horizontal"><TextBlock Text="☾" Foreground="#89B9F9" FontSize="18" Width="27"/><TextBlock x:Name="ThemeDarkText" Text="Dark Professional" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center"/></StackPanel></ComboBoxItem>
       <ComboBoxItem><StackPanel Orientation="Horizontal"><TextBlock Text="☀" Foreground="#D69B1D" FontSize="18" Width="27"/><TextBlock x:Name="ThemeLightText" Text="Light Modern" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center"/></StackPanel></ComboBoxItem>
     </ComboBox></WrapPanel>
+    <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
+     <StackPanel>
+      <TextBlock x:Name="SecurityHeading" Text="Security &amp; authenticity" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource SecondaryBrush}"/>
+      <TextBlock x:Name="SecurityExplanation" Text="Official GitHub releases. SHA-256 verifies file integrity, not malware safety. VirusTotal reports are independent and may not exist for every version." TextWrapping="Wrap" Margin="0,7,0,10" Foreground="{DynamicResource FgBrush}" FontSize="12"/>
+      <Button x:Name="VirusTotalReportButton" Content="View installer on VirusTotal" Click="VirusTotalReport_Click" HorizontalAlignment="Left" MinWidth="210" Height="34" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" BorderThickness="1" Style="{StaticResource WindowControlButton}"/>
+      <TextBlock x:Name="SecurityStatus" Text="" Margin="0,8,0,0" TextWrapping="Wrap" Foreground="{DynamicResource SecondaryBrush}" FontSize="11"/>
+     </StackPanel>
+    </Border>
   </Border>
 
    <TextBlock x:Name="SourceText" Foreground="{DynamicResource InfoBrush}" Margin="0,0,0,3"/>
