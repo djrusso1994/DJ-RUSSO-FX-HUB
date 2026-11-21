@@ -65,7 +65,28 @@ internal static class ShellInstaller
         catch { return false; }
     }
 
+    // UI-only short-lived cache. Never used for elevated install/remove security checks.
+    private static readonly object StateCacheLock = new();
+    private static State? cachedState;
+    private static DateTime cachedAtUtc;
     public static State GetState()
+    {
+        lock (StateCacheLock)
+        {
+            if (cachedState.HasValue && DateTime.UtcNow - cachedAtUtc < TimeSpan.FromSeconds(3))
+                return cachedState.Value;
+            var state = GetStateUncached();
+            cachedState = state;
+            cachedAtUtc = DateTime.UtcNow;
+            return state;
+        }
+    }
+    public static void InvalidateStateCache()
+    {
+        lock (StateCacheLock) cachedState = null;
+    }
+
+    private static State GetStateUncached()
     {
         if (Directory.Exists(InstalledPath)) return State.Conflict;
         bool wasManaged = IsManagedReceipt();
@@ -78,6 +99,7 @@ internal static class ShellInstaller
 
     public static void SaveReceipt()
     {
+        InvalidateStateCache();
         if (Sha256OrNull(InstalledPath) != ExpectedSha256)
             throw new IOException("The installed VST3 does not match the expected SHA-256.");
         Directory.CreateDirectory(Path.GetDirectoryName(ReceiptPath)!);
@@ -88,6 +110,7 @@ internal static class ShellInstaller
 
     public static void DeleteReceipt()
     {
+        InvalidateStateCache();
         if (File.Exists(ReceiptPath)) File.Delete(ReceiptPath);
     }
 
