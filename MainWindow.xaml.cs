@@ -119,6 +119,25 @@ public partial class MainWindow : Window
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
  public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.12";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ private void Header_MouseLeftButtonDown(object sender,System.Windows.Input.MouseButtonEventArgs e){
+   if(e.ChangedButton!=System.Windows.Input.MouseButton.Left)return;
+   // Never drag from a control: window buttons retain their own click handling.
+   if(e.OriginalSource is System.Windows.DependencyObject origin){
+     for(var element=origin;element!=null;element=System.Windows.Media.VisualTreeHelper.GetParent(element)){
+       if(element is Button || element is System.Windows.Controls.Primitives.ButtonBase)return;
+       if(ReferenceEquals(element,sender))break;
+     }
+   }
+   if(e.ClickCount==2){ToggleWindowMaximized();e.Handled=true;return;}
+   try{DragMove();}catch(System.InvalidOperationException){}
+ }
+ private void ToggleWindowMaximized(){
+   WindowState=WindowState==WindowState.Maximized?WindowState.Normal:WindowState.Maximized;
+   MaximizeWindowButton.Content=WindowState==WindowState.Maximized?"❐":"□";
+ }
+ private void MinimizeWindow_Click(object sender,RoutedEventArgs e)=>WindowState=WindowState.Minimized;
+ private void MaximizeWindow_Click(object sender,RoutedEventArgs e)=>ToggleWindowMaximized();
+ private void CloseWindow_Click(object sender,RoutedEventArgs e)=>Close();
  private void Social_Click(object sender,RoutedEventArgs e){if(sender is Button b && b.Tag is string url){try{Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}catch(Exception ex){MessageBox.Show(ex.Message,"DJ RUSSO FX HUB");}}}
  private void LoadPlugins(){try {var path=Path.Combine(AppContext.BaseDirectory,"plugins.json");plugins=JsonSerializer.Deserialize<List<PluginInfo>>(File.ReadAllText(path),new JsonSerializerOptions{PropertyNameCaseInsensitive=true})??new();}catch(Exception ex){StatusText.Text=ex.Message;}}
  // Frozen, shared WPF bitmaps avoid repeated decoding and per-card allocations.
@@ -370,7 +389,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.21");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.22");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
