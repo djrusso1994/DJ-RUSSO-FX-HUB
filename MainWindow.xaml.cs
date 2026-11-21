@@ -444,7 +444,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.27");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.28");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -1039,24 +1039,55 @@ public partial class MainWindow : Window
    Title=T("guide")+" — "+this.Title,
    Owner=this,Width=780,Height=610,MinWidth=520,MinHeight=350,
    WindowStartupLocation=WindowStartupLocation.CenterOwner,
-   Background=(Brush)FindResource("BgBrush"),Foreground=(Brush)FindResource("FgBrush")
+   WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.CanResize,
+   Background=(Brush)FindResource("BgBrush"),Foreground=(Brush)FindResource("FgBrush"),
+   ShowInTaskbar=false
   };
+  var frame=new Border {
+   BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1.5),
+   Background=(Brush)FindResource("BgBrush"),CornerRadius=new CornerRadius(9)
+  };
+  var root=new DockPanel();
+  var titleBar=new Grid {Height=48,Background=(Brush)FindResource("SidebarBrush")};
+  titleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+  titleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+  var title=new TextBlock {Text="DJ RUSSO FX HUB  •  "+T("guide"),FontSize=13,
+   FontWeight=FontWeights.Bold,Foreground=(Brush)FindResource("SecondaryBrush"),
+   VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(18,0,8,0)};
+  titleBar.Children.Add(title);
+  var close=new Button {Content="✕",Width=42,Height=34,Margin=new Thickness(0,0,9,0),
+   FontSize=16,FontWeight=FontWeights.Bold,Cursor=System.Windows.Input.Cursors.Hand,
+   Foreground=(Brush)FindResource("FgBrush"),Background=(Brush)FindResource("PanelBrush"),
+   BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1),
+   VerticalAlignment=VerticalAlignment.Center};
+  Grid.SetColumn(close,1);titleBar.Children.Add(close);
+  close.Click+=(_,_)=>dialog.Close();
+  titleBar.MouseLeftButtonDown+=(_,e)=>{
+   if(e.OriginalSource is System.Windows.DependencyObject origin){
+    for(var current=origin;current!=null;current=System.Windows.Media.VisualTreeHelper.GetParent(current)){
+     if(current is Button)return;
+     if(ReferenceEquals(current,titleBar))break;
+    }
+   }
+   if(e.ClickCount==2){dialog.WindowState=dialog.WindowState==WindowState.Maximized?WindowState.Normal:WindowState.Maximized;return;}
+   try{dialog.DragMove();}catch{}
+  };
+  DockPanel.SetDock(titleBar,Dock.Top);root.Children.Add(titleBar);
   var layout=new DockPanel {Margin=new Thickness(18)};
   var header=new TextBlock {Text=T("guide"),FontSize=21,FontWeight=FontWeights.Bold,
-    Foreground=(Brush)FindResource("SecondaryBrush"),Margin=new Thickness(0,0,0,12)};
+   Foreground=(Brush)FindResource("SecondaryBrush"),Margin=new Thickness(0,0,0,12)};
   DockPanel.SetDock(header,Dock.Top);layout.Children.Add(header);
   var content=new TextBox {
-    Text=GuideTexts[Index],IsReadOnly=true,TextWrapping=TextWrapping.Wrap,
-    VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
-    HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
-    Background=(Brush)FindResource("PanelBrush"),
-    Foreground=(Brush)FindResource("FgBrush"),
-    BorderBrush=(Brush)FindResource("AccentBrush"),
-    FontFamily=new FontFamily("Segoe UI"),FontSize=14,
-    Padding=new Thickness(14)
+   Text=GuideTexts[Index],IsReadOnly=true,TextWrapping=TextWrapping.Wrap,
+   VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
+   HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
+   Background=(Brush)FindResource("PanelBrush"),
+   Foreground=(Brush)FindResource("FgBrush"),
+   BorderBrush=(Brush)FindResource("AccentBrush"),
+   FontFamily=new FontFamily("Segoe UI"),FontSize=14,
+   Padding=new Thickness(14)
   };
-  layout.Children.Add(content);dialog.Content=layout;
-  // Reuse the selected language and theme at the moment the guide opens.
+  layout.Children.Add(content);root.Children.Add(layout);frame.Child=root;dialog.Content=frame;
   dialog.ShowDialog();
  }
 
