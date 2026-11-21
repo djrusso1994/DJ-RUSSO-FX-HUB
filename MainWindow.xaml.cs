@@ -370,7 +370,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.18");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.19");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -464,12 +464,16 @@ public partial class MainWindow : Window
          var buffer=new byte[81920];
          long received=0;
          var timer=System.Diagnostics.Stopwatch.StartNew();
+         long lastUiUpdateMs=-250;
          int count;
          while((count=await source.ReadAsync(buffer.AsMemory(0,buffer.Length),downloadCancel.Token))>0){
            await target.WriteAsync(buffer.AsMemory(0,count),downloadCancel.Token);
            received+=count;
            var mb=received/1048576.0;
            var speed=timer.Elapsed.TotalSeconds>0?mb/timer.Elapsed.TotalSeconds:0;
+           // Limit WPF updates to ~4 per second instead of refreshing on every 80 KB chunk.
+           if(timer.ElapsedMilliseconds-lastUiUpdateMs<250 && (!total.HasValue || received<total.Value))continue;
+           lastUiUpdateMs=timer.ElapsedMilliseconds;
            if(total.HasValue && total.Value>0){
              var percent=Math.Min(100,received*100.0/total.Value);
              progressBar.Value=percent;
@@ -505,7 +509,8 @@ public partial class MainWindow : Window
        try{if(File.Exists(partial))File.Delete(partial);}catch{}
        MessageBox.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
      }finally{
-       progressWindow.Closing+=(_,__)=>{};
+       // Allow programmatic closure after cancellation, error, or successful installation.
+       cancelButton.IsEnabled=false;
        progressWindow.Close();
        hubUpdateInProgress=false;
        UpdatesButton.IsEnabled=true;
