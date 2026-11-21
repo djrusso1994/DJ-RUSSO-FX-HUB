@@ -477,12 +477,12 @@ public partial class MainWindow : Window
      var partial=installer+".download";
      using var downloadCancel=new System.Threading.CancellationTokenSource();
      var progressWindow=new Window{
-       Title="DJ RUSSO FX HUB • UPDATE",Width=490,Height=220,
+       Title="DJ RUSSO FX HUB • UPDATE",Width=490,MinWidth=440,Height=260,MinHeight=250,SizeToContent=SizeToContent.Height,
        WindowStartupLocation=WindowStartupLocation.CenterOwner,Owner=this,
        ResizeMode=ResizeMode.NoResize,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
        Foreground=System.Windows.Media.Brushes.White,ShowInTaskbar=false
      };
-     var progressLayout=new StackPanel{Margin=new Thickness(24)};
+     var progressLayout=new StackPanel{Margin=new Thickness(24,20,24,24)};
      var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
      var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
      var progressBar=new System.Windows.Controls.ProgressBar{Height=14,Minimum=0,Maximum=100,IsIndeterminate=true,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246))};
@@ -491,7 +491,7 @@ public partial class MainWindow : Window
      progressLayout.Children.Add(progressStatus);
      progressLayout.Children.Add(progressBar);
      progressLayout.Children.Add(progressDetails);
-     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",Width=112,Height=34,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,14,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
+     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",MinWidth=124,MinHeight=40,Padding=new Thickness(14,8,14,8),HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,18,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
      // Explicit template prevents the default Windows button theme from hiding the label.
      var cancelBorderFactory=new FrameworkElementFactory(typeof(Border));
      cancelBorderFactory.SetValue(Border.BackgroundProperty,new System.Windows.TemplateBindingExtension(Button.BackgroundProperty));
