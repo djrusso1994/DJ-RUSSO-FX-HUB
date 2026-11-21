@@ -1022,6 +1022,36 @@ public partial class MainWindow : Window
   dialog.ShowDialog();
  }
 
+ // No upload and no API key: look up the SHA-256 digest published by GitHub for this release's installer.
+ private async void VirusTotalReport_Click(object sender,RoutedEventArgs e)
+ {
+  VirusTotalReportButton.IsEnabled=false;
+  SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
+  try{
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.22";
+   using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
+   response.EnsureSuccessStatusCode();
+   using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+   string? digest=null;
+   foreach(var asset in document.RootElement.GetProperty("assets").EnumerateArray()){
+    var name=asset.GetProperty("name").GetString()??"";
+    if(!name.Equals("DJ_RUSSO_FX_HUB_Setup_v"+current+".exe",StringComparison.OrdinalIgnoreCase))continue;
+    if(asset.TryGetProperty("digest",out var value) && value.ValueKind==JsonValueKind.String){
+     var raw=value.GetString()??"";
+     if(raw.StartsWith("sha256:",StringComparison.OrdinalIgnoreCase))digest=raw.Substring(7);
+    }
+    break;
+   }
+   if(digest==null || digest.Length!=64 || !digest.All(Uri.IsHexDigit)){
+    SecurityStatus.Text=Index==1?"Impronta SHA-256 non disponibile nei metadati GitHub per questa versione. Nessuna scansione eseguita.":"SHA-256 digest is not available in GitHub metadata for this version. No scan performed.";
+    return;
+   }
+   SecurityStatus.Text="SHA-256: "+digest+" — "+(Index==1?"Apertura ricerca VirusTotal (risultato non garantito).":"Opening VirusTotal lookup (a report may not exist).");
+   Process.Start(new ProcessStartInfo("https://www.virustotal.com/gui/file/"+digest+"/detection"){UseShellExecute=true});
+  }catch(Exception ex){
+   SecurityStatus.Text=(Index==1?"Impossibile aprire il rapporto: ":"Unable to open report: ")+ex.Message;
+  }finally{VirusTotalReportButton.IsEnabled=true;}
+ }
  // The button and settings panel always share the same current-view state.
  private void Settings_Click(object sender,RoutedEventArgs e)
  {
