@@ -447,7 +447,19 @@ public partial class MainWindow : Window
      progressLayout.Children.Add(progressStatus);
      progressLayout.Children.Add(progressBar);
      progressLayout.Children.Add(progressDetails);
-     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",Width=105,Height=31,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,14,0,0)};
+     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",Width=112,Height=34,HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,14,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
+     // Explicit template prevents the default Windows button theme from hiding the label.
+     var cancelBorderFactory=new FrameworkElementFactory(typeof(Border));
+     cancelBorderFactory.SetValue(Border.BackgroundProperty,new System.Windows.TemplateBindingExtension(Button.BackgroundProperty));
+     cancelBorderFactory.SetValue(Border.BorderBrushProperty,new System.Windows.TemplateBindingExtension(Button.BorderBrushProperty));
+     cancelBorderFactory.SetValue(Border.BorderThicknessProperty,new System.Windows.TemplateBindingExtension(Button.BorderThicknessProperty));
+     cancelBorderFactory.SetValue(Border.CornerRadiusProperty,new CornerRadius(7));
+     var cancelTextFactory=new FrameworkElementFactory(typeof(ContentPresenter));
+     cancelTextFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty,HorizontalAlignment.Center);
+     cancelTextFactory.SetValue(ContentPresenter.VerticalAlignmentProperty,VerticalAlignment.Center);
+     cancelTextFactory.SetValue(ContentPresenter.RecognizesAccessKeyProperty,true);
+     cancelBorderFactory.AppendChild(cancelTextFactory);
+     cancelButton.Template=new ControlTemplate(typeof(Button)){VisualTree=cancelBorderFactory};
      cancelButton.Click+=(_,__)=>{cancelButton.IsEnabled=false;downloadCancel.Cancel();};
      progressLayout.Children.Add(cancelButton);
      progressWindow.Content=progressLayout;
