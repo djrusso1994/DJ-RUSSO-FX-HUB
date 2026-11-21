@@ -9,7 +9,7 @@
 
 [**Download latest public version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) ![Status](https://img.shields.io/badge/v0.8.15-testing-BA68FF)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Latest release](https://img.shields.io/github/v/release/djrusso1994/DJ-RUSSO-FX-HUB?include_prereleases&label=Latest%20release&color=BA68FF)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases)
 
 </div>
 
@@ -53,7 +53,7 @@ The FX HUB itself is a Windows application, **not a VST3 plugin**.
 4. Close your DAW before installing or removing VST3 effects.
 5. Open FL Studio's Plugin Manager and rescan plugins after installation.
 
-**Current development build:** v0.8.15 — awaiting Windows testing. The newest public download may still be v0.8.13 until this build is approved.
+**Latest published build:** see [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases). The version badge above updates automatically when a new release is published, including prereleases.
 
 ## Compatibility and important notes
 
