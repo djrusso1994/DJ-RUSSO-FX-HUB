@@ -370,7 +370,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.20");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.21");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -684,7 +684,10 @@ public partial class MainWindow : Window
  private void SetChipPlaying(bool playing){ChipPauseIcon.Visibility=playing?Visibility.Visible:Visibility.Collapsed;ChipResumeIcon.Visibility=playing?Visibility.Collapsed:Visibility.Visible;}
  private void InitChipPlayer()
  {
-   waveTimer.Tick+=(_,_)=>UpdateMiniWave();waveTimer.Start();BuildMiniWave();
+   waveTimer.Tick+=(_,_)=>{if(WindowState!=WindowState.Minimized && IsVisible && !chipPaused)UpdateMiniWave();};
+   StateChanged+=(_,_)=>{if(WindowState==WindowState.Minimized)waveTimer.Stop();else if(IsVisible && !chipPaused)waveTimer.Start();};
+   IsVisibleChanged+=(_,_)=>{if(IsVisible && WindowState!=WindowState.Minimized && !chipPaused)waveTimer.Start();else waveTimer.Stop();};
+   waveTimer.Start();BuildMiniWave();
    chipPlayer.MediaEnded += (_,_)=>NextChip();
    chipPlayer.MediaFailed += (_,_)=>{chipTimer.Stop();SetChipPlaying(false);};
    chipTimer.Interval=TimeSpan.FromMinutes(5); // MediaEnded advances at actual file duration; timer is a fallback.
