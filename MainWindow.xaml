@@ -249,6 +249,13 @@
     </ComboBox></WrapPanel>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
+      <TextBlock Text="UPDATE WINDOW PREVIEW" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" FontSize="13"/>
+      <TextBlock Text="Test the Neon Ghost download window without downloading or installing files." Foreground="{DynamicResource FgBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10"/>
+      <Button x:Name="PreviewUpdateDialogButton" Content="PREVIEW DOWNLOAD WINDOW" Click="PreviewUpdateDialog_Click" HorizontalAlignment="Left" MinWidth="210" Height="36" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/>
+     </StackPanel>
+    </Border>
+    <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
+     <StackPanel>
       <TextBlock x:Name="SecurityHeading" Text="Security &amp; authenticity" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource SecondaryBrush}"/>
       <TextBlock x:Name="SecurityExplanation" Text="Official GitHub releases. SHA-256 verifies file integrity, not malware safety. VirusTotal reports are independent and may not exist for every version." TextWrapping="Wrap" Margin="0,7,0,10" Foreground="{DynamicResource FgBrush}" FontSize="12"/>
       <StackPanel Orientation="Horizontal"><Button x:Name="VirusTotalReportButton" Content="View installer on VirusTotal" Click="VirusTotalReport_Click" HorizontalAlignment="Left" MinWidth="210" Height="34" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" BorderThickness="1" Style="{StaticResource WindowControlButton}"/><Button x:Name="CopyInstallerHashButton" Content="Copy SHA-256" Click="CopyInstallerHash_Click" Margin="8,0,0,0" Padding="10,5" Height="34" IsEnabled="False" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/></StackPanel>
