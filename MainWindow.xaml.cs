@@ -399,7 +399,8 @@ public partial class MainWindow : Window
    const string releasesUrl="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases";
    if(hubUpdateInProgress)return;
    try{
-     using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases?per_page=30");
+     using var metadataTimeout=new System.Threading.CancellationTokenSource(TimeSpan.FromSeconds(15));
+     using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases?per_page=30",metadataTimeout.Token);
      response.EnsureSuccessStatusCode();
      using var doc=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
      JsonElement root=default;
@@ -416,7 +417,19 @@ public partial class MainWindow : Window
      if(!page.StartsWith(releasesUrl,StringComparison.OrdinalIgnoreCase))page=releasesUrl;
      var current=typeof(MainWindow).Assembly.GetName().Version??new Version(0,8,15);
      if(!Version.TryParse(tag.TrimStart('v','V'),out var available))return;
-     if(available<=current){if(interactive)MessageBox.Show(this,Index==1?"Hai già l'ultima versione pubblicata su GitHub.":"You already have the latest GitHub release.","DJ RUSSO FX HUB");return;}
+     if(available<=current){
+       if(interactive){
+         string[] upToDateMessages={
+           "DJ RUSSO FX HUB is up to date. Installed version: v"+current.ToString(3)+".",
+           "DJ RUSSO FX HUB è aggiornato. Versione installata: v"+current.ToString(3)+".",
+           "DJ RUSSO FX HUB está actualizado. Versión instalada: v"+current.ToString(3)+".",
+           "DJ RUSSO FX HUB est à jour. Version installée : v"+current.ToString(3)+".",
+           "DJ RUSSO FX HUB ist aktuell. Installierte Version: v"+current.ToString(3)+"."
+         };
+         MessageBox.Show(this,upToDateMessages[Index],"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+       }
+       return;
+     }
      var expectedName="DJ_RUSSO_FX_HUB_Setup_v"+available.ToString(3)+".exe";
      string? assetUrl=null,sha256=null;
      if(root.TryGetProperty("assets",out var assets)){
