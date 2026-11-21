@@ -395,7 +395,7 @@ public partial class MainWindow : Window
   }).ToArray();
   var detectionHeading=new[]{"Standalone VST3 candidates (filename only)","Possibili VST3 indipendenti (solo nome file)","Posibles VST3 independientes (solo nombre)","VST3 indépendants possibles (nom uniquement)","Mögliche eigenständige VST3 (nur Dateiname)"}[Index];
   var detectionList=foundStandalone.Length==0?"—":string.Join(", ",foundStandalone);
-  var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{detectionHeading}: {detectionList}\\n\\n{T("diagReadOnly")}";
+  var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   MessageBox.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
