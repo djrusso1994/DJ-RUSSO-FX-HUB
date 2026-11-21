@@ -685,8 +685,8 @@ public partial class MainWindow : Window
  private void InitChipPlayer()
  {
    waveTimer.Tick+=(_,_)=>{if(WindowState!=WindowState.Minimized && IsVisible && !chipPaused)UpdateMiniWave();};
-   StateChanged+=(_,_)=>{if(WindowState==WindowState.Minimized)waveTimer.Stop();else if(IsVisible && !chipPaused)waveTimer.Start();};
-   IsVisibleChanged+=(_,_)=>{if(IsVisible && WindowState!=WindowState.Minimized && !chipPaused)waveTimer.Start();else waveTimer.Stop();};
+   StateChanged+=(_,_)=>{if(WindowState==WindowState.Minimized)waveTimer.Stop();else if(IsVisible)waveTimer.Start();};
+   IsVisibleChanged+=(_,_)=>{if(IsVisible && WindowState!=WindowState.Minimized)waveTimer.Start();else waveTimer.Stop();};
    waveTimer.Start();BuildMiniWave();
    chipPlayer.MediaEnded += (_,_)=>NextChip();
    chipPlayer.MediaFailed += (_,_)=>{chipTimer.Stop();SetChipPlaying(false);};
