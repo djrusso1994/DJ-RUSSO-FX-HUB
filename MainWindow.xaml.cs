@@ -519,58 +519,8 @@ public partial class MainWindow : Window
      var installer=Path.Combine(updateDir,expectedName);
      var partial=installer+".download";
      using var downloadCancel=new System.Threading.CancellationTokenSource();
-     var progressWindow=new Window{
-       Title="DJ RUSSO FX HUB • UPDATE",Width=490,MinWidth=440,SizeToContent=SizeToContent.Height,
-       WindowStartupLocation=WindowStartupLocation.CenterOwner,Owner=this,
-       WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.NoResize,
-       Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
-       Foreground=System.Windows.Media.Brushes.White,ShowInTaskbar=false
-     };
-     // Custom Neon Ghost title bar: no native white Windows title strip.
-     var progressRoot=new Border{
-       BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(142,89,229)),
-       BorderThickness=new Thickness(1.5),CornerRadius=new CornerRadius(10),
-       Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
-       SnapsToDevicePixels=true
-     };
-     var progressStack=new StackPanel();
-     var progressTitleBar=new Grid{Height=46,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(24,20,49))};
-     progressTitleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
-     progressTitleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
-     var progressTitleText=new TextBlock{Text="DJ RUSSO FX HUB  •  UPDATE",FontSize=12,FontWeight=FontWeights.SemiBold,
-       VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(20,0,0,0),
-       Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(125,239,255))};
-     progressTitleBar.Children.Add(progressTitleText);
-     progressTitleBar.MouseLeftButtonDown+=(_,e)=>{if(e.ClickCount==1)try{progressWindow.DragMove();}catch(InvalidOperationException){}};
-     progressStack.Children.Add(progressTitleBar);
-     var progressLayout=new StackPanel{Margin=new Thickness(24,18,24,24)};
-     var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
-     var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
-     var progressBar=new System.Windows.Controls.ProgressBar{Height=14,Minimum=0,Maximum=100,IsIndeterminate=true,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246))};
-     var progressDetails=new TextBlock{Text="",Margin=new Thickness(0,10,0,0),FontSize=12};
-     progressLayout.Children.Add(progressHeading);
-     progressLayout.Children.Add(progressStatus);
-     progressLayout.Children.Add(progressBar);
-     progressLayout.Children.Add(progressDetails);
-     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",MinWidth=124,MinHeight=40,Padding=new Thickness(14,8,14,8),HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,18,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
-     // Explicit template prevents the default Windows button theme from hiding the label.
-     var cancelBorderFactory=new FrameworkElementFactory(typeof(Border));
-     cancelBorderFactory.SetValue(Border.BackgroundProperty,new System.Windows.TemplateBindingExtension(Button.BackgroundProperty));
-     cancelBorderFactory.SetValue(Border.BorderBrushProperty,new System.Windows.TemplateBindingExtension(Button.BorderBrushProperty));
-     cancelBorderFactory.SetValue(Border.BorderThicknessProperty,new System.Windows.TemplateBindingExtension(Button.BorderThicknessProperty));
-     cancelBorderFactory.SetValue(Border.CornerRadiusProperty,new CornerRadius(7));
-     var cancelTextFactory=new FrameworkElementFactory(typeof(ContentPresenter));
-     cancelTextFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty,HorizontalAlignment.Center);
-     cancelTextFactory.SetValue(ContentPresenter.VerticalAlignmentProperty,VerticalAlignment.Center);
-     cancelTextFactory.SetValue(ContentPresenter.RecognizesAccessKeyProperty,true);
-     cancelBorderFactory.AppendChild(cancelTextFactory);
-     cancelButton.Template=new ControlTemplate(typeof(Button)){VisualTree=cancelBorderFactory};
-     cancelButton.Click+=(_,__)=>{cancelButton.IsEnabled=false;downloadCancel.Cancel();};
-     progressLayout.Children.Add(cancelButton);
-     progressStack.Children.Add(progressLayout);
-     progressRoot.Child=progressStack;
-     progressWindow.Content=progressRoot;
-     progressWindow.Closing+=(_,e)=>{if(!downloadCancel.IsCancellationRequested && cancelButton.IsEnabled){e.Cancel=true;downloadCancel.Cancel();cancelButton.IsEnabled=false;}};
+     var (progressWindow,progressStatus,progressBar,progressDetails,cancelButton)=CreateUpdateProgressDialog(
+       ()=>downloadCancel.Cancel(),()=>downloadCancel.IsCancellationRequested);
      progressWindow.Show();
      try{
        StatusText.Text=Index==1?"Download aggiornamento in corso...":"Downloading update...";
@@ -1152,6 +1102,72 @@ public partial class MainWindow : Window
   }catch(Exception ex){
    SecurityStatus.Text=(Index==1?"Impossibile aprire il rapporto: ":"Unable to open report: ")+ex.Message;
   }finally{VirusTotalReportButton.IsEnabled=true;}
+ }
+ private (Window window,TextBlock status,System.Windows.Controls.ProgressBar bar,TextBlock details,Button cancel) CreateUpdateProgressDialog(Action onCancel,Func<bool> isCancelled){
+     var progressWindow=new Window{
+       Title="DJ RUSSO FX HUB • UPDATE",Width=490,MinWidth=440,SizeToContent=SizeToContent.Height,
+       WindowStartupLocation=WindowStartupLocation.CenterOwner,Owner=this,
+       WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.NoResize,
+       Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
+       Foreground=System.Windows.Media.Brushes.White,ShowInTaskbar=false
+     };
+     // Custom Neon Ghost title bar: no native white Windows title strip.
+     var progressRoot=new Border{
+       BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(142,89,229)),
+       BorderThickness=new Thickness(1.5),CornerRadius=new CornerRadius(10),
+       Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
+       SnapsToDevicePixels=true
+     };
+     var progressStack=new StackPanel();
+     var progressTitleBar=new Grid{Height=46,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(24,20,49))};
+     progressTitleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+     progressTitleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+     var progressTitleText=new TextBlock{Text="DJ RUSSO FX HUB  •  UPDATE",FontSize=12,FontWeight=FontWeights.SemiBold,
+       VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(20,0,0,0),
+       Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(125,239,255))};
+     progressTitleBar.Children.Add(progressTitleText);
+     progressTitleBar.MouseLeftButtonDown+=(_,e)=>{if(e.ClickCount==1)try{progressWindow.DragMove();}catch(InvalidOperationException){}};
+     progressStack.Children.Add(progressTitleBar);
+     var progressLayout=new StackPanel{Margin=new Thickness(24,18,24,24)};
+     var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
+     var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
+     var progressBar=new System.Windows.Controls.ProgressBar{Height=14,Minimum=0,Maximum=100,IsIndeterminate=true,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246))};
+     var progressDetails=new TextBlock{Text="",Margin=new Thickness(0,10,0,0),FontSize=12};
+     progressLayout.Children.Add(progressHeading);
+     progressLayout.Children.Add(progressStatus);
+     progressLayout.Children.Add(progressBar);
+     progressLayout.Children.Add(progressDetails);
+     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",MinWidth=124,MinHeight=40,Padding=new Thickness(14,8,14,8),HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,18,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
+     // Explicit template prevents the default Windows button theme from hiding the label.
+     var cancelBorderFactory=new FrameworkElementFactory(typeof(Border));
+     cancelBorderFactory.SetValue(Border.BackgroundProperty,new System.Windows.TemplateBindingExtension(Button.BackgroundProperty));
+     cancelBorderFactory.SetValue(Border.BorderBrushProperty,new System.Windows.TemplateBindingExtension(Button.BorderBrushProperty));
+     cancelBorderFactory.SetValue(Border.BorderThicknessProperty,new System.Windows.TemplateBindingExtension(Button.BorderThicknessProperty));
+     cancelBorderFactory.SetValue(Border.CornerRadiusProperty,new CornerRadius(7));
+     var cancelTextFactory=new FrameworkElementFactory(typeof(ContentPresenter));
+     cancelTextFactory.SetValue(ContentPresenter.HorizontalAlignmentProperty,HorizontalAlignment.Center);
+     cancelTextFactory.SetValue(ContentPresenter.VerticalAlignmentProperty,VerticalAlignment.Center);
+     cancelTextFactory.SetValue(ContentPresenter.RecognizesAccessKeyProperty,true);
+     cancelBorderFactory.AppendChild(cancelTextFactory);
+     cancelButton.Template=new ControlTemplate(typeof(Button)){VisualTree=cancelBorderFactory};
+     cancelButton.Click+=(_,__)=>{cancelButton.IsEnabled=false;onCancel();};
+     progressLayout.Children.Add(cancelButton);
+     progressStack.Children.Add(progressLayout);
+     progressRoot.Child=progressStack;
+     progressWindow.Content=progressRoot;
+     progressWindow.Closing+=(_,e)=>{if(!!isCancelled() && cancelButton.IsEnabled){e.Cancel=true;onCancel();cancelButton.IsEnabled=false;}};
+     return (progressWindow,progressStatus,progressBar,progressDetails,cancelButton);
+ }
+ private void PreviewUpdateDialog_Click(object sender,RoutedEventArgs e){
+   bool cancelled=false;
+   var (window,status,bar,details,cancel)=CreateUpdateProgressDialog(()=>{cancelled=true;},()=>cancelled);
+   window.Title="DJ RUSSO FX HUB • PREVIEW";
+   status.Text=Index==1?"ANTEPRIMA — nessun download reale":"PREVIEW — no actual download";
+   bar.IsIndeterminate=false;
+   bar.Value=63;
+   details.Text=Index==1?"Simulazione: 63% • nessun file scaricato":"Simulation: 63% • no files downloaded";
+   cancel.Click+=(_,_)=>window.Close();
+   window.ShowDialog();
  }
  // The button and settings panel always share the same current-view state.
  private void Settings_Click(object sender,RoutedEventArgs e)
