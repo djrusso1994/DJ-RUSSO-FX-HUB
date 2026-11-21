@@ -1097,8 +1097,8 @@ public partial class MainWindow : Window
    }
    verifiedInstallerSha256=digest;
    CopyInstallerHashButton.IsEnabled=true;
-   SecurityStatus.Text="SHA-256: "+digest+" — "+(Index==1?"Apertura ricerca VirusTotal (risultato non garantito).":"Opening VirusTotal lookup (a report may not exist).");
-   Process.Start(new ProcessStartInfo("https://www.virustotal.com/gui/file/"+digest+"/detection"){UseShellExecute=true});
+   SecurityStatus.Text="SHA-256: "+digest+" — "+(Index==1?"VirusTotal: carica manualmente l’installer per analizzarlo. Nessun file viene inviato automaticamente.":"VirusTotal: manually upload the installer to scan it. No file is uploaded automatically.");
+   Process.Start(new ProcessStartInfo("https://www.virustotal.com/gui/home/upload"){UseShellExecute=true});
   }catch(Exception ex){
    SecurityStatus.Text=(Index==1?"Impossibile aprire il rapporto: ":"Unable to open report: ")+ex.Message;
   }finally{VirusTotalReportButton.IsEnabled=true;}
