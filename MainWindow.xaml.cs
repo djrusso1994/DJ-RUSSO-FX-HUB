@@ -444,7 +444,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.24");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.25");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -520,12 +520,30 @@ public partial class MainWindow : Window
      var partial=installer+".download";
      using var downloadCancel=new System.Threading.CancellationTokenSource();
      var progressWindow=new Window{
-       Title="DJ RUSSO FX HUB • UPDATE",Width=490,MinWidth=440,Height=260,MinHeight=250,SizeToContent=SizeToContent.Height,
+       Title="DJ RUSSO FX HUB • UPDATE",Width=490,MinWidth=440,SizeToContent=SizeToContent.Height,
        WindowStartupLocation=WindowStartupLocation.CenterOwner,Owner=this,
-       ResizeMode=ResizeMode.NoResize,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
+       WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.NoResize,
+       Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
        Foreground=System.Windows.Media.Brushes.White,ShowInTaskbar=false
      };
-     var progressLayout=new StackPanel{Margin=new Thickness(24,20,24,24)};
+     // Custom Neon Ghost title bar: no native white Windows title strip.
+     var progressRoot=new Border{
+       BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(142,89,229)),
+       BorderThickness=new Thickness(1.5),CornerRadius=new CornerRadius(10),
+       Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(14,19,44)),
+       SnapsToDevicePixels=true
+     };
+     var progressStack=new StackPanel();
+     var progressTitleBar=new Grid{Height=46,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(24,20,49))};
+     progressTitleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+     progressTitleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+     var progressTitleText=new TextBlock{Text="DJ RUSSO FX HUB  •  UPDATE",FontSize=12,FontWeight=FontWeights.SemiBold,
+       VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(20,0,0,0),
+       Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(125,239,255))};
+     progressTitleBar.Children.Add(progressTitleText);
+     progressTitleBar.MouseLeftButtonDown+=(_,e)=>{if(e.ClickCount==1)try{progressWindow.DragMove();}catch(InvalidOperationException){}};
+     progressStack.Children.Add(progressTitleBar);
+     var progressLayout=new StackPanel{Margin=new Thickness(24,18,24,24)};
      var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
      var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
      var progressBar=new System.Windows.Controls.ProgressBar{Height=14,Minimum=0,Maximum=100,IsIndeterminate=true,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246))};
@@ -549,7 +567,9 @@ public partial class MainWindow : Window
      cancelButton.Template=new ControlTemplate(typeof(Button)){VisualTree=cancelBorderFactory};
      cancelButton.Click+=(_,__)=>{cancelButton.IsEnabled=false;downloadCancel.Cancel();};
      progressLayout.Children.Add(cancelButton);
-     progressWindow.Content=progressLayout;
+     progressStack.Children.Add(progressLayout);
+     progressRoot.Child=progressStack;
+     progressWindow.Content=progressRoot;
      progressWindow.Closing+=(_,e)=>{if(!downloadCancel.IsCancellationRequested && cancelButton.IsEnabled){e.Cancel=true;downloadCancel.Cancel();cancelButton.IsEnabled=false;}};
      progressWindow.Show();
      try{
