@@ -474,7 +474,7 @@ public partial class MainWindow : Window
      if(Directory.Exists(saved))destination=saved;
     }
    }catch{}
-   using var picker=new Microsoft.Win32.OpenFolderDialog{
+   var picker=new Microsoft.Win32.OpenFolderDialog{
     Title=Index==1?"Scegli la cartella in cui creare il backup":"Choose where to save the backup",
     InitialDirectory=Directory.Exists(destination)?destination:Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
     Multiselect=false
