@@ -109,12 +109,12 @@
  <Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource FgBrush}"/><Setter Property="TextOptions.TextFormattingMode" Value="Display"/><Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/></Style>
  <!-- Dropdown controls: high contrast in all three themes. No custom ControlTemplate,
       preserving WPF's tested built-in ComboBox to avoid startup deserialization faults. -->
- <SolidColorBrush x:Key="ComboSurfaceBrush" Color="#161D35"/>
- <SolidColorBrush x:Key="ComboTextBrush" Color="#F2F5FF"/>
+ <SolidColorBrush x:Key="ComboSurfaceBrush" Color="#FFFFFF"/>
+ <SolidColorBrush x:Key="ComboTextBrush" Color="#15213A"/>
  <SolidColorBrush x:Key="ComboBorderBrush" Color="#7854CE"/>
  <SolidColorBrush x:Key="ComboFocusBrush" Color="#4275CE"/>
- <SolidColorBrush x:Key="ComboHoverBrush" Color="#303D62"/>
- <SolidColorBrush x:Key="ComboSelectedBrush" Color="#28395E"/>
+ <SolidColorBrush x:Key="ComboHoverBrush" Color="#C9DDFB"/>
+ <SolidColorBrush x:Key="ComboSelectedBrush" Color="#DCE5FB"/>
  <Style TargetType="ComboBoxItem">
   <Setter Property="Foreground" Value="{DynamicResource ComboTextBrush}"/>
   <Setter Property="Background" Value="{DynamicResource ComboSurfaceBrush}"/>
@@ -313,12 +313,18 @@
 
      <Border x:Name="SettingsPanel" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
    <StackPanel>
-    <WrapPanel><TextBlock x:Name="SettingsHint" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" Margin="0,0,14,0"/><ComboBox x:Name="SettingsLanguageBox" Width="172" SelectionChanged="SettingsLanguageBox_SelectionChanged"><ComboBoxItem Tag="en"><StackPanel Orientation="Horizontal"><Image Source="Assets/flag-en.png" Width="25" Height="17" Margin="0,0,9,0"/><TextBlock Foreground="{DynamicResource ComboTextBrush}" Text="English" VerticalAlignment="Center"/></StackPanel></ComboBoxItem><ComboBoxItem Tag="it"><StackPanel Orientation="Horizontal"><Image Source="Assets/flag-it.png" Width="25" Height="17" Margin="0,0,9,0"/><TextBlock Foreground="{DynamicResource ComboTextBrush}" Text="Italiano" VerticalAlignment="Center"/></StackPanel></ComboBoxItem><ComboBoxItem Tag="es"><StackPanel Orientation="Horizontal"><Image Source="Assets/flag-es.png" Width="25" Height="17" Margin="0,0,9,0"/><TextBlock Foreground="{DynamicResource ComboTextBrush}" Text="Español" VerticalAlignment="Center"/></StackPanel></ComboBoxItem><ComboBoxItem Tag="fr"><StackPanel Orientation="Horizontal"><Image Source="Assets/flag-fr.png" Width="25" Height="17" Margin="0,0,9,0"/><TextBlock Foreground="{DynamicResource ComboTextBrush}" Text="Français" VerticalAlignment="Center"/></StackPanel></ComboBoxItem><ComboBoxItem Tag="de"><StackPanel Orientation="Horizontal"><Image Source="Assets/flag-de.png" Width="25" Height="17" Margin="0,0,9,0"/><TextBlock Foreground="{DynamicResource ComboTextBrush}" Text="Deutsch" VerticalAlignment="Center"/></StackPanel></ComboBoxItem></ComboBox><TextBlock x:Name="ThemeHint" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" Margin="22,0,14,0"/>
+    <WrapPanel><TextBlock x:Name="SettingsHint" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" Margin="0,0,14,0"/><ComboBox x:Name="SettingsLanguageBox" Width="172" SelectionChanged="SettingsLanguageBox_SelectionChanged">
+      <ComboBoxItem Tag="en" Content="English"/>
+      <ComboBoxItem Tag="it" Content="Italiano"/>
+      <ComboBoxItem Tag="es" Content="Español"/>
+      <ComboBoxItem Tag="fr" Content="Français"/>
+      <ComboBoxItem Tag="de" Content="Deutsch"/>
+     </ComboBox><TextBlock x:Name="ThemeHint" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" Margin="22,0,14,0"/>
     <ComboBox x:Name="SettingsThemeBox" Width="218" SelectionChanged="SettingsThemeBox_SelectionChanged">
-      <ComboBoxItem><StackPanel Orientation="Horizontal"><TextBlock Text="✦" Foreground="#CC60F2" FontSize="18" Width="27"/><TextBlock x:Name="ThemeNeonText" Text="Cyberpunk Neon" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center"/></StackPanel></ComboBoxItem>
-      <ComboBoxItem><StackPanel Orientation="Horizontal"><TextBlock Text="☾" Foreground="#89B9F9" FontSize="18" Width="27"/><TextBlock x:Name="ThemeDarkText" Text="Dark Professional" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center"/></StackPanel></ComboBoxItem>
-      <ComboBoxItem><StackPanel Orientation="Horizontal"><TextBlock Text="☀" Foreground="#D69B1D" FontSize="18" Width="27"/><TextBlock x:Name="ThemeLightText" Text="Light Modern" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center"/></StackPanel></ComboBoxItem>
-    </ComboBox></WrapPanel>
+      <ComboBoxItem Content="Cyberpunk Neon"/>
+      <ComboBoxItem Content="Dark Professional"/>
+      <ComboBoxItem Content="Light Modern"/>
+     </ComboBox></WrapPanel>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
       <TextBlock x:Name="PreviewHeading" Text="UPDATE WINDOW PREVIEW" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" FontSize="13"/>
