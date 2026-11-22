@@ -523,7 +523,7 @@
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,8,0"><ItemsControl x:Name="PluginList" HorizontalAlignment="Stretch" Margin="0,12,0,0"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemWidth="210"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
  <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="103"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <Grid>
-   <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="{Binding LogoHeight}" MaxWidth="150" VerticalAlignment="Center" UseLayoutRounding="True"/>
+   <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="{Binding LogoHeight}" MaxWidth="165" VerticalAlignment="Center" UseLayoutRounding="True"/>
    <TextBlock Text="{Binding FallbackName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Foreground="{DynamicResource FgBrush}" FontSize="12" FontWeight="Bold" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="170">
     <TextBlock.Style>
       <Style TargetType="TextBlock">
@@ -552,7 +552,7 @@
     </DockPanel>
    </Border>
    <Border Grid.Column="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1.7" CornerRadius="13" Margin="0,0,0,10" Padding="16">
- <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,8,0"><StackPanel>
+ <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,2,0"><StackPanel>
   <TextBlock Text="DJ RUSSO" FontSize="17" FontWeight="Bold" FontStyle="Italic" HorizontalAlignment="Center" Foreground="{DynamicResource FgBrush}"/>
   <Viewbox Width="210" MaxHeight="42" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center" ClipToBounds="True">
    <TextBlock x:Name="ProductPanelTitle" Text="METER X" FontSize="32" FontWeight="ExtraBold" FontStyle="Italic" TextAlignment="Center" Foreground="{DynamicResource HeadingBrush}"/>
