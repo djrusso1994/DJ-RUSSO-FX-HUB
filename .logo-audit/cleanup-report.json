@@ -1,0 +1,233 @@
+[
+  {
+    "name": "auto-master-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 1.0,
+    "detached_components_removed": []
+  },
+  {
+    "name": "compressor-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 0.987892,
+    "detached_components_removed": [
+      {
+        "pixels": 333,
+        "box": [
+          275,
+          109,
+          285,
+          160
+        ]
+      },
+      {
+        "pixels": 160,
+        "box": [
+          275,
+          161,
+          287,
+          181
+        ]
+      },
+      {
+        "pixels": 108,
+        "box": [
+          275,
+          206,
+          285,
+          224
+        ]
+      },
+      {
+        "pixels": 2,
+        "box": [
+          275,
+          75,
+          276,
+          77
+        ]
+      }
+    ]
+  },
+  {
+    "name": "pitch-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 0.997535,
+    "detached_components_removed": [
+      {
+        "pixels": 96,
+        "box": [
+          524,
+          138,
+          529,
+          164
+        ]
+      },
+      {
+        "pixels": 27,
+        "box": [
+          270,
+          165,
+          273,
+          176
+        ]
+      }
+    ]
+  },
+  {
+    "name": "eq-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 0.986158,
+    "detached_components_removed": [
+      {
+        "pixels": 596,
+        "box": [
+          516,
+          88,
+          526,
+          186
+        ]
+      },
+      {
+        "pixels": 126,
+        "box": [
+          519,
+          201,
+          526,
+          227
+        ]
+      }
+    ]
+  },
+  {
+    "name": "reverb-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 1.0,
+    "detached_components_removed": []
+  },
+  {
+    "name": "delay-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 1.0,
+    "detached_components_removed": []
+  },
+  {
+    "name": "drive-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 0.991591,
+    "detached_components_removed": [
+      {
+        "pixels": 284,
+        "box": [
+          276,
+          99,
+          286,
+          155
+        ]
+      },
+      {
+        "pixels": 122,
+        "box": [
+          276,
+          179,
+          287,
+          197
+        ]
+      },
+      {
+        "pixels": 22,
+        "box": [
+          276,
+          233,
+          280,
+          242
+        ]
+      }
+    ]
+  },
+  {
+    "name": "stereo-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 0.998442,
+    "detached_components_removed": [
+      {
+        "pixels": 80,
+        "box": [
+          518,
+          109,
+          522,
+          140
+        ]
+      }
+    ]
+  },
+  {
+    "name": "transient-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 0.982549,
+    "detached_components_removed": [
+      {
+        "pixels": 521,
+        "box": [
+          512,
+          89,
+          523,
+          156
+        ]
+      },
+      {
+        "pixels": 222,
+        "box": [
+          514,
+          161,
+          523,
+          199
+        ]
+      },
+      {
+        "pixels": 110,
+        "box": [
+          516,
+          226,
+          523,
+          251
+        ]
+      }
+    ]
+  },
+  {
+    "name": "vocal-remover-x",
+    "size": [
+      800,
+      300
+    ],
+    "retained_opaque_ratio": 1.0,
+    "detached_components_removed": []
+  }
+]
