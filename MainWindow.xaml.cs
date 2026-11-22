@@ -245,7 +245,16 @@ public partial class MainWindow : Window
  private readonly System.Windows.Threading.DispatcherTimer searchDebounce=new(){Interval=TimeSpan.FromMilliseconds(250)};
  private void ApplySearchDebounce(object? sender,EventArgs e){searchDebounce.Stop();if(ready)Refresh();}
 
- private void Refresh()
+  private static void SetDropdownLabel(ComboBoxItem item, string value)
+ {
+     if (item.Content is StackPanel panel)
+     {
+         foreach (var child in panel.Children)
+             if (child is TextBlock text) { text.Text = value; return; }
+     }
+     item.Content = value;
+ }
+private void Refresh()
  {
      SettingsButton.Content="⚙   "+T("settings"); GuideButton.Content="ⓘ   "+T("guide");
      ThemeHint.Text=T("theme");SettingsHint.Text=T("settingshint");
@@ -261,7 +270,7 @@ public partial class MainWindow : Window
      };
      for (int i = 0; i < 4; i++)
          if (ProductFilter.Items[i] is ComboBoxItem filterItem)
-             filterItem.Content = filterLabels[Index][i];
+             SetDropdownLabel(filterItem, filterLabels[Index][i]);
 
      PreviewHeading.Text=new[]{"UPDATE WINDOW PREVIEW","ANTEPRIMA FINESTRA AGGIORNAMENTO","VISTA PREVIA DE ACTUALIZACIÓN","APERÇU DE LA MISE À JOUR","VORSCHAU UPDATE-FENSTER"}[Index];
      PreviewExplanation.Text=new[]{"Preview the Neon Ghost window without downloading or installing files.","Verifica la finestra Neon Ghost senza scaricare o installare file.","Prueba la ventana Neon Ghost sin descargar ni instalar archivos.","Teste la fenêtre Neon Ghost sans téléchargement ni installation.","Neon Ghost-Fenster testen, ohne Dateien herunterzuladen oder zu installieren."}[Index];
@@ -276,7 +285,7 @@ public partial class MainWindow : Window
      ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
      ShellInstallButton.Content=BulkInstallLabels[Index]; ShellRemoveButton.Content=BulkRemoveLabels[Index];
      StatusText.Text=T("ready");
-     ((ComboBoxItem)SettingsThemeBox.Items[0]).Content=T("neon");((ComboBoxItem)SettingsThemeBox.Items[1]).Content=T("dark");((ComboBoxItem)SettingsThemeBox.Items[2]).Content=T("light");
+     SetDropdownLabel((ComboBoxItem)SettingsThemeBox.Items[0],T("neon"));SetDropdownLabel((ComboBoxItem)SettingsThemeBox.Items[1],T("dark"));SetDropdownLabel((ComboBoxItem)SettingsThemeBox.Items[2],T("light"));
      var shellState=ShellInstaller.GetState();
      var shellStatusKey=shellState switch {
          ShellInstaller.State.Managed=>"shellManaged",
