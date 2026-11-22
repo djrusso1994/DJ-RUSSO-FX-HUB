@@ -120,7 +120,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.33";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.34";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  private void Header_MouseLeftButtonDown(object sender,System.Windows.Input.MouseButtonEventArgs e){
    if(e.ChangedButton!=System.Windows.Input.MouseButton.Left)return;
    // Never drag from a control: window buttons retain their own click handling.
@@ -265,16 +265,13 @@ public partial class MainWindow : Window
          if (ProductFilter.Items[i] is ComboBoxItem filterItem)
              filterItem.Content = filterLabels[Index][i];
 
-     PreviewHeading.Text=new[]{"UPDATE WINDOW PREVIEW","ANTEPRIMA FINESTRA AGGIORNAMENTO","VISTA PREVIA DE ACTUALIZACIÓN","APERÇU DE LA MISE À JOUR","VORSCHAU UPDATE-FENSTER"}[Index];
-     PreviewExplanation.Text=new[]{"Preview the Neon Ghost window without downloading or installing files.","Verifica la finestra Neon Ghost senza scaricare o installare file.","Prueba la ventana Neon Ghost sin descargar ni instalar archivos.","Teste la fenêtre Neon Ghost sans téléchargement ni installation.","Neon Ghost-Fenster testen, ohne Dateien herunterzuladen oder zu installieren."}[Index];
-     PreviewUpdateDialogButton.Content=new[]{"PREVIEW DOWNLOAD","ANTEPRIMA DOWNLOAD","VISTA PREVIA","APERÇU DU TÉLÉCHARGEMENT","DOWNLOAD-VORSCHAU"}[Index];
      GitHubProjectButton.ToolTip=new[]{"Open the official GitHub repository","Apri il repository ufficiale GitHub","Abrir el repositorio oficial en GitHub","Ouvrir le dépôt GitHub officiel","Offizielles GitHub-Repository öffnen"}[Index];
      SecurityHeading.Text=new[]{"Security & authenticity","Sicurezza e autenticità","Seguridad y autenticidad","Sécurité et authenticité","Sicherheit und Authentizität"}[Index];
      SecurityExplanation.Text=new[]{"Official GitHub releases. SHA-256 checks file integrity, not malware safety. VirusTotal may have no report.","Release ufficiali GitHub. SHA-256 verifica l'integrità, non l'assenza di malware. VirusTotal potrebbe non avere un rapporto.","Versiones oficiales de GitHub. SHA-256 comprueba la integridad, no la ausencia de malware. Puede que VirusTotal no tenga informe.","Versions officielles GitHub. SHA-256 vérifie l'intégrité, pas l'absence de logiciels malveillants. Le rapport VirusTotal peut être absent.","Offizielle GitHub-Releases. SHA-256 prüft die Integrität, nicht die Malware-Freiheit. Ein VirusTotal-Bericht ist eventuell nicht verfügbar."}[Index];
      VirusTotalReportButton.Content=new[]{"Open VirusTotal upload","Apri caricamento VirusTotal","Abrir carga de VirusTotal","Ouvrir VirusTotal","VirusTotal-Upload öffnen"}[Index];
      CopyInstallerHashButton.Content=new[]{"Copy SHA-256","Copia SHA-256","Copiar SHA-256","Copier SHA-256","SHA-256 kopieren"}[Index];
      SourceText.Text=T("source");Subtitle.Text=T("subtitle");
-     UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
+     UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");OpenBackupFolderButton.Content="▣   "+new[]{"OPEN BACKUPS","APRI BACKUP","ABRIR COPIAS","OUVRIR SAUVEGARDES","BACKUPS ÖFFNEN"}[Index];OpenBackupFolderButton.ToolTip=new[]{"Open the most recent backup folder","Apri la cartella dell'ultimo backup","Abrir la carpeta de la última copia","Ouvrir le dossier de la dernière sauvegarde","Letzten Backup-Ordner öffnen"}[Index];FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
      ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
      ShellInstallButton.Content=BulkInstallLabels[Index]; ShellRemoveButton.Content=BulkRemoveLabels[Index];
      StatusText.Text=T("ready");
@@ -360,7 +357,7 @@ public partial class MainWindow : Window
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[0]),0),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[1]),0.55),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[2]),1)},new Point(0,0),new Point(1,0));
-  // v0.8.33: themed WPF ComboBox popup and selected item in all three modes.
+  // v0.8.34: themed WPF ComboBox popup and selected item in all three modes.
   foreach(var (key,value) in new[]{
    ("ComboSurfaceBrush",light?"#FFFFFF":dark?"#252D40":"#171B35"),
    ("ComboTextBrush",light?"#15213A":"#F5F7FF"),
@@ -492,8 +489,30 @@ public partial class MainWindow : Window
      File.Copy(source,Path.Combine(dir,name),false);
     }
    File.WriteAllText(Path.Combine(dir,"README.txt"),"DJ RUSSO FX HUB local snapshot. Do not copy files to protected VST3 locations manually. FX SHELL binary is not included; installer receipt is informational only.");
-   try{Directory.CreateDirectory(preferenceDirectory);File.WriteAllText(lastDestinationFile,selected);}catch{}
+   try{Directory.CreateDirectory(preferenceDirectory);File.WriteAllText(lastDestinationFile,selected);File.WriteAllText(Path.Combine(preferenceDirectory,"last-backup-created.txt"),dir);}catch{}
    NeonDialog.Show(this,(Index==1?"Backup creato:\n":"Backup created:\n")+dir,"FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+  }catch(Exception ex){NeonDialog.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
+ }
+ private void OpenBackupFolder_Click(object sender,RoutedEventArgs e){
+  try{
+   var configDir=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub");
+   var lastCreated=Path.Combine(configDir,"last-backup-created.txt");
+   var lastSelected=Path.Combine(configDir,"last-backup-folder.txt");
+   string? folder=null;
+   if(File.Exists(lastCreated)){
+    var path=File.ReadAllText(lastCreated).Trim();
+    if(Directory.Exists(path))folder=path;
+   }
+   if(folder==null && File.Exists(lastSelected)){
+    var path=File.ReadAllText(lastSelected).Trim();
+    if(Directory.Exists(path))folder=path;
+   }
+   if(folder==null && Directory.Exists(BackupDir))folder=BackupDir;
+   if(folder==null){
+    NeonToast.Show(this,new[]{"No backup folder available yet.","Non è ancora presente una cartella di backup.","Todavía no hay carpeta de copia de seguridad.","Aucun dossier de sauvegarde disponible.","Noch kein Backup-Ordner vorhanden."}[Index],warning:true);
+    return;
+   }
+   Process.Start(new ProcessStartInfo{FileName=folder,UseShellExecute=true});
   }catch(Exception ex){NeonDialog.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void Diagnostics_Click(object sender,RoutedEventArgs e){
@@ -527,7 +546,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.33");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.34");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -564,7 +583,7 @@ public partial class MainWindow : Window
            "DJ RUSSO FX HUB est à jour. Version installée : v"+current.ToString(3)+".",
            "DJ RUSSO FX HUB ist aktuell. Installierte Version: v"+current.ToString(3)+"."
          };
-         NeonDialog.Show(this,upToDateMessages[Index],"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+         NeonToast.Show(this,upToDateMessages[Index]);
        }
        return;
      }
@@ -721,7 +740,7 @@ public partial class MainWindow : Window
        ? ShellInstaller.GetState() is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary
        : packageId=="meter-x" && File.Exists(MeterExePath);
      if(!installed){
-       NeonDialog.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.","DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+       NeonToast.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.",warning:true);
        return;
      }
      using var response=await UpdateClient.GetAsync("https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/main/plugin-updates.json");
@@ -740,7 +759,7 @@ public partial class MainWindow : Window
      var message=Index==1
        ? $"Pacchetto: {packageId}\\nVersione inclusa di riferimento: {installedVersion}\\nUltima versione nel catalogo: {version}\\n\\n"+(available?"Pacchetto pubblicato: l'installazione automatica richiede ancora verifica di integrità e compatibilità.":"Nessun aggiornamento autonomo del plugin disponibile. I file installati non saranno modificati.")
        : $"Package: {packageId}\\nBundled reference version: {installedVersion}\\nCatalog version: {version}\\n\\n"+(available?"Published package: automatic installation requires integrity and compatibility validation.":"No standalone plugin update available. Installed files will not be modified.");
-     NeonDialog.Show(this,message,"DJ RUSSO FX HUB • PLUGIN UPDATES",MessageBoxButton.OK,MessageBoxImage.Information);
+     NeonToast.Show(this,message);
    }catch(Exception ex){
      NeonDialog.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
    }finally{PluginUpdatesButton.IsEnabled=true;}
@@ -771,7 +790,7 @@ public partial class MainWindow : Window
  }
  private void UpdateMeterUi(){ /* METER X controls live inside its existing card. */ }
  private void MeterImport_Click(object sender,RoutedEventArgs e){
-  if(File.Exists(MeterExePath)){NeonDialog.Show(this,Index==1?"METER X è già installato.":"METER X is already installed.","METER X");return;}
+  if(File.Exists(MeterExePath)){NeonToast.Show(this,Index==1?"METER X è già installato.":"METER X is already installed.");return;}
   InstallMeterFile(out var detail);
   Refresh();
   NeonDialog.Show(this,detail,"METER X",MessageBoxButton.OK,MessageBoxImage.Information);
@@ -1201,7 +1220,7 @@ public partial class MainWindow : Window
   CopyInstallerHashButton.IsEnabled=false;
   SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
   try{
-   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.33";
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.34";
    using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
    response.EnsureSuccessStatusCode();
    using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -1304,33 +1323,6 @@ public partial class MainWindow : Window
      progressWindow.Content=progressRoot;
      progressWindow.Closing+=(_,e)=>{if(!!isCancelled() && cancelButton.IsEnabled){e.Cancel=true;onCancel();cancelButton.IsEnabled=false;}};
      return (progressWindow,progressStatus,progressBar,progressDetails,cancelButton);
- }
- private void PreviewUpdateDialog_Click(object sender,RoutedEventArgs e){
-   bool cancelled=false;
-   var (window,status,bar,details,cancel)=CreateUpdateProgressDialog(()=>{cancelled=true;},()=>cancelled);
-   window.Title="DJ RUSSO FX HUB • PREVIEW";
-   status.Text=Index==1?"ANTEPRIMA — nessun download reale":"PREVIEW — no actual download";
-   bar.IsIndeterminate=false;
-   bar.Value=0;
-   details.Text=Index==1?"Simulazione • nessun file scaricato":"Simulation • no files downloaded";
-   var demoTimer=new System.Windows.Threading.DispatcherTimer{
-    Interval=TimeSpan.FromMilliseconds(55)
-   };
-   demoTimer.Tick+=(_,_)=>{
-    if(cancelled || !window.IsVisible){demoTimer.Stop();return;}
-    var next=Math.Min(100,bar.Value+1.4);
-    bar.Value=next;
-    var percent=next.ToString("F0");
-    details.Text=Index==1?"Simulazione: "+percent+"% • nessun file scaricato":"Simulation: "+percent+"% • no files downloaded";
-    if(next>=100){
-     demoTimer.Stop();
-     status.Text=Index==1?"✓ ANTEPRIMA COMPLETATA — nessun file installato":"✓ PREVIEW COMPLETE — no files installed";
-    }
-   };
-   window.Loaded+=(_,_)=>demoTimer.Start();
-   window.Closed+=(_,_)=>demoTimer.Stop();
-   cancel.Click+=(_,_)=>window.Close();
-   window.ShowDialog();
  }
  // The button and settings panel always share the same current-view state.
  private void Settings_Click(object sender,RoutedEventArgs e)

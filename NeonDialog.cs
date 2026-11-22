@@ -5,6 +5,8 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using System.Windows.Media.Animation;
+using System.Windows.Media.Effects;
 
 namespace DJRussoFXHub;
 
@@ -241,6 +243,55 @@ internal static class NeonDialog
         factory.AppendChild(content);
         style.Setters.Add(new Setter(Button.TemplateProperty, new ControlTemplate(typeof(Button)) { VisualTree = factory }));
         button.Style = style;
+
+        // Gentle spring on hover; always returns to Y=0. No delayed click or sticky displacement.
+        var translation = new TranslateTransform();
+        button.RenderTransform = translation;
+        var neon = border is SolidColorBrush solid ? solid.Color : Color.FromRgb(90, 232, 255);
+        var glow = new DropShadowEffect
+        {
+            Color = neon, BlurRadius = 17, ShadowDepth = 0, Opacity = 0.08
+        };
+        button.Effect = glow;
+        void Glow(bool active)
+        {
+            glow.BeginAnimation(DropShadowEffect.OpacityProperty,
+                new DoubleAnimation(active ? 0.82 : 0.08, TimeSpan.FromMilliseconds(165)));
+            glow.BeginAnimation(DropShadowEffect.BlurRadiusProperty,
+                new DoubleAnimation(active ? 19 : 11, TimeSpan.FromMilliseconds(165)));
+        }
+        button.MouseEnter += (_, _) =>
+        {
+            Glow(true);
+            var spring = new DoubleAnimationUsingKeyFrames();
+            spring.KeyFrames.Add(new EasingDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.Zero)));
+            spring.KeyFrames.Add(new EasingDoubleKeyFrame(-4, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(110))));
+            spring.KeyFrames.Add(new EasingDoubleKeyFrame(1, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(215))));
+            spring.KeyFrames.Add(new EasingDoubleKeyFrame(-1, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(300))));
+            spring.KeyFrames.Add(new EasingDoubleKeyFrame(0, KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(390))));
+            translation.BeginAnimation(TranslateTransform.YProperty, spring, HandoffBehavior.SnapshotAndReplace);
+        };
+        button.MouseLeave += (_, _) =>
+        {
+            Glow(false);
+            translation.BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation(0, TimeSpan.FromMilliseconds(140)),
+                HandoffBehavior.SnapshotAndReplace);
+        };
+        button.PreviewMouseLeftButtonDown += (_, _) =>
+        {
+            translation.BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation(1.5, TimeSpan.FromMilliseconds(70)),
+                HandoffBehavior.SnapshotAndReplace);
+        };
+        button.PreviewMouseLeftButtonUp += (_, _) =>
+        {
+            translation.BeginAnimation(TranslateTransform.YProperty,
+                new DoubleAnimation(0, TimeSpan.FromMilliseconds(110)),
+                HandoffBehavior.SnapshotAndReplace);
+        };
+        button.GotKeyboardFocus += (_, _) => Glow(true);
+        button.LostKeyboardFocus += (_, _) => { if (!button.IsMouseOver) Glow(false); };
         return button;
     }
 }
