@@ -75,6 +75,8 @@
    </ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
  </Style>
  <Style x:Key="ProductCardStyle" TargetType="Border">
+  <Setter Property="RenderTransform"><Setter.Value><TranslateTransform Y="0"/></Setter.Value></Setter>
+  <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
   <Setter Property="Background" Value="{DynamicResource CardFillBrush}"/>
   <Setter Property="BorderBrush" Value="{DynamicResource CardStrokeBrush}"/>
   <Setter Property="BorderThickness" Value="1.6"/>
@@ -86,6 +88,22 @@
     <Setter Property="BorderBrush" Value="{DynamicResource NeonCyanBrush}"/>
     <Setter Property="Effect"><Setter.Value><DropShadowEffect Color="#00DDF8" BlurRadius="18" ShadowDepth="0" Opacity="0.7"/></Setter.Value></Setter>
    </Trigger>
+   <EventTrigger RoutedEvent="MouseEnter">
+    <BeginStoryboard><Storyboard>
+     <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
+      <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.12" Value="-4"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.23" Value="1"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.36" Value="-2"/>
+     </DoubleAnimationUsingKeyFrames>
+    </Storyboard></BeginStoryboard>
+   </EventTrigger>
+   <EventTrigger RoutedEvent="MouseLeave">
+    <BeginStoryboard><Storyboard>
+     <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+      To="0" Duration="0:0:0.16"/>
+    </Storyboard></BeginStoryboard>
+   </EventTrigger>
   </Style.Triggers>
  </Style>
  <Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource FgBrush}"/><Setter Property="TextOptions.TextFormattingMode" Value="Display"/><Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/></Style>
@@ -138,7 +156,30 @@
   <Setter Property="FontSize" Value="15"/>
   <Setter Property="MinHeight" Value="39"/>
  </Style>
- <Style TargetType="Button"><Setter Property="Background" Value="{DynamicResource PanelBrush}"/><Setter Property="Foreground" Value="{DynamicResource FgBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/><Setter Property="Padding" Value="14,9"/><Setter Property="Margin" Value="0,0,10,0"/><Setter Property="Cursor" Value="Hand"/></Style>
+ <!-- Lightweight global micro-bounce for clickable HUB buttons.
+      Explicit SocialNeonButton keeps its original stronger animation. -->
+ <Style TargetType="Button">
+  <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+  <Setter Property="Foreground" Value="{DynamicResource FgBrush}"/>
+  <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+  <Setter Property="Padding" Value="14,9"/>
+  <Setter Property="Margin" Value="0,0,10,0"/>
+  <Setter Property="Cursor" Value="Hand"/>
+  <Setter Property="RenderTransform"><Setter.Value><TranslateTransform Y="0"/></Setter.Value></Setter>
+  <Style.Triggers>
+   <EventTrigger RoutedEvent="MouseEnter">
+    <BeginStoryboard><Storyboard>
+     <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
+      <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.11" Value="-4"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.21" Value="1"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.31" Value="0"/>
+     </DoubleAnimationUsingKeyFrames>
+    </Storyboard></BeginStoryboard>
+   </EventTrigger>
+   <Trigger Property="IsPressed" Value="True"><Setter Property="Opacity" Value="0.90"/></Trigger>
+  </Style.Triggers>
+ </Style>
 
  <Style x:Key="NeonActionButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
   <Setter Property="FontWeight" Value="Bold"/><Setter Property="MinHeight" Value="44"/>
@@ -153,7 +194,7 @@
     <Trigger Property="IsEnabled" Value="False"><Setter TargetName="NeonFrame" Property="Opacity" Value="0.35"/></Trigger>
    </ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
  </Style>
- <Style x:Key="WindowControlButton" TargetType="Button">
+ <Style x:Key="WindowControlButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
    <Border x:Name="WindowButtonFrame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="7">
     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
