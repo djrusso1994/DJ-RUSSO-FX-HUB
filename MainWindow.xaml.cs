@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 namespace DJRussoFXHub;
 public partial class MainWindow : Window
 {
+ internal int DialogLanguageIndex => Index;
+
  private record PluginInfo(string id,string name,string category,string status);
  private sealed class PluginCard { public string Id {get;set;}=""; public bool IsSelected {get;set;} public bool IsReady {get;set;} public string ActionLabel {get;set;}=""; public string RemoveLabel {get;set;}=""; public Visibility ActionVisibility => IsReady ? Visibility.Visible : Visibility.Collapsed; public string FallbackName {get;set;}=""; public int LogoHeight {get;set;}=78; public BitmapSource? Logo {get;set;} public string Category {get;set;}=""; public string Footer {get;set;}=""; public Visibility MeterVisibility {get;set;}=Visibility.Collapsed; public bool MeterReady {get;set;} public bool MeterInstallReady {get;set;} public string MeterImportLabel {get;set;}=""; public string MeterLaunchLabel {get;set;}=""; public string MeterRemoveLabel {get;set;}=""; public string BadgeSymbol {get;set;}="✕"; public System.Windows.Media.Brush BadgeBrush {get;set;}=System.Windows.Media.Brushes.IndianRed; public string BadgeTip {get;set;}=""; }
  private record EffectPackage(string id,string detector,List<string> effectIds);
@@ -181,7 +183,7 @@ public partial class MainWindow : Window
  private void MinimizeWindow_Click(object sender,RoutedEventArgs e)=>WindowState=WindowState.Minimized;
  private void MaximizeWindow_Click(object sender,RoutedEventArgs e)=>ToggleWindowMaximized();
  private void CloseWindow_Click(object sender,RoutedEventArgs e)=>Close();
- private void Social_Click(object sender,RoutedEventArgs e){if(sender is Button b && b.Tag is string url){try{Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}catch(Exception ex){MessageBox.Show(ex.Message,"DJ RUSSO FX HUB");}}}
+ private void Social_Click(object sender,RoutedEventArgs e){if(sender is Button b && b.Tag is string url){try{Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}catch(Exception ex){NeonDialog.Show(ex.Message,"DJ RUSSO FX HUB");}}}
  private void LoadPlugins(){try {var path=Path.Combine(AppContext.BaseDirectory,"plugins.json");plugins=JsonSerializer.Deserialize<List<PluginInfo>>(File.ReadAllText(path),new JsonSerializerOptions{PropertyNameCaseInsensitive=true})??new();}catch(Exception ex){StatusText.Text=ex.Message;}}
  // Frozen, shared WPF bitmaps avoid repeated decoding and per-card allocations.
  private static readonly Dictionary<string,BitmapImage?> assetCache=new(StringComparer.OrdinalIgnoreCase);
@@ -395,7 +397,7 @@ public partial class MainWindow : Window
   }catch(Exception ex){detail="METER X: "+ex.Message;return false;}
  }
  private void InstallShell_Click(object sender,RoutedEventArgs e){
-  if(MessageBox.Show(this,Index==1?
+  if(NeonDialog.Show(this,Index==1?
      "Installare i componenti disponibili? FX SHELL richiede autorizzazione amministratore. Chiudi prima FL Studio.":
      "Install available components? FX SHELL requires administrator approval. Close FL Studio first.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
@@ -415,10 +417,10 @@ public partial class MainWindow : Window
   else messages.Add("FX SHELL: "+T("shellConflict"));
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
   Refresh();
-  MessageBox.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
-  if(MessageBox.Show(this,Index==1?
+  if(NeonDialog.Show(this,Index==1?
      "Rimuovere FX SHELL e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
      "Remove HUB-managed FX SHELL and METER X? External files are untouched. Close FL Studio and METER X.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
@@ -435,7 +437,7 @@ public partial class MainWindow : Window
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
   }else messages.Add("METER X: not installed / non installato");
   Refresh();
-  MessageBox.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private int RunElevated(string operation)
  {
@@ -455,17 +457,44 @@ public partial class MainWindow : Window
  private void ShowInstallResult(int code)
  {
      var key=code switch {2=>"payloadBad",3=>"shellConflict",4=>"shellChanged",5=>"permissionError",6=>"ioError",7=>"notManaged",9=>"cancelled",_=>"unknownError"};
-     MessageBox.Show(T(key),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+     NeonDialog.Show(T(key),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
  }
  private void ProductSearch_Changed(object sender,System.Windows.Controls.TextChangedEventArgs e){if(ready){searchDebounce.Stop();searchDebounce.Start();}}
  private void ProductFilter_Changed(object sender,SelectionChangedEventArgs e){if(ready){searchDebounce.Stop();Refresh();}}
  private string BackupDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","Backups");
  private void Backup_Click(object sender,RoutedEventArgs e){
-  try{var dir=Path.Combine(BackupDir,DateTime.Now.ToString("yyyyMMdd_HHmmss_fff"));Directory.CreateDirectory(dir);
-   foreach(var source in new[]{PrefPath,ManagedPath,MeterExePath})if(File.Exists(source)){var name=source==MeterExePath?"METER_X.exe":Path.GetFileName(source);File.Copy(source,Path.Combine(dir,name),false);}
+  // Preserve the existing snapshot contents. Only its destination is selected by the user.
+  try{
+   var preferenceDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub");
+   var lastDestinationFile=Path.Combine(preferenceDirectory,"last-backup-folder.txt");
+   string destination=BackupDir;
+   try{
+    if(File.Exists(lastDestinationFile)){
+     var saved=File.ReadAllText(lastDestinationFile).Trim();
+     if(Directory.Exists(saved))destination=saved;
+    }
+   }catch{}
+   using var picker=new Microsoft.Win32.OpenFolderDialog{
+    Title=Index==1?"Scegli la cartella in cui creare il backup":"Choose where to save the backup",
+    InitialDirectory=Directory.Exists(destination)?destination:Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+    Multiselect=false
+   };
+   if(picker.ShowDialog(this)!=true)return;
+   var selected=picker.FolderName;
+   if(!Directory.Exists(selected))throw new DirectoryNotFoundException(selected);
+   var dir=Path.Combine(selected,"DJ_RUSSO_FX_HUB_Backup_"+DateTime.Now.ToString("yyyyMMdd_HHmmss_fff"));
+   // Do not reuse or overwrite an existing backup folder.
+   if(Directory.Exists(dir))throw new IOException("Backup folder already exists: "+dir);
+   Directory.CreateDirectory(dir);
+   foreach(var source in new[]{PrefPath,ManagedPath,MeterExePath})
+    if(File.Exists(source)){
+     var name=source==MeterExePath?"METER_X.exe":Path.GetFileName(source);
+     File.Copy(source,Path.Combine(dir,name),false);
+    }
    File.WriteAllText(Path.Combine(dir,"README.txt"),"DJ RUSSO FX HUB local snapshot. Do not copy files to protected VST3 locations manually. FX SHELL binary is not included; installer receipt is informational only.");
-   MessageBox.Show(this,(Index==1?"Backup creato:\n":"Backup created:\n")+dir,"FX HUB");
-  }catch(Exception ex){MessageBox.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
+   try{Directory.CreateDirectory(preferenceDirectory);File.WriteAllText(lastDestinationFile,selected);}catch{}
+   NeonDialog.Show(this,(Index==1?"Backup creato:\n":"Backup created:\n")+dir,"FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+  }catch(Exception ex){NeonDialog.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void Diagnostics_Click(object sender,RoutedEventArgs e){
   // Display only localized text; the underlying tests remain read-only and unchanged.
@@ -493,7 +522,7 @@ public partial class MainWindow : Window
   var detectionHeading=new[]{"Standalone VST3 candidates (filename only)","Possibili VST3 indipendenti (solo nome file)","Posibles VST3 independientes (solo nombre)","VST3 indépendants possibles (nom uniquement)","Mögliche eigenständige VST3 (nur Dateiname)"}[Index];
   var detectionList=foundStandalone.Length==0?"—":string.Join(", ",foundStandalone);
   var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
-  MessageBox.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
@@ -520,7 +549,7 @@ public partial class MainWindow : Window
        if(!Version.TryParse(tagName.TrimStart('v','V'),out var parsed))continue;
        if(newest==null || parsed>newest){newest=parsed;root=release;}
      }
-     if(newest==null){if(interactive)MessageBox.Show(this,Index==1?"Nessuna versione pubblicata su GitHub.":"No GitHub releases are available.","DJ RUSSO FX HUB");return;}
+     if(newest==null){if(interactive)NeonDialog.Show(this,Index==1?"Nessuna versione pubblicata su GitHub.":"No GitHub releases are available.","DJ RUSSO FX HUB");return;}
      var tag=root.GetProperty("tag_name").GetString()??"";
      var page=root.GetProperty("html_url").GetString()??releasesUrl;
      if(!page.StartsWith(releasesUrl,StringComparison.OrdinalIgnoreCase))page=releasesUrl;
@@ -535,7 +564,7 @@ public partial class MainWindow : Window
            "DJ RUSSO FX HUB est à jour. Version installée : v"+current.ToString(3)+".",
            "DJ RUSSO FX HUB ist aktuell. Installierte Version: v"+current.ToString(3)+"."
          };
-         MessageBox.Show(this,upToDateMessages[Index],"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+         NeonDialog.Show(this,upToDateMessages[Index],"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
        }
        return;
      }
@@ -560,12 +589,12 @@ public partial class MainWindow : Window
         assetUri.Scheme!="https" || assetUri.Host!="github.com" ||
         !assetUri.AbsolutePath.StartsWith("/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/",StringComparison.OrdinalIgnoreCase)){
        var prompt=Index==1?$"È disponibile la v{available}. Per sicurezza questa Release richiede il download manuale da GitHub. Aprire la pagina?":$"Version {available} is available. This release requires manual download for security. Open GitHub?";
-       if(MessageBox.Show(this,prompt,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Information)==MessageBoxResult.Yes)
+       if(NeonDialog.Show(this,prompt,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Information)==MessageBoxResult.Yes)
          Process.Start(new ProcessStartInfo(page){UseShellExecute=true});
        return;
      }
      var confirm=Index==1?$"DJ RUSSO FX HUB v{available} disponibile.\nScaricare l'installer ufficiale, verificare SHA-256 e avviare l'aggiornamento?\nWindows potrebbe chiedere autorizzazione amministratore.":$"DJ RUSSO FX HUB v{available} available.\nDownload and verify the official installer, then launch the update?\nWindows may request administrator permission.";
-     if(MessageBox.Show(this,confirm,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+     if(NeonDialog.Show(this,confirm,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
      hubUpdateInProgress=true;
      UpdatesButton.IsEnabled=false;
      var updateDir=Path.Combine(Path.GetTempPath(),"DJRussoFXHub","Updates");
@@ -630,7 +659,7 @@ public partial class MainWindow : Window
        StatusText.Text=Index==1?"Download annullato":"Download cancelled";
      }catch(Exception ex){
        try{if(File.Exists(partial))File.Delete(partial);}catch{}
-       MessageBox.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+       NeonDialog.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
      }finally{
        // Allow programmatic closure after cancellation, error, or successful installation.
        cancelButton.IsEnabled=false;
@@ -639,9 +668,9 @@ public partial class MainWindow : Window
        UpdatesButton.IsEnabled=true;
        StatusText.Text=T("ready");
      }
-   }catch(Exception ex){if(interactive)MessageBox.Show(this,(Index==1?"Impossibile controllare GitHub: ":"Could not check GitHub: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
+   }catch(Exception ex){if(interactive)NeonDialog.Show(this,(Index==1?"Impossibile controllare GitHub: ":"Could not check GitHub: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
- private void OpenFolder_Click(object sender,RoutedEventArgs e){var path=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");if(Directory.Exists(path))Process.Start(new ProcessStartInfo{FileName=path,UseShellExecute=true});else MessageBox.Show(T("missingfolder")+path);}
+ private void OpenFolder_Click(object sender,RoutedEventArgs e){var path=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");if(Directory.Exists(path))Process.Start(new ProcessStartInfo{FileName=path,UseShellExecute=true});else NeonDialog.Show(T("missingfolder")+path);}
 
  private static readonly string[] MeterImportLabels={"IMPORT EXE","IMPORTA EXE","IMPORTAR EXE","IMPORTER EXE","EXE IMPORTIEREN"};
  private static readonly string[] MeterLaunchLabels={"LAUNCH","AVVIA","ABRIR","LANCER","STARTEN"};
@@ -692,7 +721,7 @@ public partial class MainWindow : Window
        ? ShellInstaller.GetState() is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary
        : packageId=="meter-x" && File.Exists(MeterExePath);
      if(!installed){
-       MessageBox.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.","DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+       NeonDialog.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.","DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
        return;
      }
      using var response=await UpdateClient.GetAsync("https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/main/plugin-updates.json");
@@ -711,9 +740,9 @@ public partial class MainWindow : Window
      var message=Index==1
        ? $"Pacchetto: {packageId}\\nVersione inclusa di riferimento: {installedVersion}\\nUltima versione nel catalogo: {version}\\n\\n"+(available?"Pacchetto pubblicato: l'installazione automatica richiede ancora verifica di integrità e compatibilità.":"Nessun aggiornamento autonomo del plugin disponibile. I file installati non saranno modificati.")
        : $"Package: {packageId}\\nBundled reference version: {installedVersion}\\nCatalog version: {version}\\n\\n"+(available?"Published package: automatic installation requires integrity and compatibility validation.":"No standalone plugin update available. Installed files will not be modified.");
-     MessageBox.Show(this,message,"DJ RUSSO FX HUB • PLUGIN UPDATES",MessageBoxButton.OK,MessageBoxImage.Information);
+     NeonDialog.Show(this,message,"DJ RUSSO FX HUB • PLUGIN UPDATES",MessageBoxButton.OK,MessageBoxImage.Information);
    }catch(Exception ex){
-     MessageBox.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+     NeonDialog.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
    }finally{PluginUpdatesButton.IsEnabled=true;}
  }
  private void SelectedProductInstall_Click(object sender,RoutedEventArgs e){
@@ -722,19 +751,19 @@ public partial class MainWindow : Window
  }
  private void InstallSelectedShell(){
   if(ShellInstaller.GetState()!=ShellInstaller.State.Missing || !ShellInstaller.HasExpectedPayload())return;
-  if(MessageBox.Show(this,Index==1?"Installare FX SHELL con Sidechain X, Reverse FX e Stutter FX? Chiudi FL Studio.":"Install FX SHELL including Sidechain X, Reverse FX and Stutter FX? Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,Index==1?"Installare FX SHELL con Sidechain X, Reverse FX e Stutter FX? Chiudi FL Studio.":"Install FX SHELL including Sidechain X, Reverse FX and Stutter FX? Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.InstallArgument);
-  if(result==0){try{ShellInstaller.SaveReceipt();}catch(Exception ex){MessageBox.Show(this,ex.Message,"FX SHELL");}}
-  else MessageBox.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
+  if(result==0){try{ShellInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"FX SHELL");}}
+  else NeonDialog.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
   Refresh();
  }
  private void SelectedProductRemove_Click(object sender,RoutedEventArgs e){
   if(selectedProductId=="meter-x"){MeterRemove_Click(sender,e);return;}
   if(!IsShellProduct(selectedProductId) || ShellInstaller.GetState()!=ShellInstaller.State.Managed)return;
-  if(MessageBox.Show(this,Index==1?"Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.":"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,Index==1?"Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.":"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.RemoveArgument);
-  if(result==0){try{ShellInstaller.DeleteReceipt();}catch(Exception ex){MessageBox.Show(this,ex.Message,"FX SHELL");}}
-  else MessageBox.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
+  if(result==0){try{ShellInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"FX SHELL");}}
+  else NeonDialog.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
   Refresh();
  }
  private void SelectedProductLaunch_Click(object sender,RoutedEventArgs e){
@@ -742,20 +771,20 @@ public partial class MainWindow : Window
  }
  private void UpdateMeterUi(){ /* METER X controls live inside its existing card. */ }
  private void MeterImport_Click(object sender,RoutedEventArgs e){
-  if(File.Exists(MeterExePath)){MessageBox.Show(this,Index==1?"METER X è già installato.":"METER X is already installed.","METER X");return;}
+  if(File.Exists(MeterExePath)){NeonDialog.Show(this,Index==1?"METER X è già installato.":"METER X is already installed.","METER X");return;}
   InstallMeterFile(out var detail);
   Refresh();
-  MessageBox.Show(this,detail,"METER X",MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,detail,"METER X",MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private void MeterLaunch_Click(object sender,RoutedEventArgs e){
   try{if(File.Exists(MeterExePath))Process.Start(new ProcessStartInfo{FileName=MeterExePath,WorkingDirectory=Path.GetDirectoryName(MeterExePath)!,UseShellExecute=true});}
-  catch(Exception ex){MessageBox.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
+  catch(Exception ex){NeonDialog.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void MeterRemove_Click(object sender,RoutedEventArgs e){
   if(!File.Exists(MeterExePath))return;
   var msg=Index==1?"Rimuovere solo la copia di METER X importata nell'HUB?":"Remove only the HUB-imported METER X copy?";
-  if(MessageBox.Show(this,msg,"METER X",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
-  try{File.Delete(MeterExePath);Refresh();}catch(Exception ex){MessageBox.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
+  if(NeonDialog.Show(this,msg,"METER X",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  try{File.Delete(MeterExePath);Refresh();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
 
  private void CloseScan_Click(object sender,RoutedEventArgs e) => ScanResultsPanel.Visibility=Visibility.Collapsed;
@@ -881,7 +910,7 @@ public partial class MainWindow : Window
          ScanResultsHeading.Text=Index==1?"ERRORE DURANTE LA SCANSIONE":"SCAN ERROR";
          ScanResultsDetails.Text=ex.Message;
          ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+MeterExePath;
-         MessageBox.Show(this,ex.ToString(),"DJ RUSSO FX HUB v0.6.1 — SCAN ERROR",MessageBoxButton.OK,MessageBoxImage.Error);
+         NeonDialog.Show(this,ex.ToString(),"DJ RUSSO FX HUB v0.6.1 — SCAN ERROR",MessageBoxButton.OK,MessageBoxImage.Error);
      }
  }
 
@@ -1097,6 +1126,14 @@ public partial class MainWindow : Window
    Background=(Brush)FindResource("BgBrush"),Foreground=(Brush)FindResource("FgBrush"),
    ShowInTaskbar=false
   };
+  // Match the main HUB chrome: no native white top resize stripe.
+  System.Windows.Shell.WindowChrome.SetWindowChrome(dialog,new System.Windows.Shell.WindowChrome{
+   CaptionHeight=0,
+   ResizeBorderThickness=new Thickness(7),
+   GlassFrameThickness=new Thickness(0),
+   CornerRadius=new CornerRadius(0),
+   UseAeroCaptionButtons=false
+  });
   var frame=new Border {
    BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1.5),
    Background=(Brush)FindResource("BgBrush"),CornerRadius=new CornerRadius(9)
@@ -1141,7 +1178,7 @@ public partial class MainWindow : Window
    FontFamily=new FontFamily("Segoe UI"),FontSize=14,
    Padding=new Thickness(14)
   };
-  // Custom vertical scroll bar only inside the Guide, not on other HUB controls.
+  // Keep the existing Guide scrollbar and read-only content unchanged.
   content.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=(Style)FindResource("NeonGuideScrollBar");
   layout.Children.Add(content);root.Children.Add(layout);frame.Child=root;dialog.Content=frame;
   dialog.ShowDialog();
