@@ -1,3 +1,13 @@
+v0.8.30 - Neon Ghost cumulative interface polish (22 November 2026)
+- Applied a subtle 4 px elastic hover bounce and click feedback to HUB navigation and action buttons; the stronger social icon bounce remains unchanged.
+- Added spring/lift and glow feedback to all 14 VST product cards without altering installation actions.
+- Corrected language and theme dropdown selected labels by using plain-text items instead of nested StackPanel objects; selected text uses safe dark-on-light contrast in Windows' native ComboBox.
+- Repaired the filter dropdown contrast as part of the shared native ComboBox style.
+- Removed the cyan curved underline beneath the HUB header logo and enlarged the header logo area.
+- Added a once-cached transparency crop of the existing high-resolution HUB logo to improve its visible size without replacing or editing original assets.
+- Preserved all plugin packages, paths, DSP behavior, release hash verification, download/cancel operation, and installed preferences.
+- Windows build and manual visual QA are required to verify hover and dropdown appearance on actual DPI-scaled Windows setups.
+
 v0.8.29 - VST logo sizing correction (22 November 2026)
 - Fixed the plugin cards ignoring their individual LogoHeight property: the ten planned VST logos now have a larger display area.
 - For planned plugin artwork only, cache a trimmed view of transparent PNG margins while preserving each original logo, its aspect ratio, and the source assets.
