@@ -18,8 +18,8 @@
  <SolidColorBrush x:Key="NavSelectedBrush" Color="#213352"/>
  <LinearGradientBrush x:Key="CardFillBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#14152D" Offset="0"/><GradientStop Color="#111329" Offset="0.6"/><GradientStop Color="#1A0C2D" Offset="1"/></LinearGradientBrush>
  <LinearGradientBrush x:Key="HeaderFillBrush" StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#080B1E" Offset="0"/><GradientStop Color="#16112B" Offset="0.55"/><GradientStop Color="#080B1E" Offset="1"/></LinearGradientBrush>
- <Style x:Key="NavNeonButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-  <Setter Property="Height" Value="49"/><Setter Property="HorizontalContentAlignment" Value="Center"/>
+ <Style x:Key="NavNeonButton" TargetType="Button">
+  <Setter Property="Height" Value="49"/><Setter Property="Cursor" Value="Hand"/><Setter Property="HorizontalContentAlignment" Value="Center"/>
   <Setter Property="FontSize" Value="13"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="#F5F6FF"/>
   <Setter Property="Padding" Value="14,6"/><Setter Property="Margin" Value="0,0,0,8"/>
   <Setter Property="ContentTemplate"><Setter.Value><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" TextTrimming="None" TextAlignment="Center" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center"/></DataTemplate></Setter.Value></Setter>
