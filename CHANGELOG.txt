@@ -1,3 +1,11 @@
+v0.8.31 - Navigation and card hover correction (22 November 2026)
+- Product-card lift now completes at Y=0, so cards do not stay vertically offset while hovered.
+- Sidebar navigation uses dedicated bounce on the visible NavFrame, with MouseLeave reset. Avoid duplicate animations from implicit Button styles.
+- Sidebar action group lowered 18 px for more breathing room; existing internal scroll remains available.
+- VST card grid given 12 px of upper clearance below the filter to prevent a bounce from touching the viewport edge.
+- No changes to plugin payloads, update verification, installation flows, links or VST DSP.
+- Automated Windows build and visual validation required before confirming release.
+
 v0.8.30 - Neon Ghost cumulative interface polish (22 November 2026)
 - Applied a subtle 4 px elastic hover bounce and click feedback to HUB navigation and action buttons; the stronger social icon bounce remains unchanged.
 - Added spring/lift and glow feedback to all 14 VST product cards without altering installation actions.

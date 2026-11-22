@@ -18,8 +18,8 @@
  <SolidColorBrush x:Key="NavSelectedBrush" Color="#213352"/>
  <LinearGradientBrush x:Key="CardFillBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#14152D" Offset="0"/><GradientStop Color="#111329" Offset="0.6"/><GradientStop Color="#1A0C2D" Offset="1"/></LinearGradientBrush>
  <LinearGradientBrush x:Key="HeaderFillBrush" StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#080B1E" Offset="0"/><GradientStop Color="#16112B" Offset="0.55"/><GradientStop Color="#080B1E" Offset="1"/></LinearGradientBrush>
- <Style x:Key="NavNeonButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-  <Setter Property="Height" Value="49"/><Setter Property="HorizontalContentAlignment" Value="Center"/>
+ <Style x:Key="NavNeonButton" TargetType="Button">
+  <Setter Property="Height" Value="49"/><Setter Property="Cursor" Value="Hand"/><Setter Property="HorizontalContentAlignment" Value="Center"/>
   <Setter Property="FontSize" Value="13"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="Foreground" Value="#F5F6FF"/>
   <Setter Property="Padding" Value="14,6"/><Setter Property="Margin" Value="0,0,0,8"/>
   <Setter Property="ContentTemplate"><Setter.Value><DataTemplate><TextBlock Text="{Binding}" TextWrapping="Wrap" TextTrimming="None" TextAlignment="Center" FontSize="13" FontWeight="SemiBold" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center"/></DataTemplate></Setter.Value></Setter>
@@ -27,7 +27,8 @@
   <Setter Property="BorderThickness" Value="1"/>
   <Setter Property="Background" Value="{DynamicResource CardFillBrush}"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
-   <Border x:Name="NavFrame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}">
+   <Border x:Name="NavFrame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9" Padding="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
+    <Border.RenderTransform><TranslateTransform Y="0"/></Border.RenderTransform>
     <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center" TextElement.Foreground="{TemplateBinding Foreground}" TextElement.FontWeight="SemiBold"/>
    </Border>
    <ControlTemplate.Triggers>
@@ -36,6 +37,22 @@
      <Setter TargetName="NavFrame" Property="Effect"><Setter.Value><DropShadowEffect Color="#16DFFF" BlurRadius="14" ShadowDepth="0" Opacity="0.8"/></Setter.Value></Setter>
     </Trigger>
     <Trigger Property="IsEnabled" Value="False"><Setter TargetName="NavFrame" Property="Opacity" Value="0.85"/></Trigger>
+    <EventTrigger RoutedEvent="MouseEnter">
+     <BeginStoryboard><Storyboard>
+      <DoubleAnimationUsingKeyFrames Storyboard.TargetName="NavFrame" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
+       <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.12" Value="-4"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.24" Value="1"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.38" Value="0"/>
+      </DoubleAnimationUsingKeyFrames>
+     </Storyboard></BeginStoryboard>
+    </EventTrigger>
+    <EventTrigger RoutedEvent="MouseLeave">
+     <BeginStoryboard><Storyboard>
+      <DoubleAnimation Storyboard.TargetName="NavFrame" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+       To="0" Duration="0:0:0.15"/>
+     </Storyboard></BeginStoryboard>
+    </EventTrigger>
    </ControlTemplate.Triggers>
   </ControlTemplate></Setter.Value></Setter>
  </Style>
@@ -95,6 +112,7 @@
       <EasingDoubleKeyFrame KeyTime="0:0:0.12" Value="-4"/>
       <EasingDoubleKeyFrame KeyTime="0:0:0.23" Value="1"/>
       <EasingDoubleKeyFrame KeyTime="0:0:0.36" Value="-2"/>
+      <EasingDoubleKeyFrame KeyTime="0:0:0.46" Value="0"/>
      </DoubleAnimationUsingKeyFrames>
     </Storyboard></BeginStoryboard>
    </EventTrigger>
@@ -253,7 +271,7 @@
  </Grid>
  <Border Grid.Row="1" Grid.Column="0" Margin="12,14,10,14" CornerRadius="14" BorderBrush="{DynamicResource NeonPinkBrush}" BorderThickness="1.3" Background="{DynamicResource SidebarBrush}">
   <Border.Effect><DropShadowEffect Color="#AF2AFF" BlurRadius="13" ShadowDepth="0" Opacity="0.4"/></Border.Effect>
-  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12,12,12,12">
+  <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12,30,12,12">
    <Button x:Name="DiagnosticsButton" Content="◈   DIAGNOSTICS" Click="Diagnostics_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="BackupButton" Content="▣   CREATE BACKUP" Click="Backup_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="UpdatesButton" Click="CheckUpdates_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
@@ -355,7 +373,7 @@
        <TextBlock x:Name="SearchCaption" Text="SEARCH PRODUCTS" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" Margin="2,0,0,5"/><TextBox x:Name="ProductSearch" TextChanged="ProductSearch_Changed" ToolTip="Search products" MinHeight="39" Padding="10,8" Margin="0,0,0,10"/>
        <TextBlock x:Name="FilterCaption" Text="FILTER PRODUCTS" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" Margin="2,0,0,5"/><ComboBox x:Name="ProductFilter" FontSize="14" FontWeight="SemiBold" SelectionChanged="ProductFilter_Changed" SelectedIndex="0" MinHeight="30"><ComboBoxItem Content="All products"/><ComboBoxItem Content="Installed"/><ComboBoxItem Content="Available"/><ComboBoxItem Content="Coming soon"/></ComboBox>
       </StackPanel>
-      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,0"><ItemsControl x:Name="PluginList" HorizontalAlignment="Stretch"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemWidth="210"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+      <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,0"><ItemsControl x:Name="PluginList" HorizontalAlignment="Stretch" Margin="0,12,0,0"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemWidth="210"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
  <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="103"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <Grid>
    <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="{Binding LogoHeight}" MaxWidth="150" VerticalAlignment="Center" UseLayoutRounding="True"/>
