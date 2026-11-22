@@ -308,9 +308,9 @@
        <TextBlock x:Name="FilterCaption" Text="FILTER PRODUCTS" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" Margin="2,0,0,5"/><ComboBox x:Name="ProductFilter" FontSize="14" FontWeight="SemiBold" SelectionChanged="ProductFilter_Changed" SelectedIndex="0" MinHeight="30"><ComboBoxItem Content="All products"/><ComboBoxItem Content="Installed"/><ComboBoxItem Content="Available"/><ComboBoxItem Content="Coming soon"/></ComboBox>
       </StackPanel>
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,0"><ItemsControl x:Name="PluginList" HorizontalAlignment="Stretch"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemWidth="210"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
- <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="91"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
+ <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="103"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <Grid>
-   <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="77" MaxWidth="148" VerticalAlignment="Top"/>
+   <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="{Binding LogoHeight}" MaxWidth="150" VerticalAlignment="Center" UseLayoutRounding="True"/>
    <TextBlock Text="{Binding FallbackName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Foreground="{DynamicResource FgBrush}" FontSize="12" FontWeight="Bold" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="170">
     <TextBlock.Style>
       <Style TargetType="TextBlock">
