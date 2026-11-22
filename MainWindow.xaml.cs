@@ -16,7 +16,7 @@ public partial class MainWindow : Window
  internal int DialogLanguageIndex => Index;
 
  private record PluginInfo(string id,string name,string category,string status);
- private sealed class PluginCard { public string Id {get;set;}=""; public bool IsSelected {get;set;} public bool IsReady {get;set;} public string ActionLabel {get;set;}=""; public string RemoveLabel {get;set;}=""; public Visibility ActionVisibility => IsReady ? Visibility.Visible : Visibility.Collapsed; public string FallbackName {get;set;}=""; public int LogoHeight {get;set;}=78; public BitmapSource? Logo {get;set;} public string Category {get;set;}=""; public string Footer {get;set;}=""; public Visibility MeterVisibility {get;set;}=Visibility.Collapsed; public bool MeterReady {get;set;} public bool MeterInstallReady {get;set;} public string MeterImportLabel {get;set;}=""; public string MeterLaunchLabel {get;set;}=""; public string MeterRemoveLabel {get;set;}=""; public string BadgeSymbol {get;set;}="✕"; public System.Windows.Media.Brush BadgeBrush {get;set;}=System.Windows.Media.Brushes.IndianRed; public string BadgeTip {get;set;}=""; }
+ private sealed class PluginCard { public string Id {get;set;}=""; public bool IsSelected {get;set;} public bool IsReady {get;set;} public string ActionLabel {get;set;}=""; public string RemoveLabel {get;set;}=""; public Visibility ActionVisibility => IsReady ? Visibility.Visible : Visibility.Collapsed; public string FallbackName {get;set;}=""; public int LogoHeight {get;set;}=78; public int LogoMaxWidth {get;set;}=150; public BitmapSource? Logo {get;set;} public string Category {get;set;}=""; public string Footer {get;set;}=""; public Visibility MeterVisibility {get;set;}=Visibility.Collapsed; public bool MeterReady {get;set;} public bool MeterInstallReady {get;set;} public string MeterImportLabel {get;set;}=""; public string MeterLaunchLabel {get;set;}=""; public string MeterRemoveLabel {get;set;}=""; public string BadgeSymbol {get;set;}="✕"; public System.Windows.Media.Brush BadgeBrush {get;set;}=System.Windows.Media.Brushes.IndianRed; public string BadgeTip {get;set;}=""; }
  private record EffectPackage(string id,string detector,List<string> effectIds);
  private record EffectManifest(int schemaVersion,List<EffectPackage> packages);
  private EffectManifest manifest=new(1,new());
@@ -120,7 +120,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.35";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.36";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  private void Header_MouseLeftButtonDown(object sender,System.Windows.Input.MouseButtonEventArgs e){
    if(e.ChangedButton!=System.Windows.Input.MouseButton.Left)return;
    // Never drag from a control: window buttons retain their own click handling.
@@ -310,7 +310,7 @@ public partial class MainWindow : Window
              BadgeBrush=installed?System.Windows.Media.Brushes.LimeGreen:planned?System.Windows.Media.Brushes.MediumPurple:System.Windows.Media.Brushes.IndianRed,
              BadgeTip=installed?(Index==1?"Installato e verificato":"Installed and verified"):
                  (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
-             FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?95:77,Category=T(category),
+             FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?103:77,LogoMaxWidth=planned?165:150,Category=T(category),
              Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+ShellInstaller.VersionLabel
          });
      }
@@ -357,7 +357,7 @@ public partial class MainWindow : Window
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[0]),0),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[1]),0.55),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[2]),1)},new Point(0,0),new Point(1,0));
-  // v0.8.35: themed WPF ComboBox popup and selected item in all three modes.
+  // v0.8.36: themed WPF ComboBox popup and selected item in all three modes.
   foreach(var (key,value) in new[]{
    ("ComboSurfaceBrush",light?"#FFFFFF":dark?"#252D40":"#171B35"),
    ("ComboTextBrush",light?"#15213A":"#F5F7FF"),
@@ -549,7 +549,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.35");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.36");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -718,6 +718,9 @@ public partial class MainWindow : Window
   bool installed=meter?File.Exists(MeterExePath):shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
   ProductPanelTitle.Text=fx.name;
   ProductPanelLogo.Source=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter",_=>fx.id});
+  // All ten unreleased products share the same generously sized detail logo.
+  // Preserve current sizes for FX SHELL effects and METER X.
+  ProductPanelLogo.Height=(!meter && !shell)?184:132;
   ProductPanelVersion.Text=meter?"v1.2.6 • NEON GHOST":shell?ShellInstaller.VersionLabel:"COMING SOON / IN ARRIVO";
   ProductPanelDescription.Text=meter?
     "Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation":
@@ -1145,7 +1148,8 @@ public partial class MainWindow : Window
    Owner=this,Width=780,Height=610,MinWidth=520,MinHeight=350,
    WindowStartupLocation=WindowStartupLocation.CenterOwner,
    WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.CanResize,
-   Background=(Brush)FindResource("BgBrush"),Foreground=(Brush)FindResource("FgBrush"),
+   AllowsTransparency=true,
+   Background=Brushes.Transparent,Foreground=(Brush)FindResource("FgBrush"),
    ShowInTaskbar=false
   };
   // Match the main HUB chrome: no native white top resize stripe.
@@ -1158,9 +1162,16 @@ public partial class MainWindow : Window
   });
   var frame=new Border {
    BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1.5),
-   Background=(Brush)FindResource("BgBrush"),CornerRadius=new CornerRadius(9)
+   Background=(Brush)FindResource("BgBrush"),CornerRadius=new CornerRadius(10),
+   Margin=new Thickness(2),SnapsToDevicePixels=true
   };
   var root=new DockPanel();
+  // Guide has its own resizable Window: clip title and body to the same inner
+  // rounded perimeter to prevent disconnected neon lines and dark corner seams.
+  root.SizeChanged+=(_,_)=>{
+   if(root.ActualWidth>0 && root.ActualHeight>0)
+    root.Clip=new RectangleGeometry(new Rect(0,0,root.ActualWidth,root.ActualHeight),8.5,8.5);
+  };
   var titleBar=new Grid {Height=48,Background=(Brush)FindResource("SidebarBrush")};
   titleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
   titleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
@@ -1172,7 +1183,8 @@ public partial class MainWindow : Window
    FontSize=16,FontWeight=FontWeights.Bold,Cursor=System.Windows.Input.Cursors.Hand,
    Foreground=(Brush)FindResource("FgBrush"),Background=(Brush)FindResource("PanelBrush"),
    BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1),
-   VerticalAlignment=VerticalAlignment.Center};
+   VerticalAlignment=VerticalAlignment.Center,
+   Style=(Style)FindResource("WindowControlButton")};
   Grid.SetColumn(close,1);titleBar.Children.Add(close);
   close.Click+=(_,_)=>dialog.Close();
   titleBar.MouseLeftButtonDown+=(_,e)=>{
@@ -1223,7 +1235,7 @@ public partial class MainWindow : Window
   CopyInstallerHashButton.IsEnabled=false;
   SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
   try{
-   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.35";
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.36";
    using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
    response.EnsureSuccessStatusCode();
    using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
