@@ -276,7 +276,7 @@ public partial class MainWindow : Window
      ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
      ShellInstallButton.Content=BulkInstallLabels[Index]; ShellRemoveButton.Content=BulkRemoveLabels[Index];
      StatusText.Text=T("ready");
-     ThemeNeonText.Text=T("neon");ThemeDarkText.Text=T("dark");ThemeLightText.Text=T("light");
+     ((ComboBoxItem)SettingsThemeBox.Items[0]).Content=T("neon");((ComboBoxItem)SettingsThemeBox.Items[1]).Content=T("dark");((ComboBoxItem)SettingsThemeBox.Items[2]).Content=T("light");
      var shellState=ShellInstaller.GetState();
      var shellStatusKey=shellState switch {
          ShellInstaller.State.Managed=>"shellManaged",
@@ -358,12 +358,13 @@ public partial class MainWindow : Window
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[0]),0),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[1]),0.55),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[2]),1)},new Point(0,0),new Point(1,0));
-  // Dark drop-downs for Neon Ghost/Dark; native WPF template retained for DPI safety.
+  // Native WPF selected-item surface stays light even in dark themes.
+  // Use plain text content + dark selection text for reliable visibility at all DPI settings.
   foreach(var (key,value) in new[]{
-   ("ComboSurfaceBrush",light?"#FFFFFF":dark?"#20273B":"#161D35"),
-   ("ComboTextBrush",light?"#15213A":"#F2F5FF"),
-   ("ComboHoverBrush",light?"#C9DDFB":dark?"#33425E":"#304064"),
-   ("ComboSelectedBrush",light?"#DCE5FB":dark?"#334A66":"#293D68"),
+   ("ComboSurfaceBrush","#FFFFFF"),
+   ("ComboTextBrush","#15213A"),
+   ("ComboHoverBrush","#C9DDFB"),
+   ("ComboSelectedBrush","#DCE5FB"),
    ("ComboBorderBrush",light?"#7854CE":dark?"#7485B9":"#805EE4"),
    ("ComboFocusBrush",light?"#4275CE":"#61E4FF")
   })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
