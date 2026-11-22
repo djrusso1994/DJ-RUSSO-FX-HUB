@@ -120,7 +120,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.34";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.35";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  private void Header_MouseLeftButtonDown(object sender,System.Windows.Input.MouseButtonEventArgs e){
    if(e.ChangedButton!=System.Windows.Input.MouseButton.Left)return;
    // Never drag from a control: window buttons retain their own click handling.
@@ -357,7 +357,7 @@ public partial class MainWindow : Window
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[0]),0),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[1]),0.55),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[2]),1)},new Point(0,0),new Point(1,0));
-  // v0.8.34: themed WPF ComboBox popup and selected item in all three modes.
+  // v0.8.35: themed WPF ComboBox popup and selected item in all three modes.
   foreach(var (key,value) in new[]{
    ("ComboSurfaceBrush",light?"#FFFFFF":dark?"#252D40":"#171B35"),
    ("ComboTextBrush",light?"#15213A":"#F5F7FF"),
@@ -495,6 +495,7 @@ public partial class MainWindow : Window
  }
  private void OpenBackupFolder_Click(object sender,RoutedEventArgs e){
   try{
+   // Always open Explorer, even before the first snapshot has been created.
    var configDir=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub");
    var lastCreated=Path.Combine(configDir,"last-backup-created.txt");
    var lastSelected=Path.Combine(configDir,"last-backup-folder.txt");
@@ -507,12 +508,14 @@ public partial class MainWindow : Window
     var path=File.ReadAllText(lastSelected).Trim();
     if(Directory.Exists(path))folder=path;
    }
-   if(folder==null && Directory.Exists(BackupDir))folder=BackupDir;
-   if(folder==null){
-    NeonToast.Show(this,new[]{"No backup folder available yet.","Non è ancora presente una cartella di backup.","Todavía no hay carpeta de copia de seguridad.","Aucun dossier de sauvegarde disponible.","Noch kein Backup-Ordner vorhanden."}[Index],warning:true);
-    return;
-   }
-   Process.Start(new ProcessStartInfo{FileName=folder,UseShellExecute=true});
+   folder??=BackupDir;
+   Directory.CreateDirectory(folder);
+   // Use Explorer explicitly to avoid ambiguity in the shell association for folders.
+   Process.Start(new ProcessStartInfo{
+    FileName="explorer.exe",
+    Arguments="\"" + folder + "\"",
+    UseShellExecute=true
+   });
   }catch(Exception ex){NeonDialog.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void Diagnostics_Click(object sender,RoutedEventArgs e){
@@ -546,7 +549,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.34");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.35");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -583,7 +586,7 @@ public partial class MainWindow : Window
            "DJ RUSSO FX HUB est à jour. Version installée : v"+current.ToString(3)+".",
            "DJ RUSSO FX HUB ist aktuell. Installierte Version: v"+current.ToString(3)+"."
          };
-         NeonToast.Show(this,upToDateMessages[Index]);
+         NeonDialog.Show(this,upToDateMessages[Index],"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
        }
        return;
      }
@@ -1220,7 +1223,7 @@ public partial class MainWindow : Window
   CopyInstallerHashButton.IsEnabled=false;
   SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
   try{
-   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.34";
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.35";
    using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
    response.EnsureSuccessStatusCode();
    using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
