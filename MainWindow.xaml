@@ -552,13 +552,13 @@
     </DockPanel>
    </Border>
    <Border Grid.Column="1" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1.7" CornerRadius="13" Margin="0,0,0,10" Padding="16">
- <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,2,0"><StackPanel>
+ <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,0,-10,0"><StackPanel Margin="0,0,10,0">
   <TextBlock Text="DJ RUSSO" FontSize="17" FontWeight="Bold" FontStyle="Italic" HorizontalAlignment="Center" Foreground="{DynamicResource FgBrush}"/>
-  <Viewbox Width="210" MaxHeight="42" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center" ClipToBounds="True">
+  <Viewbox Height="54" MaxHeight="54" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Stretch" ClipToBounds="False">
    <TextBlock x:Name="ProductPanelTitle" Text="METER X" FontSize="32" FontWeight="ExtraBold" FontStyle="Italic" TextAlignment="Center" Foreground="{DynamicResource HeadingBrush}"/>
   </Viewbox>
   <TextBlock x:Name="ProductPanelVersion" Text="v1.2.6  •  NEON GHOST" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{DynamicResource AccentBrush}" Margin="0,0,0,12"/>
-  <Image x:Name="ProductPanelLogo" Source="Assets/meter-x.png" Height="132" Stretch="Uniform" Margin="0,0,0,9"/>
+  <Image x:Name="ProductPanelLogo" Source="Assets/meter-x.png" Height="132" Stretch="Uniform" StretchDirection="DownOnly" HorizontalAlignment="Center" Margin="0,0,0,9" RenderOptions.BitmapScalingMode="Fant"/>
   <TextBlock x:Name="ProductPanelDescription" Text="Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation" TextWrapping="Wrap" FontSize="12" Foreground="{DynamicResource InfoBrush}" Margin="0,5,0,13"/>
   <Button x:Name="MeterPanelInstallButton" Content="INSTALL / INSTALLA" Style="{StaticResource NeonActionButton}" Click="SelectedProductInstall_Click" Margin="0,0,0,8" BorderBrush="#24E977" Background="#0D3729"/>
   <Button x:Name="MeterPanelRemoveButton" Content="REMOVE / RIMUOVI" Style="{StaticResource NeonActionButton}" Click="SelectedProductRemove_Click" Margin="0,0,0,8" BorderBrush="#E13AF5" Background="#392044"/>
