@@ -1,3 +1,12 @@
+v0.8.38 - Clean future-plugin logo transparency (22 November 2026)
+- Inspected the original PNG assets of all 10 "Coming soon / In arrivo" products.
+- Removed detached side fragments from Compressor X, Drive X, EQ X, Pitch X, Stereo X and Transient X.
+- Auto Master X, Reverb X, Delay X and Vocal Remover X required no pixel changes.
+- Preserved original RGB artwork, transparency format, 800x300 dimensions, titles and plugin behavior.
+- No edits to UI layout, VST installers, update logic, backups, music playback or DSP.
+- Version updated solely for the new signed-off installer and update detection.
+- Kept v0.8.37 as a downloadable fallback; validate appearance in FX HUB after installing.
+
 v0.8.31 - Navigation and card hover correction (22 November 2026)
 - Product-card lift now completes at Y=0, so cards do not stay vertically offset while hovered.
 - Sidebar navigation uses dedicated bounce on the visible NavFrame, with MouseLeave reset. Avoid duplicate animations from implicit Button styles.
