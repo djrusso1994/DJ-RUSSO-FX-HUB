@@ -1,3 +1,13 @@
+v0.8.28 - Neon Ghost cumulative visual polish (22 November 2026)
+- Guide / README window: native Windows title bar replaced with movable, resizable Neon Ghost header, close X and dark guide-only scrollbar.
+- Enlarged the original HUB header logo and enabled high-quality Fant downscaling (no source logo artwork altered).
+- Added elastic hover bounce to social tiles and a vector GitHub repository icon below the mini waveform.
+- Settings: condensed multilingual preview button; improved responsive VirusTotal / SHA-256 controls and labels.
+- Theme-aware dropdown palettes added without replacing native ComboBox templates; check selected text contrast on Windows.
+- Update dialog: subtle animated gradient, dark progress track, cancel hover feedback, and zero-download preview progress from 0 to 100 percent.
+- Kept GitHub update/download verification, plugin payloads, DSP, versions, paths, existing external URLs and backup/diagnostics behavior unchanged.
+- Automated Windows compilation to be validated on the PR before release; visual QA in Windows still recommended.
+
 v0.8.12 - Dropdown text readability fix
 - Restored high contrast dark text on native white WPF dropdown surfaces.
 - Explicit TextBlock foreground for language items to avoid global style override.
