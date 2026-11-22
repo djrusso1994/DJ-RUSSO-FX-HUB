@@ -49,9 +49,10 @@ internal static class NeonDialog
             MaxHeight = 650,
             WindowStartupLocation = owner != null ? WindowStartupLocation.CenterOwner : WindowStartupLocation.CenterScreen,
             WindowStyle = WindowStyle.None,
+            AllowsTransparency = true,
             ResizeMode = ResizeMode.NoResize,
             ShowInTaskbar = false,
-            Background = bg,
+            Background = Brushes.Transparent,
             Foreground = fg,
             FontFamily = new FontFamily("Segoe UI"),
             UseLayoutRounding = true,
@@ -69,6 +70,13 @@ internal static class NeonDialog
             SnapsToDevicePixels = true
         };
         var root = new DockPanel();
+        // Clip header and body together to rounded geometry: no square corner seams.
+        root.SizeChanged += (_, _) =>
+        {
+            var width = Math.Max(0, root.ActualWidth);
+            var height = Math.Max(0, root.ActualHeight);
+            root.Clip = new RectangleGeometry(new Rect(0, 0, width, height), 10.5, 10.5);
+        };
         var header = new Grid { Background = panel, Height = 56 };
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         header.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -175,7 +183,17 @@ internal static class NeonDialog
 
         void Add(string text, MessageBoxResult value, bool primary = false, bool cancel = false)
         {
-            var button = MakeButton(text, primary ? accent : panel, fg, primary ? cyan : accent);
+            var primaryFg = fg;
+            if (accent is SolidColorBrush solidAccent)
+            {
+                var ac = solidAccent.Color;
+                // Dark type on bright lavender, light type on dark accent.
+                var luminance = (0.2126 * ac.R + 0.7152 * ac.G + 0.0722 * ac.B);
+                primaryFg = luminance >= 128
+                    ? new SolidColorBrush(Color.FromRgb(17, 20, 39))
+                    : Brushes.White;
+            }
+            var button = MakeButton(text, primary ? accent : panel, primary ? primaryFg : fg, primary ? cyan : accent);
             button.MinWidth = 108; button.Height = 41;
             button.Margin = new Thickness(8, 0, 0, 0);
             button.IsDefault = primary;
