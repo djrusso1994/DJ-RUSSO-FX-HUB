@@ -56,12 +56,22 @@
   <Setter Property="Background" Value="#12172D"/><Setter Property="BorderBrush" Value="#7656E6"/><Setter Property="BorderThickness" Value="1.3"/>
   <Setter Property="Cursor" Value="Hand"/><Setter Property="FontSize" Value="10"/><Setter Property="FontWeight" Value="SemiBold"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
-   <Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15" Padding="{TemplateBinding Padding}">
+   <Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15" Padding="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
+    <Border.RenderTransform><TranslateTransform Y="0"/></Border.RenderTransform>
     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
    </Border><ControlTemplate.Triggers>
     <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="Frame" Property="BorderBrush" Value="#56F2FF"/>
      <Setter TargetName="Frame" Property="Effect"><Setter.Value><DropShadowEffect Color="#6C5CFF" BlurRadius="9" ShadowDepth="0" Opacity="0.55"/></Setter.Value></Setter>
     </Trigger><Trigger Property="IsPressed" Value="True"><Setter TargetName="Frame" Property="Background" Value="#25224C"/></Trigger>
+   <EventTrigger RoutedEvent="MouseEnter"><BeginStoryboard><Storyboard>
+     <DoubleAnimationUsingKeyFrames Storyboard.TargetName="Frame" Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)">
+       <EasingDoubleKeyFrame KeyTime="0:0:0" Value="0"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.13" Value="-8"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.25" Value="2"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.35" Value="-3"/>
+       <EasingDoubleKeyFrame KeyTime="0:0:0.45" Value="0"/>
+     </DoubleAnimationUsingKeyFrames>
+    </Storyboard></BeginStoryboard></EventTrigger>
    </ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter>
  </Style>
  <Style x:Key="ProductCardStyle" TargetType="Border">
@@ -81,12 +91,12 @@
  <Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource FgBrush}"/><Setter Property="TextOptions.TextFormattingMode" Value="Display"/><Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/></Style>
  <!-- Dropdown controls: high contrast in all three themes. No custom ControlTemplate,
       preserving WPF's tested built-in ComboBox to avoid startup deserialization faults. -->
- <SolidColorBrush x:Key="ComboSurfaceBrush" Color="#FFFFFF"/>
- <SolidColorBrush x:Key="ComboTextBrush" Color="#15213A"/>
+ <SolidColorBrush x:Key="ComboSurfaceBrush" Color="#161D35"/>
+ <SolidColorBrush x:Key="ComboTextBrush" Color="#F2F5FF"/>
  <SolidColorBrush x:Key="ComboBorderBrush" Color="#7854CE"/>
  <SolidColorBrush x:Key="ComboFocusBrush" Color="#4275CE"/>
- <SolidColorBrush x:Key="ComboHoverBrush" Color="#C9DDFB"/>
- <SolidColorBrush x:Key="ComboSelectedBrush" Color="#DCE5FB"/>
+ <SolidColorBrush x:Key="ComboHoverBrush" Color="#303D62"/>
+ <SolidColorBrush x:Key="ComboSelectedBrush" Color="#28395E"/>
  <Style TargetType="ComboBoxItem">
   <Setter Property="Foreground" Value="{DynamicResource ComboTextBrush}"/>
   <Setter Property="Background" Value="{DynamicResource ComboSurfaceBrush}"/>
@@ -154,6 +164,21 @@
    </ControlTemplate.Triggers>
   </ControlTemplate></Setter.Value></Setter>
  </Style>
+ <Style x:Key="NeonGuideScrollBar" TargetType="ScrollBar">
+  <Setter Property="Width" Value="13"/>
+  <Setter Property="Background" Value="#10162D"/>
+  <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="ScrollBar">
+   <Border Background="#10162D" CornerRadius="6" Margin="1,3">
+    <Track x:Name="PART_Track" IsDirectionReversed="True" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
+     <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/></Track.DecreaseRepeatButton>
+     <Track.Thumb><Thumb><Thumb.Template><ControlTemplate TargetType="Thumb">
+      <Border Background="#9B62EC" BorderBrush="#61E4FF" BorderThickness="1" CornerRadius="6"/>
+     </ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+     <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageDownCommand" Opacity="0" Focusable="False"/></Track.IncreaseRepeatButton>
+    </Track>
+   </Border>
+  </ControlTemplate></Setter.Value></Setter>
+ </Style>
  </Window.Resources>
 <Grid>
  <Grid.RowDefinitions><RowDefinition Height="82"/><RowDefinition Height="*"/></Grid.RowDefinitions>
@@ -164,8 +189,8 @@
   </Border>
   <Grid Margin="26,0,16,0" Background="Transparent" MouseLeftButtonDown="Header_MouseLeftButtonDown"><Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-    <Border Width="80" Height="62" CornerRadius="9" BorderBrush="{DynamicResource NeonCyanBrush}" BorderThickness="0,0,0,1" Margin="0,0,16,0">
-     <Image Source="Assets/hub.png" Stretch="Uniform"/>
+    <Border Width="102" Height="72" CornerRadius="9" BorderBrush="{DynamicResource NeonCyanBrush}" BorderThickness="0,0,0,1" Margin="0,0,12,0" SnapsToDevicePixels="True">
+     <Image Source="Assets/hub.png" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" UseLayoutRounding="True"/>
     </Border>
     <TextBlock Text="DJ RUSSO" FontSize="33" FontStyle="Italic" FontWeight="Black" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center">
      <TextBlock.Effect><DropShadowEffect Color="#A8C9F9" BlurRadius="7" ShadowDepth="0" Opacity="0.4"/></TextBlock.Effect>
@@ -226,6 +251,11 @@
      <Canvas x:Name="MiniWaveCanvas" Height="48" ClipToBounds="True" Background="#0D132A" SizeChanged="MiniWave_SizeChanged"/>
     </StackPanel>
    </Border>
+   <Button x:Name="GitHubProjectButton" Style="{StaticResource SocialNeonButton}" Click="Social_Click" Tag="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB" ToolTip="Open the official GitHub project" HorizontalAlignment="Center" Width="82" Height="68" Margin="6,18,6,10">
+    <Viewbox Width="48" Height="48" Stretch="Uniform" SnapsToDevicePixels="True"><Canvas Width="24" Height="24">
+      <Path Fill="#F7F8FF" Data="M 12,0.3 C 5.4,0.3 0,5.7 0,12.3 C 0,17.6 3.4,22.1 8.2,23.7 C 8.8,23.8 9,23.4 9,23.1 L 9,20.9 C 5.7,21.6 5,19.5 5,19.5 C 4.4,18.1 3.6,17.7 3.6,17.7 C 2.5,17 3.7,17 3.7,17 C 4.9,17.1 5.5,18.2 5.5,18.2 C 6.6,20.1 8.4,19.5 9.1,19.2 C 9.2,18.4 9.5,17.9 9.8,17.6 C 7.1,17.3 4.3,16.3 4.3,11.7 C 4.3,10.6 4.7,9.8 5.3,9.1 C 5.2,8.8 4.9,7.9 5.4,6.6 C 5.4,6.6 6.2,6.4 9,8 C 10,7.8 11,7.7 12,7.7 C 13,7.7 14,7.8 15,8 C 17.8,6.4 18.6,6.6 18.6,6.6 C 19.1,7.9 18.8,8.8 18.7,9.1 C 19.3,9.8 19.7,10.6 19.7,11.7 C 19.7,16.3 16.9,17.3 14.2,17.6 C 14.6,18 15,18.7 15,19.9 L 15,23.1 C 15,23.4 15.2,23.8 15.8,23.7 C 20.6,22.1 24,17.6 24,12.3 C 24,5.7 18.6,0.3 12,0.3 Z"/>
+    </Canvas></Viewbox>
+   </Button>
 
   </StackPanel></ScrollViewer>
  </Border>
@@ -250,16 +280,16 @@
     </ComboBox></WrapPanel>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
-      <TextBlock Text="ANTEPRIMA FINESTRA AGGIORNAMENTO" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" FontSize="13"/>
-      <TextBlock Text="Verifica la finestra Neon Ghost senza scaricare o installare file." Foreground="{DynamicResource FgBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10"/>
-      <Button x:Name="PreviewUpdateDialogButton" Content="PREVIEW DOWNLOAD WINDOW / ANTEPRIMA" Click="PreviewUpdateDialog_Click" HorizontalAlignment="Left" MinWidth="210" Height="36" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/>
+      <TextBlock x:Name="PreviewHeading" Text="UPDATE WINDOW PREVIEW" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" FontSize="13"/>
+      <TextBlock x:Name="PreviewExplanation" Text="Preview the Neon Ghost window without downloading or installing files." Foreground="{DynamicResource FgBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10"/>
+      <Button x:Name="PreviewUpdateDialogButton" Content="PREVIEW DOWNLOAD" Click="PreviewUpdateDialog_Click" HorizontalAlignment="Left" MinWidth="210" Height="36" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/>
      </StackPanel>
     </Border>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
       <TextBlock x:Name="SecurityHeading" Text="Security &amp; authenticity" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource SecondaryBrush}"/>
       <TextBlock x:Name="SecurityExplanation" Text="Official GitHub releases. SHA-256 verifies file integrity, not malware safety. VirusTotal reports are independent and may not exist for every version." TextWrapping="Wrap" Margin="0,7,0,10" Foreground="{DynamicResource FgBrush}" FontSize="12"/>
-      <StackPanel Orientation="Horizontal"><Button x:Name="VirusTotalReportButton" Content="Apri VirusTotal (carica installer)" Click="VirusTotalReport_Click" HorizontalAlignment="Left" MinWidth="210" Height="34" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" BorderThickness="1" Style="{StaticResource WindowControlButton}"/><Button x:Name="CopyInstallerHashButton" Content="Copy SHA-256" Click="CopyInstallerHash_Click" Margin="8,0,0,0" Padding="10,5" Height="34" IsEnabled="False" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/></StackPanel>
+      <WrapPanel><Button x:Name="VirusTotalReportButton" Content="Apri VirusTotal (carica installer)" Click="VirusTotalReport_Click" HorizontalAlignment="Left" MinWidth="205" Height="38" Margin="0,0,8,8" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" BorderThickness="1" Style="{StaticResource WindowControlButton}"/><Button x:Name="CopyInstallerHashButton" Content="Copy SHA-256" Click="CopyInstallerHash_Click" Margin="0,0,0,8" MinWidth="130" Padding="12,5" Height="38" IsEnabled="False" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/></WrapPanel>
       <TextBlock x:Name="SecurityStatus" Text="" Margin="0,8,0,0" TextWrapping="Wrap" Foreground="{DynamicResource SecondaryBrush}" FontSize="11"/>
      </StackPanel>
     </Border>
