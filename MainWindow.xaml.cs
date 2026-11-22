@@ -120,7 +120,33 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.36";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.37";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ // Temporarily favor speed while Windows is actively resizing/maximizing,
+ // then restore high-quality antialiasing after layout has settled.
+ // This cannot replace or override the native DWM maximize transition.
+ private readonly System.Windows.Threading.DispatcherTimer resizeQualityTimer=new(){
+  Interval=TimeSpan.FromMilliseconds(180)
+ };
+ private bool resizingFastMode=false;
+ private void InitializeResizeRendering(){
+  resizeQualityTimer.Tick+=(_,_)=>{
+   resizeQualityTimer.Stop();
+   resizingFastMode=false;
+   RenderOptions.SetBitmapScalingMode(this,BitmapScalingMode.Fant);
+   RenderOptions.SetBitmapScalingMode(ProductPanelLogo,BitmapScalingMode.Fant);
+  };
+  SizeChanged+=(_,_)=>{
+   if(!IsLoaded)return;
+   if(!resizingFastMode){
+    resizingFastMode=true;
+    RenderOptions.SetBitmapScalingMode(this,BitmapScalingMode.LowQuality);
+    RenderOptions.SetBitmapScalingMode(ProductPanelLogo,BitmapScalingMode.LowQuality);
+   }
+   resizeQualityTimer.Stop();
+   resizeQualityTimer.Start();
+  };
+  Closed+=(_,_)=>resizeQualityTimer.Stop();
+ }
  private void Header_MouseLeftButtonDown(object sender,System.Windows.Input.MouseButtonEventArgs e){
    if(e.ChangedButton!=System.Windows.Input.MouseButton.Left)return;
    // Never drag from a control: window buttons retain their own click handling.
@@ -357,7 +383,7 @@ public partial class MainWindow : Window
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[0]),0),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[1]),0.55),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[2]),1)},new Point(0,0),new Point(1,0));
-  // v0.8.36: themed WPF ComboBox popup and selected item in all three modes.
+  // v0.8.37: themed WPF ComboBox popup and selected item in all three modes.
   foreach(var (key,value) in new[]{
    ("ComboSurfaceBrush",light?"#FFFFFF":dark?"#252D40":"#171B35"),
    ("ComboTextBrush",light?"#15213A":"#F5F7FF"),
@@ -549,7 +575,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.36");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.37");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -717,10 +743,14 @@ public partial class MainWindow : Window
   var shellState=ShellInstaller.GetState();
   bool installed=meter?File.Exists(MeterExePath):shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
   ProductPanelTitle.Text=fx.name;
-  ProductPanelLogo.Source=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter",_=>fx.id});
-  // All ten unreleased products share the same generously sized detail logo.
-  // Preserve current sizes for FX SHELL effects and METER X.
-  ProductPanelLogo.Height=(!meter && !shell)?184:132;
+  var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter",_=>fx.id});
+  var comingSoon=!meter && !shell;
+  // Use the same cached transparent-pixel crop already used in the catalog.
+  // This keeps the artwork itself legible, not merely its oversized PNG canvas.
+  ProductPanelLogo.Source=comingSoon?CardLogo(fx.id,productAsset,true):productAsset;
+  ProductPanelLogo.Height=comingSoon?216:132;
+  ProductPanelLogo.Width=comingSoon?240:double.NaN;
+  ProductPanelLogo.Stretch=Stretch.Uniform;
   ProductPanelVersion.Text=meter?"v1.2.6 • NEON GHOST":shell?ShellInstaller.VersionLabel:"COMING SOON / IN ARRIVO";
   ProductPanelDescription.Text=meter?
     "Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation":
@@ -1235,7 +1265,7 @@ public partial class MainWindow : Window
   CopyInstallerHashButton.IsEnabled=false;
   SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
   try{
-   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.36";
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.37";
    using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
    response.EnsureSuccessStatusCode();
    using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
