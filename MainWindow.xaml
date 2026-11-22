@@ -405,11 +405,11 @@
   <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"><StackPanel Margin="12,30,12,12">
    <Button x:Name="DiagnosticsButton" Content="◈   DIAGNOSTICS" Click="Diagnostics_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="BackupButton" Content="▣   CREATE BACKUP" Click="Backup_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
+   <Button x:Name="OpenBackupFolderButton" Content="▣   OPEN BACKUP FOLDER" Click="OpenBackupFolder_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}" ToolTip="Open the last backup folder / Apri la cartella dell’ultimo backup"/>
    <Button x:Name="UpdatesButton" Click="CheckUpdates_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="ScanButton" Click="Scan_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="FolderButton" Click="OpenFolder_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="SettingsButton" Click="Settings_Click" Style="{StaticResource SettingsNavButton}" Foreground="{DynamicResource FgBrush}"/>
-   <Button x:Name="PreviewUpdateQuickButton" Content="◈   ANTEPRIMA AGGIORNAMENTO" Click="PreviewUpdateDialog_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}" ToolTip="Simula la finestra di download Neon Ghost senza scaricare file"/>
    <Button x:Name="GuideButton" Click="Guide_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Border Height="1" Background="{DynamicResource NeonPinkBrush}" Opacity="0.6" Margin="0,17,0,17"/>
    <Border Margin="0,3,0,0" Padding="8" CornerRadius="13" Background="#0B1027" BorderBrush="#A15DFF" BorderThickness="1.5">
@@ -475,13 +475,6 @@
       <ComboBoxItem Content="Dark Professional" ContentTemplate="{StaticResource ThemeDarkTemplate}"/>
       <ComboBoxItem Content="Light Modern" ContentTemplate="{StaticResource ThemeLightTemplate}"/>
      </ComboBox></WrapPanel>
-    <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
-     <StackPanel>
-      <TextBlock x:Name="PreviewHeading" Text="UPDATE WINDOW PREVIEW" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" FontSize="13"/>
-      <TextBlock x:Name="PreviewExplanation" Text="Preview the Neon Ghost window without downloading or installing files." Foreground="{DynamicResource FgBrush}" FontSize="12" TextWrapping="Wrap" Margin="0,6,0,10"/>
-      <Button x:Name="PreviewUpdateDialogButton" Content="PREVIEW DOWNLOAD" Click="PreviewUpdateDialog_Click" HorizontalAlignment="Left" MinWidth="210" Height="36" Padding="12,5" Foreground="{DynamicResource FgBrush}" Background="{DynamicResource CardFillBrush}" BorderBrush="{DynamicResource NeonCyanBrush}" Style="{StaticResource WindowControlButton}"/>
-     </StackPanel>
-    </Border>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
       <TextBlock x:Name="SecurityHeading" Text="Security &amp; authenticity" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource SecondaryBrush}"/>
