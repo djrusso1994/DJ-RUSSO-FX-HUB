@@ -523,7 +523,7 @@
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,8,0"><ItemsControl x:Name="PluginList" HorizontalAlignment="Stretch" Margin="0,12,0,0"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemWidth="210"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
  <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="103"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
   <Grid>
-   <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="{Binding LogoHeight}" MaxWidth="165" VerticalAlignment="Center" UseLayoutRounding="True"/>
+   <Image Source="{Binding Logo}" Stretch="Uniform" RenderOptions.BitmapScalingMode="Fant" SnapsToDevicePixels="True" HorizontalAlignment="Center" Height="{Binding LogoHeight}" MaxWidth="{Binding LogoMaxWidth}" VerticalAlignment="Center" UseLayoutRounding="True"/>
    <TextBlock Text="{Binding FallbackName}" HorizontalAlignment="Center" VerticalAlignment="Bottom" Foreground="{DynamicResource FgBrush}" FontSize="12" FontWeight="Bold" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="170">
     <TextBlock.Style>
       <Style TargetType="TextBlock">
