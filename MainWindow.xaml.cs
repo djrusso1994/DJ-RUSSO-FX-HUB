@@ -249,8 +249,8 @@ public partial class MainWindow : Window
  {
      if (item.Content is StackPanel panel)
      {
-         foreach (var child in panel.Children)
-             if (child is TextBlock text) { text.Text = value; return; }
+         for (int i = panel.Children.Count - 1; i >= 0; i--)
+             if (panel.Children[i] is TextBlock text) { text.Text = value; return; }
      }
      item.Content = value;
  }
