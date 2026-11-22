@@ -65,6 +65,24 @@ jobs:
           if (-not (Test-Path -LiteralPath $shell -PathType Leaf)) { throw "FX SHELL VST3 missing from publish output." }
           Write-Host "METER X and FX SHELL payloads verified."
 
+      # Early smoke check for WPF resource/XAML parse failures before packaging or releasing.
+      - name: Smoke-test FX HUB WPF startup
+        shell: pwsh
+        run: |
+          $exe = Join-Path $env:GITHUB_WORKSPACE "publish/DJRussoFXHub.exe"
+          if (-not (Test-Path -LiteralPath $exe -PathType Leaf)) { throw "FX HUB EXE missing." }
+          $p = Start-Process -FilePath $exe -WorkingDirectory (Split-Path $exe) -PassThru
+          try {
+            Start-Sleep -Seconds 8
+            $p.Refresh()
+            if ($p.HasExited) { throw "FX HUB exited during WPF startup (code $($p.ExitCode)); check XAML and exception logs." }
+            Write-Host "WPF startup smoke test passed (process remained running)."
+          }
+          finally {
+            $p.Refresh()
+            if (-not $p.HasExited) { Stop-Process -Id $p.Id -Force -ErrorAction SilentlyContinue }
+          }
+
       - name: Install Inno Setup
         shell: pwsh
         run: |
