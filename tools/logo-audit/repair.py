@@ -1,7 +1,7 @@
 """Conservative cleanup of detached PNG fragments; leave existing artwork untouched."""
 from PIL import Image, ImageDraw, ImageFilter, ImageChops, ImageFont
 from pathlib import Path
-import json, base64, io
+import json, base64, io, subprocess
 
 NAMES=["auto-master-x","compressor-x","pitch-x","eq-x","reverb-x","delay-x","drive-x","stereo-x","transient-x","vocal-remover-x"]
 assets=Path("Assets")
@@ -12,7 +12,9 @@ font=ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",1
 summary=[]
 for i,name in enumerate(NAMES):
     path=assets/f"{name}.png"
-    im=Image.open(path).convert("RGBA")
+    # Always regenerate from the verified release: repeated runs are byte-for-byte deterministic.
+    original_png=subprocess.check_output(["git","show",f"v0.8.37:Assets/{name}.png"])
+    im=Image.open(io.BytesIO(original_png)).convert("RGBA")
     w,h=im.size
     original_alpha=im.getchannel("A")
     alpha=original_alpha.tobytes()
@@ -42,6 +44,7 @@ for i,name in enumerate(NAMES):
     keep=bytearray(w*h)
     for pos in largest:keep[pos]=255
     removed=[]
+    remove_mask=bytearray(w*h)
     for comp,box in components[1:]:
         x0,y0,x1,y1=box
         # Keep little internal highlights; exclude detached side scraps.
@@ -50,10 +53,15 @@ for i,name in enumerate(NAMES):
         if interior:
             for pos in comp:keep[pos]=255
         else:
+            for pos in comp:remove_mask[pos]=255
             removed.append({"pixels":len(comp),"box":list(box)})
-    keep_im=Image.frombytes("L",(w,h),bytes(keep))
-    # Retain soft glow within four pixels of the intact emblem.
-    keep_im=keep_im.filter(ImageFilter.MaxFilter(9))
+    main_mask=Image.frombytes("L",(w,h),bytes(keep))
+    # Keep original antialiasing around intact artwork, but exclude the faint
+    # halos of discarded fragments too. Never erase a true main-logo pixel.
+    soft_keep=main_mask.filter(ImageFilter.MaxFilter(9))
+    discarded_mask=Image.frombytes("L",(w,h),bytes(remove_mask))
+    discarded_halos=discarded_mask.filter(ImageFilter.MaxFilter(9))
+    keep_im=ImageChops.lighter(ImageChops.subtract(soft_keep,discarded_halos),main_mask)
     new_alpha=ImageChops.multiply(original_alpha,keep_im)
     # Protect the original drawing and lettering: only alpha changes.
     new=im.copy();new.putalpha(new_alpha)
