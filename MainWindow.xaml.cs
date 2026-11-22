@@ -14,7 +14,7 @@ namespace DJRussoFXHub;
 public partial class MainWindow : Window
 {
  private record PluginInfo(string id,string name,string category,string status);
- private sealed class PluginCard { public string Id {get;set;}=""; public bool IsSelected {get;set;} public bool IsReady {get;set;} public string ActionLabel {get;set;}=""; public string RemoveLabel {get;set;}=""; public Visibility ActionVisibility => IsReady ? Visibility.Visible : Visibility.Collapsed; public string FallbackName {get;set;}=""; public int LogoHeight {get;set;}=78; public BitmapImage? Logo {get;set;} public string Category {get;set;}=""; public string Footer {get;set;}=""; public Visibility MeterVisibility {get;set;}=Visibility.Collapsed; public bool MeterReady {get;set;} public bool MeterInstallReady {get;set;} public string MeterImportLabel {get;set;}=""; public string MeterLaunchLabel {get;set;}=""; public string MeterRemoveLabel {get;set;}=""; public string BadgeSymbol {get;set;}="✕"; public System.Windows.Media.Brush BadgeBrush {get;set;}=System.Windows.Media.Brushes.IndianRed; public string BadgeTip {get;set;}=""; }
+ private sealed class PluginCard { public string Id {get;set;}=""; public bool IsSelected {get;set;} public bool IsReady {get;set;} public string ActionLabel {get;set;}=""; public string RemoveLabel {get;set;}=""; public Visibility ActionVisibility => IsReady ? Visibility.Visible : Visibility.Collapsed; public string FallbackName {get;set;}=""; public int LogoHeight {get;set;}=78; public BitmapSource? Logo {get;set;} public string Category {get;set;}=""; public string Footer {get;set;}=""; public Visibility MeterVisibility {get;set;}=Visibility.Collapsed; public bool MeterReady {get;set;} public bool MeterInstallReady {get;set;} public string MeterImportLabel {get;set;}=""; public string MeterLaunchLabel {get;set;}=""; public string MeterRemoveLabel {get;set;}=""; public string BadgeSymbol {get;set;}="✕"; public System.Windows.Media.Brush BadgeBrush {get;set;}=System.Windows.Media.Brushes.IndianRed; public string BadgeTip {get;set;}=""; }
  private record EffectPackage(string id,string detector,List<string> effectIds);
  private record EffectManifest(int schemaVersion,List<EffectPackage> packages);
  private EffectManifest manifest=new(1,new());
@@ -200,6 +200,47 @@ public partial class MainWindow : Window
      }catch{return assetCache[name]=null;}
    }
  }
+ // Normalize the *visible* bounds of the original transparent PNGs on coming-soon cards.
+ // Preserves each artist logo and keeps the bundled source assets unchanged.
+ private static readonly Dictionary<string,BitmapSource?> cardLogoCache=new(StringComparer.OrdinalIgnoreCase);
+ private static BitmapSource? CardLogo(string id,BitmapImage? source,bool planned){
+   if(source==null || !planned)return source;
+   lock(cardLogoCache){
+     if(cardLogoCache.TryGetValue(id,out var cached))return cached;
+     BitmapSource chosen=source;
+     try{
+       BitmapSource argb=source.Format==PixelFormats.Bgra32
+         ? source : new FormatConvertedBitmap(source,PixelFormats.Bgra32,null,0);
+       int w=argb.PixelWidth,h=argb.PixelHeight;
+       if(w>0 && h>0 && (long)w*h<5000000){
+         var stride=checked(w*4);
+         var pixels=new byte[checked(stride*h)];
+         argb.CopyPixels(pixels,stride,0);
+         int left=w,right=-1,top=h,bottom=-1;
+         // Alpha threshold avoids antialiasing/glow specks from inflating the crop.
+         for(int y=0;y<h;y++)
+           for(int x=0;x<w;x++)
+             if(pixels[y*stride+x*4+3]>=30){
+               if(x<left)left=x;if(x>right)right=x;
+               if(y<top)top=y;if(y>bottom)bottom=y;
+             }
+         if(right>=left && bottom>=top){
+           int cw=right-left+1,ch=bottom-top+1;
+           int pad=Math.Max(6,(int)(Math.Max(cw,ch)*0.045));
+           int x0=Math.Max(0,left-pad),y0=Math.Max(0,top-pad);
+           int x1=Math.Min(w,right+pad+1),y1=Math.Min(h,bottom+pad+1);
+           // Ignore near-full-frame PNGs; do not accidentally cut full-bleed artwork.
+           if(x1-x0<w*0.94 || y1-y0<h*0.94){
+             var cropped=new CroppedBitmap(source,new Int32Rect(x0,y0,x1-x0,y1-y0));
+             cropped.Freeze();
+             chosen=cropped;
+           }
+         }
+       }
+     }catch{chosen=source;} // Malformed/opaque assets fall back to the unmodified source.
+     return cardLogoCache[id]=chosen;
+   }
+ }
  // Debounce search so filesystem checks, SHA-256 validation and WPF cards are not rebuilt for each keystroke.
  private readonly System.Windows.Threading.DispatcherTimer searchDebounce=new(){Interval=TimeSpan.FromMilliseconds(250)};
  private void ApplySearchDebounce(object? sender,EventArgs e){searchDebounce.Stop();if(ready)Refresh();}
@@ -270,7 +311,7 @@ public partial class MainWindow : Window
              BadgeBrush=installed?System.Windows.Media.Brushes.LimeGreen:planned?System.Windows.Media.Brushes.MediumPurple:System.Windows.Media.Brushes.IndianRed,
              BadgeTip=installed?(Index==1?"Installato e verificato":"Installed and verified"):
                  (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
-             FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=logo,LogoHeight=fx.id=="meter-x"?105:(fx.id=="sidechain-x" || fx.id=="reverse-fx" || fx.id=="stutter-fx" ? 78 : 122),Category=T(category),
+             FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?95:77,Category=T(category),
              Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+ShellInstaller.VersionLabel
          });
      }
