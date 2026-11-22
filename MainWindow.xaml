@@ -125,28 +125,111 @@
   </Style.Triggers>
  </Style>
  <Style TargetType="TextBlock"><Setter Property="Foreground" Value="{DynamicResource FgBrush}"/><Setter Property="TextOptions.TextFormattingMode" Value="Display"/><Setter Property="TextOptions.TextRenderingMode" Value="ClearType"/></Style>
- <!-- Dropdown controls: high contrast in all three themes. No custom ControlTemplate,
-      preserving WPF's tested built-in ComboBox to avoid startup deserialization faults. -->
- <SolidColorBrush x:Key="ComboSurfaceBrush" Color="#FFFFFF"/>
- <SolidColorBrush x:Key="ComboTextBrush" Color="#15213A"/>
- <SolidColorBrush x:Key="ComboBorderBrush" Color="#7854CE"/>
- <SolidColorBrush x:Key="ComboFocusBrush" Color="#4275CE"/>
- <SolidColorBrush x:Key="ComboHoverBrush" Color="#C9DDFB"/>
- <SolidColorBrush x:Key="ComboSelectedBrush" Color="#DCE5FB"/>
+
+ <!-- WPF native ComboBox behavior retained; only the visible shell and popup are themed. -->
+ <SolidColorBrush x:Key="ComboSurfaceBrush" Color="#171B35"/>
+ <SolidColorBrush x:Key="ComboTextBrush" Color="#F5F7FF"/>
+ <SolidColorBrush x:Key="ComboBorderBrush" Color="#946BDE"/>
+ <SolidColorBrush x:Key="ComboFocusBrush" Color="#52E9FF"/>
+ <SolidColorBrush x:Key="ComboHoverBrush" Color="#303A60"/>
+ <SolidColorBrush x:Key="ComboSelectedBrush" Color="#3D315F"/>
+  <DataTemplate x:Key="FlagEnglishTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Image Source="Assets/flag-en.png" Width="23" Height="16" Stretch="Uniform" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="Fant"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FlagItalianoTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Image Source="Assets/flag-it.png" Width="23" Height="16" Stretch="Uniform" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="Fant"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FlagEspañolTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Image Source="Assets/flag-es.png" Width="23" Height="16" Stretch="Uniform" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="Fant"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FlagFrançaisTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Image Source="Assets/flag-fr.png" Width="23" Height="16" Stretch="Uniform" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="Fant"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FlagDeutschTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Image Source="Assets/flag-de.png" Width="23" Height="16" Stretch="Uniform" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="Fant"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="ThemeNeonTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Path Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" Data="M10,0 L12.5,7.5 20,10 12.5,12.5 10,20 7.5,12.5 0,10 7.5,7.5 Z" Fill="{DynamicResource AccentBrush}"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="ThemeDarkTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Path Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" Data="M16,1 A9,9 0 1 0 19,17 A7,7 0 0 1 16,1 Z" Fill="#68D9FA"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="ThemeLightTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Path Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" Data="M10,0 L12,5 L18,2 L15,8 L20,10 L15,12 L18,18 L12,15 L10,20 L8,15 L2,18 L5,12 L0,10 L5,8 L2,2 L8,5 Z" Fill="#E7AC28"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FilterAllTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Path Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" Data="M0,0 H8 V8 H0 Z M12,0 H20 V8 H12 Z M0,12 H8 V20 H0 Z M12,12 H20 V20 H12 Z" Fill="{DynamicResource AccentBrush}"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FilterInstalledTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Path Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" Data="M1,10 L7,16 L19,2" Stroke="{DynamicResource NeonGreenBrush}" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FilterAvailableTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Path Width="20" Height="20" Stretch="Uniform" Margin="0,0,10,0" Data="M10,1 V15 M4,10 L10,16 L16,10 M2,19 H18" Stroke="{DynamicResource NeonCyanBrush}" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+ <DataTemplate x:Key="FilterSoonTemplate">
+  <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+   <Grid Width="20" Height="20" Margin="0,0,10,0"><Ellipse Stroke="{DynamicResource AccentBrush}" StrokeThickness="2"/><Path Data="M10,4 V10 L14,13" Stroke="{DynamicResource AccentBrush}" StrokeThickness="2" Fill="Transparent" StrokeStartLineCap="Round"/></Grid>
+   <TextBlock Text="{Binding}" Foreground="{DynamicResource ComboTextBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+  </StackPanel>
+ </DataTemplate>
+
  <Style TargetType="ComboBoxItem">
   <Setter Property="Foreground" Value="{DynamicResource ComboTextBrush}"/>
   <Setter Property="Background" Value="{DynamicResource ComboSurfaceBrush}"/>
-  <Setter Property="Padding" Value="9,5"/>
-  <Setter Property="MinHeight" Value="32"/>
+  <Setter Property="Padding" Value="10,6"/>
+  <Setter Property="MinHeight" Value="34"/>
   <Setter Property="FontFamily" Value="Segoe UI"/>
   <Setter Property="FontSize" Value="13"/>
-  <Setter Property="FontWeight" Value="Medium"/>
-  <Setter Property="HorizontalContentAlignment" Value="Left"/>
+  <Setter Property="FontWeight" Value="SemiBold"/>
+  <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
   <Setter Property="VerticalContentAlignment" Value="Center"/>
-  <Style.Triggers>
-   <Trigger Property="IsHighlighted" Value="True"><Setter Property="Background" Value="{DynamicResource ComboHoverBrush}"/><Setter Property="Foreground" Value="{DynamicResource ComboTextBrush}"/></Trigger>
-   <Trigger Property="IsSelected" Value="True"><Setter Property="Background" Value="{DynamicResource ComboSelectedBrush}"/><Setter Property="Foreground" Value="{DynamicResource ComboTextBrush}"/></Trigger>
-  </Style.Triggers>
+  <Setter Property="Template">
+   <Setter.Value>
+    <ControlTemplate TargetType="ComboBoxItem">
+     <Border x:Name="ItemFrame" Background="{TemplateBinding Background}" CornerRadius="7" Padding="{TemplateBinding Padding}" Margin="4,2" SnapsToDevicePixels="True">
+      <ContentPresenter ContentSource="Content" VerticalAlignment="Center" HorizontalAlignment="Stretch"/>
+     </Border>
+     <ControlTemplate.Triggers>
+      <Trigger Property="IsHighlighted" Value="True"><Setter TargetName="ItemFrame" Property="Background" Value="{DynamicResource ComboHoverBrush}"/></Trigger>
+      <Trigger Property="IsSelected" Value="True"><Setter TargetName="ItemFrame" Property="Background" Value="{DynamicResource ComboSelectedBrush}"/></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ItemFrame" Property="Opacity" Value="0.48"/></Trigger>
+     </ControlTemplate.Triggers>
+    </ControlTemplate>
+   </Setter.Value>
+  </Setter>
  </Style>
  <Style TargetType="ComboBox">
   <Setter Property="Foreground" Value="{DynamicResource ComboTextBrush}"/>
@@ -156,14 +239,39 @@
   <Setter Property="FontFamily" Value="Segoe UI"/>
   <Setter Property="FontSize" Value="13"/>
   <Setter Property="FontWeight" Value="SemiBold"/>
-  <Setter Property="MinHeight" Value="35"/>
-  <Setter Property="Padding" Value="7,3"/>
-  <Setter Property="MaxDropDownHeight" Value="210"/>
+  <Setter Property="MinHeight" Value="37"/>
+  <Setter Property="MaxDropDownHeight" Value="230"/>
   <Setter Property="VerticalContentAlignment" Value="Center"/>
-  <Style.Triggers>
-   <Trigger Property="IsMouseOver" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource ComboFocusBrush}"/></Trigger>
-   <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter Property="BorderBrush" Value="{DynamicResource ComboFocusBrush}"/></Trigger>
-  </Style.Triggers>
+  <Setter Property="Template">
+   <Setter.Value>
+    <ControlTemplate TargetType="ComboBox">
+     <Grid SnapsToDevicePixels="True">
+      <Border x:Name="ComboFrame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="9">
+       <Grid>
+        <ContentPresenter Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}" ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}" Margin="12,3,37,3" IsHitTestVisible="False" VerticalAlignment="Center"/>
+        <Path Data="M0,0 L5,5 L10,0" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,13,0" Stroke="{DynamicResource ComboTextBrush}" StrokeThickness="2.1" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Fill="Transparent"/>
+        <ToggleButton x:Name="DropDownToggle" ClickMode="Press" Focusable="False" BorderThickness="0" Background="Transparent" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+         <ToggleButton.Template><ControlTemplate TargetType="ToggleButton"><Border Background="Transparent"/></ControlTemplate></ToggleButton.Template>
+        </ToggleButton>
+       </Grid>
+      </Border>
+      <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
+       <Border x:Name="PopupFrame" MinWidth="{Binding ActualWidth, ElementName=ComboFrame}" MaxHeight="{TemplateBinding MaxDropDownHeight}" Background="{DynamicResource ComboSurfaceBrush}" BorderBrush="{DynamicResource ComboBorderBrush}" BorderThickness="1.5" CornerRadius="9" Padding="3" SnapsToDevicePixels="True">
+        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+         <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+        </ScrollViewer>
+       </Border>
+      </Popup>
+     </Grid>
+     <ControlTemplate.Triggers>
+      <Trigger Property="IsMouseOver" Value="True"><Setter TargetName="ComboFrame" Property="BorderBrush" Value="{DynamicResource ComboFocusBrush}"/></Trigger>
+      <Trigger Property="IsKeyboardFocusWithin" Value="True"><Setter TargetName="ComboFrame" Property="BorderBrush" Value="{DynamicResource ComboFocusBrush}"/></Trigger>
+      <Trigger Property="IsDropDownOpen" Value="True"><Setter TargetName="ComboFrame" Property="BorderBrush" Value="{DynamicResource ComboFocusBrush}"/></Trigger>
+      <Trigger Property="IsEnabled" Value="False"><Setter TargetName="ComboFrame" Property="Opacity" Value="0.45"/></Trigger>
+     </ControlTemplate.Triggers>
+    </ControlTemplate>
+   </Setter.Value>
+  </Setter>
  </Style>
  <Style TargetType="TextBox">
   <Setter Property="Foreground" Value="#F7F8FF"/>
@@ -237,6 +345,29 @@
     </Track>
    </Border>
   </ControlTemplate></Setter.Value></Setter>
+ </Style>
+
+ <!-- All HUB ScrollViewers inherit the same Neon Ghost scrollbar; horizontal scrolling keeps its correct commands. -->
+ <Style TargetType="ScrollBar" BasedOn="{StaticResource NeonGuideScrollBar}">
+  <Style.Triggers>
+   <Trigger Property="Orientation" Value="Horizontal">
+    <Setter Property="Width" Value="Auto"/>
+    <Setter Property="Height" Value="13"/>
+    <Setter Property="Template">
+     <Setter.Value>
+      <ControlTemplate TargetType="ScrollBar">
+       <Border Background="#10162D" CornerRadius="6" Margin="3,1">
+        <Track x:Name="PART_Track" Orientation="Horizontal" IsDirectionReversed="False" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
+         <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageLeftCommand" Opacity="0" Focusable="False"/></Track.DecreaseRepeatButton>
+         <Track.Thumb><Thumb><Thumb.Template><ControlTemplate TargetType="Thumb"><Border Background="#9B62EC" BorderBrush="#61E4FF" BorderThickness="1" CornerRadius="6"/></ControlTemplate></Thumb.Template></Thumb></Track.Thumb>
+         <Track.IncreaseRepeatButton><RepeatButton Command="ScrollBar.PageRightCommand" Opacity="0" Focusable="False"/></Track.IncreaseRepeatButton>
+        </Track>
+       </Border>
+      </ControlTemplate>
+     </Setter.Value>
+    </Setter>
+   </Trigger>
+  </Style.Triggers>
  </Style>
  </Window.Resources>
 <Grid>
@@ -333,16 +464,16 @@
      <Border x:Name="SettingsPanel" Visibility="Collapsed" Background="{DynamicResource PanelBrush}" BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" CornerRadius="8" Padding="14" Margin="0,0,0,12">
    <StackPanel>
     <WrapPanel><TextBlock x:Name="SettingsHint" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" Margin="0,0,14,0"/><ComboBox x:Name="SettingsLanguageBox" Width="172" SelectionChanged="SettingsLanguageBox_SelectionChanged">
-      <ComboBoxItem Tag="en" Content="English"/>
-      <ComboBoxItem Tag="it" Content="Italiano"/>
-      <ComboBoxItem Tag="es" Content="Español"/>
-      <ComboBoxItem Tag="fr" Content="Français"/>
-      <ComboBoxItem Tag="de" Content="Deutsch"/>
+      <ComboBoxItem Tag="en" Content="English" ContentTemplate="{StaticResource FlagEnglishTemplate}"/>
+      <ComboBoxItem Tag="it" Content="Italiano" ContentTemplate="{StaticResource FlagItalianoTemplate}"/>
+      <ComboBoxItem Tag="es" Content="Español" ContentTemplate="{StaticResource FlagEspañolTemplate}"/>
+      <ComboBoxItem Tag="fr" Content="Français" ContentTemplate="{StaticResource FlagFrançaisTemplate}"/>
+      <ComboBoxItem Tag="de" Content="Deutsch" ContentTemplate="{StaticResource FlagDeutschTemplate}"/>
      </ComboBox><TextBlock x:Name="ThemeHint" Foreground="{DynamicResource FgBrush}" VerticalAlignment="Center" Margin="22,0,14,0"/>
     <ComboBox x:Name="SettingsThemeBox" Width="218" SelectionChanged="SettingsThemeBox_SelectionChanged">
-      <ComboBoxItem Content="Cyberpunk Neon"/>
-      <ComboBoxItem Content="Dark Professional"/>
-      <ComboBoxItem Content="Light Modern"/>
+      <ComboBoxItem Content="Cyberpunk Neon" ContentTemplate="{StaticResource ThemeNeonTemplate}"/>
+      <ComboBoxItem Content="Dark Professional" ContentTemplate="{StaticResource ThemeDarkTemplate}"/>
+      <ComboBoxItem Content="Light Modern" ContentTemplate="{StaticResource ThemeLightTemplate}"/>
      </ComboBox></WrapPanel>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
@@ -371,7 +502,7 @@
      <StackPanel DockPanel.Dock="Top" Margin="0,0,0,12">
        <TextBlock x:Name="DashboardText" FontSize="14" FontWeight="Bold" Foreground="{DynamicResource HeadingBrush}" TextWrapping="Wrap" Margin="0,0,0,9"/>
        <TextBlock x:Name="SearchCaption" Text="SEARCH PRODUCTS" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" Margin="2,0,0,5"/><TextBox x:Name="ProductSearch" TextChanged="ProductSearch_Changed" ToolTip="Search products" MinHeight="39" Padding="10,8" Margin="0,0,0,10"/>
-       <TextBlock x:Name="FilterCaption" Text="FILTER PRODUCTS" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" Margin="2,0,0,5"/><ComboBox x:Name="ProductFilter" FontSize="14" FontWeight="SemiBold" SelectionChanged="ProductFilter_Changed" SelectedIndex="0" MinHeight="30"><ComboBoxItem Content="All products"/><ComboBoxItem Content="Installed"/><ComboBoxItem Content="Available"/><ComboBoxItem Content="Coming soon"/></ComboBox>
+       <TextBlock x:Name="FilterCaption" Text="FILTER PRODUCTS" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource SecondaryBrush}" Margin="2,0,0,5"/><ComboBox x:Name="ProductFilter" FontSize="14" FontWeight="SemiBold" SelectionChanged="ProductFilter_Changed" SelectedIndex="0" MinHeight="30"><ComboBoxItem Content="All products" ContentTemplate="{StaticResource FilterAllTemplate}"/><ComboBoxItem Content="Installed" ContentTemplate="{StaticResource FilterInstalledTemplate}"/><ComboBoxItem Content="Available" ContentTemplate="{StaticResource FilterAvailableTemplate}"/><ComboBoxItem Content="Coming soon" ContentTemplate="{StaticResource FilterSoonTemplate}"/></ComboBox>
       </StackPanel>
       <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="0,0,0,0"><ItemsControl x:Name="PluginList" HorizontalAlignment="Stretch" Margin="0,12,0,0"><ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel ItemWidth="210"/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
  <ItemsControl.ItemTemplate><DataTemplate><Border Width="196" Height="264" Margin="0,0,14,14" Cursor="Hand" MouseLeftButtonUp="ProductCard_Click" ToolTip="Select product / Seleziona prodotto" Style="{StaticResource ProductCardStyle}"><Grid Margin="12,11,12,12"><Grid.RowDefinitions><RowDefinition Height="103"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions>
