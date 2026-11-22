@@ -1,3 +1,11 @@
+v0.8.29 - VST logo sizing correction (22 November 2026)
+- Fixed the plugin cards ignoring their individual LogoHeight property: the ten planned VST logos now have a larger display area.
+- For planned plugin artwork only, cache a trimmed view of transparent PNG margins while preserving each original logo, its aspect ratio, and the source assets.
+- Kept the four main plugin logos unchanged and retained existing plugin availability/installation states.
+- No changes to plugin binaries, audio processing, installer paths or update/backup logic.
+- Other proposed UI refinements (dropdown text, main header logo and all-button/card hover animations) are NOT part of this release.
+- Windows compile and installer build are verified via GitHub Actions before publication; final visual QA should be performed on Windows.
+
 v0.8.28 - Neon Ghost cumulative visual polish (22 November 2026)
 - Guide / README window: native Windows title bar replaced with movable, resizable Neon Ghost header, close X and dark guide-only scrollbar.
 - Enlarged the original HUB header logo and enabled high-quality Fant downscaling (no source logo artwork altered).
