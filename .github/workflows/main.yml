@@ -96,13 +96,13 @@ jobs:
           if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
           & $iscc "installer\\DJ_RUSSO_FX_HUB.iss"
           if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed." }
-          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.36.exe")) { throw "Installer output missing." }
+          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.37.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: DJ_RUSSO_FX_HUB_Setup_v0.8.36
-          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.36.exe
+          name: DJ_RUSSO_FX_HUB_Setup_v0.8.37
+          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.37.exe
           if-no-files-found: error
 
       - name: Create ZIP
