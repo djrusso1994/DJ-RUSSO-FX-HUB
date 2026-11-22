@@ -222,9 +222,13 @@ public partial class MainWindow : Window
          if (ProductFilter.Items[i] is ComboBoxItem filterItem)
              filterItem.Content = filterLabels[Index][i];
 
+     PreviewHeading.Text=new[]{"UPDATE WINDOW PREVIEW","ANTEPRIMA FINESTRA AGGIORNAMENTO","VISTA PREVIA DE ACTUALIZACIÓN","APERÇU DE LA MISE À JOUR","VORSCHAU UPDATE-FENSTER"}[Index];
+     PreviewExplanation.Text=new[]{"Preview the Neon Ghost window without downloading or installing files.","Verifica la finestra Neon Ghost senza scaricare o installare file.","Prueba la ventana Neon Ghost sin descargar ni instalar archivos.","Teste la fenêtre Neon Ghost sans téléchargement ni installation.","Neon Ghost-Fenster testen, ohne Dateien herunterzuladen oder zu installieren."}[Index];
+     PreviewUpdateDialogButton.Content=new[]{"PREVIEW DOWNLOAD","ANTEPRIMA DOWNLOAD","VISTA PREVIA","APERÇU DU TÉLÉCHARGEMENT","DOWNLOAD-VORSCHAU"}[Index];
+     GitHubProjectButton.ToolTip=new[]{"Open the official GitHub repository","Apri il repository ufficiale GitHub","Abrir el repositorio oficial en GitHub","Ouvrir le dépôt GitHub officiel","Offizielles GitHub-Repository öffnen"}[Index];
      SecurityHeading.Text=new[]{"Security & authenticity","Sicurezza e autenticità","Seguridad y autenticidad","Sécurité et authenticité","Sicherheit und Authentizität"}[Index];
      SecurityExplanation.Text=new[]{"Official GitHub releases. SHA-256 checks file integrity, not malware safety. VirusTotal may have no report.","Release ufficiali GitHub. SHA-256 verifica l'integrità, non l'assenza di malware. VirusTotal potrebbe non avere un rapporto.","Versiones oficiales de GitHub. SHA-256 comprueba la integridad, no la ausencia de malware. Puede que VirusTotal no tenga informe.","Versions officielles GitHub. SHA-256 vérifie l'intégrité, pas l'absence de logiciels malveillants. Le rapport VirusTotal peut être absent.","Offizielle GitHub-Releases. SHA-256 prüft die Integrität, nicht die Malware-Freiheit. Ein VirusTotal-Bericht ist eventuell nicht verfügbar."}[Index];
-     VirusTotalReportButton.Content=new[]{"View installer on VirusTotal","Cerca installer su VirusTotal","Ver instalador en VirusTotal","Voir sur VirusTotal","Installer auf VirusTotal prüfen"}[Index];
+     VirusTotalReportButton.Content=new[]{"Open VirusTotal upload","Apri caricamento VirusTotal","Abrir carga de VirusTotal","Ouvrir VirusTotal","VirusTotal-Upload öffnen"}[Index];
      CopyInstallerHashButton.Content=new[]{"Copy SHA-256","Copia SHA-256","Copiar SHA-256","Copier SHA-256","SHA-256 kopieren"}[Index];
      SourceText.Text=T("source");Subtitle.Text=T("subtitle");
      UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
@@ -313,6 +317,15 @@ public partial class MainWindow : Window
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[0]),0),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[1]),0.55),
    new GradientStop((Color)ColorConverter.ConvertFromString(headerStops[2]),1)},new Point(0,0),new Point(1,0));
+  // Dark drop-downs for Neon Ghost/Dark; native WPF template retained for DPI safety.
+  foreach(var (key,value) in new[]{
+   ("ComboSurfaceBrush",light?"#FFFFFF":dark?"#20273B":"#161D35"),
+   ("ComboTextBrush",light?"#15213A":"#F2F5FF"),
+   ("ComboHoverBrush",light?"#C9DDFB":dark?"#33425E":"#304064"),
+   ("ComboSelectedBrush",light?"#DCE5FB":dark?"#334A66":"#293D68"),
+   ("ComboBorderBrush",light?"#7854CE":dark?"#7485B9":"#805EE4"),
+   ("ComboFocusBrush",light?"#4275CE":"#61E4FF")
+  })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
   var installBg=light?"#E2F8EA":dark?"#18372C":"#0D3729";
   var removeBg=light?"#F9E4F7":dark?"#392B40":"#392044";
   var launchBg=light?"#E3F7FB":dark?"#1B3841":"#0C3846";
@@ -444,7 +457,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.27");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.28");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -1039,24 +1052,57 @@ public partial class MainWindow : Window
    Title=T("guide")+" — "+this.Title,
    Owner=this,Width=780,Height=610,MinWidth=520,MinHeight=350,
    WindowStartupLocation=WindowStartupLocation.CenterOwner,
-   Background=(Brush)FindResource("BgBrush"),Foreground=(Brush)FindResource("FgBrush")
+   WindowStyle=WindowStyle.None,ResizeMode=ResizeMode.CanResize,
+   Background=(Brush)FindResource("BgBrush"),Foreground=(Brush)FindResource("FgBrush"),
+   ShowInTaskbar=false
   };
+  var frame=new Border {
+   BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1.5),
+   Background=(Brush)FindResource("BgBrush"),CornerRadius=new CornerRadius(9)
+  };
+  var root=new DockPanel();
+  var titleBar=new Grid {Height=48,Background=(Brush)FindResource("SidebarBrush")};
+  titleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+  titleBar.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+  var title=new TextBlock {Text="DJ RUSSO FX HUB  •  "+T("guide"),FontSize=13,
+   FontWeight=FontWeights.Bold,Foreground=(Brush)FindResource("SecondaryBrush"),
+   VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(18,0,8,0)};
+  titleBar.Children.Add(title);
+  var close=new Button {Content="✕",Width=42,Height=34,Margin=new Thickness(0,0,9,0),
+   FontSize=16,FontWeight=FontWeights.Bold,Cursor=System.Windows.Input.Cursors.Hand,
+   Foreground=(Brush)FindResource("FgBrush"),Background=(Brush)FindResource("PanelBrush"),
+   BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1),
+   VerticalAlignment=VerticalAlignment.Center};
+  Grid.SetColumn(close,1);titleBar.Children.Add(close);
+  close.Click+=(_,_)=>dialog.Close();
+  titleBar.MouseLeftButtonDown+=(_,e)=>{
+   if(e.OriginalSource is System.Windows.DependencyObject origin){
+    for(var current=origin;current!=null;current=System.Windows.Media.VisualTreeHelper.GetParent(current)){
+     if(current is Button)return;
+     if(ReferenceEquals(current,titleBar))break;
+    }
+   }
+   if(e.ClickCount==2){dialog.WindowState=dialog.WindowState==WindowState.Maximized?WindowState.Normal:WindowState.Maximized;return;}
+   try{dialog.DragMove();}catch{}
+  };
+  DockPanel.SetDock(titleBar,Dock.Top);root.Children.Add(titleBar);
   var layout=new DockPanel {Margin=new Thickness(18)};
   var header=new TextBlock {Text=T("guide"),FontSize=21,FontWeight=FontWeights.Bold,
-    Foreground=(Brush)FindResource("SecondaryBrush"),Margin=new Thickness(0,0,0,12)};
+   Foreground=(Brush)FindResource("SecondaryBrush"),Margin=new Thickness(0,0,0,12)};
   DockPanel.SetDock(header,Dock.Top);layout.Children.Add(header);
   var content=new TextBox {
-    Text=GuideTexts[Index],IsReadOnly=true,TextWrapping=TextWrapping.Wrap,
-    VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
-    HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
-    Background=(Brush)FindResource("PanelBrush"),
-    Foreground=(Brush)FindResource("FgBrush"),
-    BorderBrush=(Brush)FindResource("AccentBrush"),
-    FontFamily=new FontFamily("Segoe UI"),FontSize=14,
-    Padding=new Thickness(14)
+   Text=GuideTexts[Index],IsReadOnly=true,TextWrapping=TextWrapping.Wrap,
+   VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
+   HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
+   Background=(Brush)FindResource("PanelBrush"),
+   Foreground=(Brush)FindResource("FgBrush"),
+   BorderBrush=(Brush)FindResource("AccentBrush"),
+   FontFamily=new FontFamily("Segoe UI"),FontSize=14,
+   Padding=new Thickness(14)
   };
-  layout.Children.Add(content);dialog.Content=layout;
-  // Reuse the selected language and theme at the moment the guide opens.
+  // Custom vertical scroll bar only inside the Guide, not on other HUB controls.
+  content.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=(Style)FindResource("NeonGuideScrollBar");
+  layout.Children.Add(content);root.Children.Add(layout);frame.Child=root;dialog.Content=frame;
   dialog.ShowDialog();
  }
 
@@ -1131,7 +1177,26 @@ public partial class MainWindow : Window
      var progressLayout=new StackPanel{Margin=new Thickness(24,18,24,24)};
      var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
      var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
-     var progressBar=new System.Windows.Controls.ProgressBar{Height=14,Minimum=0,Maximum=100,IsIndeterminate=true,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246))};
+     var progressBrush=new System.Windows.Media.LinearGradientBrush{
+       StartPoint=new Point(0,0.5),EndPoint=new Point(1,0.5),
+       GradientStops=new System.Windows.Media.GradientStopCollection{
+        new System.Windows.Media.GradientStop(System.Windows.Media.Color.FromRgb(128,79,228),0),
+        new System.Windows.Media.GradientStop(System.Windows.Media.Color.FromRgb(250,123,226),0.47),
+        new System.Windows.Media.GradientStop(System.Windows.Media.Color.FromRgb(86,224,249),0.62),
+        new System.Windows.Media.GradientStop(System.Windows.Media.Color.FromRgb(128,79,228),1)
+       },RelativeTransform=new System.Windows.Media.TranslateTransform()
+     };
+     ((System.Windows.Media.TranslateTransform)progressBrush.RelativeTransform).BeginAnimation(
+      System.Windows.Media.TranslateTransform.XProperty,
+      new System.Windows.Media.Animation.DoubleAnimation{
+       From=-0.5,To=0.5,Duration=new Duration(TimeSpan.FromSeconds(1.7)),
+       AutoReverse=true,RepeatBehavior=System.Windows.Media.Animation.RepeatBehavior.Forever
+      });
+     var progressBar=new System.Windows.Controls.ProgressBar{
+      Height=16,Minimum=0,Maximum=100,IsIndeterminate=true,
+      Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(24,26,55)),
+      BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(111,79,202)),
+      BorderThickness=new Thickness(1),Foreground=progressBrush};
      var progressDetails=new TextBlock{Text="",Margin=new Thickness(0,10,0,0),FontSize=12};
      progressLayout.Children.Add(progressHeading);
      progressLayout.Children.Add(progressStatus);
@@ -1150,6 +1215,10 @@ public partial class MainWindow : Window
      cancelTextFactory.SetValue(ContentPresenter.RecognizesAccessKeyProperty,true);
      cancelBorderFactory.AppendChild(cancelTextFactory);
      cancelButton.Template=new ControlTemplate(typeof(Button)){VisualTree=cancelBorderFactory};
+     var cancelBorder=cancelButton.BorderBrush;
+     var cancelBackground=cancelButton.Background;
+     cancelButton.MouseEnter+=(_,__)=>{cancelButton.BorderBrush=new SolidColorBrush(Color.FromRgb(99,234,255));cancelButton.Background=new SolidColorBrush(Color.FromRgb(50,43,90));};
+     cancelButton.MouseLeave+=(_,__)=>{cancelButton.BorderBrush=cancelBorder;cancelButton.Background=cancelBackground;};
      cancelButton.Click+=(_,__)=>{cancelButton.IsEnabled=false;onCancel();};
      progressLayout.Children.Add(cancelButton);
      progressStack.Children.Add(progressLayout);
@@ -1164,8 +1233,24 @@ public partial class MainWindow : Window
    window.Title="DJ RUSSO FX HUB • PREVIEW";
    status.Text=Index==1?"ANTEPRIMA — nessun download reale":"PREVIEW — no actual download";
    bar.IsIndeterminate=false;
-   bar.Value=63;
-   details.Text=Index==1?"Simulazione: 63% • nessun file scaricato":"Simulation: 63% • no files downloaded";
+   bar.Value=0;
+   details.Text=Index==1?"Simulazione • nessun file scaricato":"Simulation • no files downloaded";
+   var demoTimer=new System.Windows.Threading.DispatcherTimer{
+    Interval=TimeSpan.FromMilliseconds(55)
+   };
+   demoTimer.Tick+=(_,_)=>{
+    if(cancelled || !window.IsVisible){demoTimer.Stop();return;}
+    var next=Math.Min(100,bar.Value+1.4);
+    bar.Value=next;
+    var percent=next.ToString("F0");
+    details.Text=Index==1?"Simulazione: "+percent+"% • nessun file scaricato":"Simulation: "+percent+"% • no files downloaded";
+    if(next>=100){
+     demoTimer.Stop();
+     status.Text=Index==1?"✓ ANTEPRIMA COMPLETATA — nessun file installato":"✓ PREVIEW COMPLETE — no files installed";
+    }
+   };
+   window.Loaded+=(_,_)=>demoTimer.Start();
+   window.Closed+=(_,_)=>demoTimer.Stop();
    cancel.Click+=(_,_)=>window.Close();
    window.ShowDialog();
  }
