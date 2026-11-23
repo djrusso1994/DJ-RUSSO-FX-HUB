@@ -491,7 +491,7 @@ public partial class MainWindow : Window
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
-     "Rimuovere FX SHELL e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
+     "Rimuovere FX SHELL, REVERB X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
      "Remove HUB-managed FX SHELL, REVERB X and METER X? External files are untouched. Close FL Studio and METER X.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
