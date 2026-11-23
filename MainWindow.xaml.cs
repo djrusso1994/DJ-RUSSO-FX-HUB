@@ -298,7 +298,9 @@ public partial class MainWindow : Window
      CopyInstallerHashButton.Content=new[]{"Copy SHA-256","Copia SHA-256","Copiar SHA-256","Copier SHA-256","SHA-256 kopieren"}[Index];
      SourceText.Text=T("source");Subtitle.Text=T("subtitle");
      UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");OpenBackupFolderButton.Content="▣   "+new[]{"OPEN BACKUPS","APRI BACKUP","ABRIR COPIAS","OUVRIR SAUVEGARDES","BACKUPS ÖFFNEN"}[Index];OpenBackupFolderButton.ToolTip=new[]{"Open the most recent backup folder","Apri la cartella dell'ultimo backup","Abrir la carpeta de la última copia","Ouvrir le dossier de la dernière sauvegarde","Letzten Backup-Ordner öffnen"}[Index];FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
-     ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
+     PluginUpdatesButton.Content=new[]{"PLUGIN UPDATES","AGGIORNAMENTI PLUGIN","ACTUALIZAR PLUGINS","MAJ PLUGINS","PLUGIN-UPDATES"}[Index];
+      PluginUpdatesButton.ToolTip=new[]{"Check for plugin updates","Controlla aggiornamenti plugin","Buscar actualizaciones de plugins","Vérifier les mises à jour des plugins","Plugin-Updates prüfen"}[Index];
+      ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
      ShellInstallButton.Content=BulkInstallLabels[Index]; ShellRemoveButton.Content=BulkRemoveLabels[Index];
      StatusText.Text=T("ready");
      ((ComboBoxItem)SettingsThemeBox.Items[0]).Content=T("neon");((ComboBoxItem)SettingsThemeBox.Items[1]).Content=T("dark");((ComboBoxItem)SettingsThemeBox.Items[2]).Content=T("light");
@@ -597,7 +599,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.38");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.39");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -615,6 +617,8 @@ public partial class MainWindow : Window
      Version? newest=null;
      foreach(var release in doc.RootElement.EnumerateArray()){
        if(release.TryGetProperty("draft",out var draft) && draft.GetBoolean())continue;
+        // Do not offer preview builds through the stable updater.
+        if(release.TryGetProperty("prerelease",out var prerelease) && prerelease.GetBoolean())continue;
        var tagName=release.GetProperty("tag_name").GetString()??"";
        if(!Version.TryParse(tagName.TrimStart('v','V'),out var parsed))continue;
        if(newest==null || parsed>newest){newest=parsed;root=release;}
