@@ -329,7 +329,7 @@ public partial class MainWindow : Window
      foreach(var fx in plugins)
      {
          bool planned=fx.status=="Planned" && fx.id!="meter-x";
-         var logo=fx.id switch {"sidechain-x"=>Asset("sidechain"),"reverse-fx"=>Asset(theme=="light"?"reverse_light":"reverse"),"stutter-fx"=>Asset("stutter"),"meter-x"=>Asset("meter-x"),_=>Asset(fx.id)};
+         var logo=fx.id switch {"sidechain-x"=>Asset("sidechain"),"reverse-fx"=>Asset(theme=="light"?"reverse_light":"reverse"),"stutter-fx"=>Asset("stutter"),"meter-x"=>Asset("meter-x"),"reverb-x"=>Asset("logo-reverb-x"),_=>Asset(fx.id)};
          var category=fx.category switch {"Dynamics"=>"dynamics","Creative FX"=>"creative","Analysis"=>"analysis","Mastering"=>"mastering","Vocal"=>"vocal","EQ"=>"eq","Spatial"=>"spatial","Saturation"=>"saturation","AI Offline"=>"ai",_=>"creative"};
          bool installed=fx.id=="meter-x" ? File.Exists(MeterExePath) : fx.id=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : (!planned && verifiedIds.Contains(fx.id));
          cards.Add(new PluginCard {
@@ -769,7 +769,7 @@ public partial class MainWindow : Window
   var shellState=ShellInstaller.GetState();
   bool installed=meter?File.Exists(MeterExePath):reverb ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
   ProductPanelTitle.Text=fx.name;
-  var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter",_=>fx.id});
+  var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter","reverb-x"=>"logo-reverb-x",_=>fx.id});
   var comingSoon=!meter && !shell && !reverb;
   // Use the same cached transparent-pixel crop already used in the catalog.
   // This keeps the artwork itself legible, not merely its oversized PNG canvas.
