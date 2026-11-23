@@ -575,7 +575,7 @@
   <Button x:Name="MeterPanelInstallButton" Content="INSTALL / INSTALLA" Style="{StaticResource NeonActionButton}" Click="SelectedProductInstall_Click" Margin="0,0,0,8" BorderBrush="#24E977" Background="#0D3729"/>
   <Button x:Name="MeterPanelRemoveButton" Content="REMOVE / RIMUOVI" Style="{StaticResource NeonActionButton}" Click="SelectedProductRemove_Click" Margin="0,0,0,8" BorderBrush="#E13AF5" Background="#392044"/>
   <Button x:Name="MeterPanelLaunchButton" Content="▶  LAUNCH / AVVIA" Style="{StaticResource NeonActionButton}" Click="SelectedProductLaunch_Click" Margin="0,0,0,12" BorderBrush="#3FEFFF" Background="#0C3846"/>
-  <Button x:Name="PluginUpdatesButton" Foreground="#FFFFFF" Content="CHECK PLUGIN UPDATES / CONTROLLA AGGIORNAMENTI PLUGIN" Style="{StaticResource NeonActionButton}" Click="CheckPluginUpdates_Click" Margin="0,0,0,10" BorderBrush="#3FEFFF" Background="#112A40" FontSize="9" ToolTip="Controlla aggiornamenti plugin / Check plugin updates" />
+  <Button x:Name="PluginUpdatesButton" Foreground="#FFFFFF" Content="AGGIORNAMENTI PLUGIN" Style="{StaticResource NeonActionButton}" Click="CheckPluginUpdates_Click" Margin="0,0,0,10" BorderBrush="#3FEFFF" Background="#112A40" FontSize="9" ToolTip="Controlla aggiornamenti plugin / Check plugin updates" />
   <TextBlock x:Name="MeterPanelState" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SecondaryBrush}" Margin="0,0,0,10" TextWrapping="Wrap"/>
    <Border Margin="0,12,0,0" Padding="9" CornerRadius="8" Background="{DynamicResource ChipSurfaceBrush}" BorderBrush="{DynamicResource SocialBorderBrush}" BorderThickness="1">
    <Border.Effect><DropShadowEffect Color="#8B45FF" BlurRadius="17" ShadowDepth="0" Opacity="0.5"/></Border.Effect>
