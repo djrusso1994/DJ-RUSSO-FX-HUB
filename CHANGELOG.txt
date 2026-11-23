@@ -1,3 +1,12 @@
+v0.8.40 - REVERB X v1.3 integration (staging; not yet published)
+- Added independent REVERB X v1.3 VST3 installer with pinned SHA-256 and safe install/remove behavior.
+- Kept the existing REVERB X card in its original catalog position and reused Assets/reverb-x.png.
+- Updated product panel, version and available status; installer controls require the exact verified payload.
+- Added Reverb X to package manifests and plugin update catalog without claiming automatic plugin updates.
+- Windows build is blocked if the REVERB X payload is absent or its SHA-256 does not match.
+- Existing FX SHELL, METER X, DSP and unrelated cards are unchanged.
+- This branch is staging only; requires payload commit, Windows build, installer test and release approval.
+
 v0.8.38 - Clean future-plugin logo transparency (22 November 2026)
 - Inspected the original PNG assets of all 10 "Coming soon / In arrivo" products.
 - Removed detached side fragments from Compressor X, Drive X, EQ X, Pitch X, Stereo X and Transient X.
