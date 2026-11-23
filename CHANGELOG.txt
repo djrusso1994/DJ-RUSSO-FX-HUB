@@ -1,4 +1,5 @@
 v0.8.40 - REVERB X v1.3 integration (staging; not yet published)
+- The 25,455,616-byte REVERB X VST3 payload has now been uploaded to the staging branch; SHA-256 verification and Windows tests are required before release.
 - Added independent REVERB X v1.3 VST3 installer with pinned SHA-256 and safe install/remove behavior.
 - Kept the existing REVERB X card in its original catalog position and reused Assets/reverb-x.png.
 - Updated product panel, version and available status; installer controls require the exact verified payload.
