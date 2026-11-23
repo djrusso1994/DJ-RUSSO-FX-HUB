@@ -16,6 +16,13 @@
  <SolidColorBrush x:Key="CardStrokeBrush" Color="#7864DD"/>
  <SolidColorBrush x:Key="SidebarBrush" Color="#101127"/>
  <SolidColorBrush x:Key="NavSelectedBrush" Color="#213352"/>
+ <SolidColorBrush x:Key="SocialSurfaceBrush" Color="#0B1027"/>
+ <SolidColorBrush x:Key="SocialButtonBrush" Color="#12172D"/>
+ <SolidColorBrush x:Key="SocialBorderBrush" Color="#A15DFF"/>
+ <SolidColorBrush x:Key="SocialLabelBrush" Color="#86F4FF"/>
+ <SolidColorBrush x:Key="WaveSurfaceBrush" Color="#0D132A"/>
+ <SolidColorBrush x:Key="ScrollRailBrush" Color="#141B35"/>
+ <SolidColorBrush x:Key="ScrollThumbBrush" Color="#8154C8"/>
  <LinearGradientBrush x:Key="CardFillBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#14152D" Offset="0"/><GradientStop Color="#111329" Offset="0.6"/><GradientStop Color="#1A0C2D" Offset="1"/></LinearGradientBrush>
  <LinearGradientBrush x:Key="HeaderFillBrush" StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#080B1E" Offset="0"/><GradientStop Color="#16112B" Offset="0.55"/><GradientStop Color="#080B1E" Offset="1"/></LinearGradientBrush>
  <Style x:Key="NavNeonButton" TargetType="Button">
@@ -70,7 +77,7 @@
  </Style>
  <Style x:Key="SocialNeonButton" TargetType="Button">
   <Setter Property="Height" Value="64"/><Setter Property="Margin" Value="4"/><Setter Property="Padding" Value="7,5"/>
-  <Setter Property="Background" Value="#12172D"/><Setter Property="BorderBrush" Value="#7656E6"/><Setter Property="BorderThickness" Value="1.3"/>
+  <Setter Property="Background" Value="{DynamicResource SocialButtonBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource SocialBorderBrush}"/><Setter Property="BorderThickness" Value="1.3"/>
   <Setter Property="Cursor" Value="Hand"/><Setter Property="FontSize" Value="10"/><Setter Property="FontWeight" Value="SemiBold"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
    <Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15" Padding="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
@@ -339,12 +346,12 @@
   <Setter Property="Background" Value="Transparent"/>
   <Setter Property="Template"><Setter.Value>
    <ControlTemplate TargetType="ScrollBar">
-    <Border x:Name="ScrollLane" Background="#141B35" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="2,8,5,8" SnapsToDevicePixels="True">
+    <Border x:Name="ScrollLane" Background="{DynamicResource ScrollRailBrush}" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="2,8,5,8" SnapsToDevicePixels="True">
      <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
       <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/></Track.DecreaseRepeatButton>
       <Track.Thumb><Thumb Cursor="Hand">
        <Thumb.Template><ControlTemplate TargetType="Thumb">
-        <Border x:Name="ScrollThumb" Background="#8154C8" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5" SnapsToDevicePixels="True"/>
+        <Border x:Name="ScrollThumb" Background="{DynamicResource ScrollThumbBrush}" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5" SnapsToDevicePixels="True"/>
         <ControlTemplate.Triggers>
          <Trigger Property="IsMouseOver" Value="True">
           <Setter TargetName="ScrollThumb" Property="Background" Value="#A869E9"/>
@@ -372,11 +379,11 @@
     <Setter Property="Height" Value="15"/>
     <Setter Property="Template"><Setter.Value>
      <ControlTemplate TargetType="ScrollBar">
-      <Border x:Name="ScrollLaneHorizontal" Background="#141B35" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="8,2,8,5">
+      <Border x:Name="ScrollLaneHorizontal" Background="{DynamicResource ScrollRailBrush}" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="8,2,8,5">
        <Track x:Name="PART_Track" Orientation="Horizontal" IsDirectionReversed="False" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
         <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageLeftCommand" Opacity="0" Focusable="False"/></Track.DecreaseRepeatButton>
         <Track.Thumb><Thumb Cursor="Hand"><Thumb.Template><ControlTemplate TargetType="Thumb">
-         <Border x:Name="HorizontalThumb" Background="#8154C8" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5"/>
+         <Border x:Name="HorizontalThumb" Background="{DynamicResource ScrollThumbBrush}" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5"/>
          <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True">
           <Setter TargetName="HorizontalThumb" Property="Background" Value="#A869E9"/>
           <Setter TargetName="HorizontalThumb" Property="BorderBrush" Value="#5CEBFF"/>
@@ -435,8 +442,8 @@
    <Button x:Name="SettingsButton" Click="Settings_Click" Style="{StaticResource SettingsNavButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="GuideButton" Click="Guide_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Border Height="1" Background="{DynamicResource NeonPinkBrush}" Opacity="0.6" Margin="0,17,0,17"/>
-   <Border Margin="0,3,0,0" Padding="8" CornerRadius="13" Background="#0B1027" BorderBrush="#A15DFF" BorderThickness="1.5">
-    <StackPanel><TextBlock Text="✦ FOLLOW DJ RUSSO" Foreground="#86F4FF" FontWeight="ExtraBold" FontSize="11" Margin="3,3,0,9"/>
+   <Border Margin="0,3,0,0" Padding="8" CornerRadius="13" Background="{DynamicResource SocialSurfaceBrush}" BorderBrush="{DynamicResource SocialBorderBrush}" BorderThickness="1.5">
+    <StackPanel><TextBlock Text="✦ FOLLOW DJ RUSSO" Foreground="{DynamicResource SocialLabelBrush}" FontWeight="ExtraBold" FontSize="11" Margin="3,3,0,9"/>
      <UniformGrid Columns="2">
       <Button Style="{StaticResource SocialNeonButton}" Click="Social_Click" Tag="https://www.youtube.com/user/MrDjrusso" ToolTip="YouTube"><Viewbox Width="44" Height="44" Stretch="Uniform" SnapsToDevicePixels="True"><Canvas Width="64" Height="64"><Rectangle Canvas.Left="4" Canvas.Top="13" Width="56" Height="38" RadiusX="12" RadiusY="12" Fill="#FF0033"/>
  <Path Data="M 27,22 L 44,32 27,42 Z" Fill="#FFFFFF"/></Canvas></Viewbox></Button>
@@ -460,9 +467,9 @@
  <Path Data="M 10,46 L 24,35 M 54,46 L 40,35" Stroke="#D2B1FF" StrokeThickness="3" Fill="Transparent"/></Canvas></Viewbox></Button>
      </UniformGrid></StackPanel>
    </Border>
-   <Border Margin="0,10,0,0" Padding="8,7" CornerRadius="11" Background="#0B1027" BorderBrush="#7155D9" BorderThickness="1">
-    <StackPanel><TextBlock Text="NEON MINI WAVEFORM" Foreground="#7DEFFF" FontWeight="Bold" FontSize="10" Margin="2,0,0,5"/>
-     <Canvas x:Name="MiniWaveCanvas" Height="48" ClipToBounds="True" Background="#0D132A" SizeChanged="MiniWave_SizeChanged"/>
+   <Border Margin="0,10,0,0" Padding="8,7" CornerRadius="11" Background="{DynamicResource SocialSurfaceBrush}" BorderBrush="{DynamicResource SocialBorderBrush}" BorderThickness="1">
+    <StackPanel><TextBlock Text="NEON MINI WAVEFORM" Foreground="{DynamicResource SocialLabelBrush}" FontWeight="Bold" FontSize="10" Margin="2,0,0,5"/>
+     <Canvas x:Name="MiniWaveCanvas" Height="48" ClipToBounds="True" Background="{DynamicResource WaveSurfaceBrush}" SizeChanged="MiniWave_SizeChanged"/>
     </StackPanel>
    </Border>
    <Button x:Name="GitHubProjectButton" Style="{StaticResource SocialNeonButton}" Click="Social_Click" Tag="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB" ToolTip="Open the official GitHub project" HorizontalAlignment="Center" Width="82" Height="68" Margin="6,18,6,10">
