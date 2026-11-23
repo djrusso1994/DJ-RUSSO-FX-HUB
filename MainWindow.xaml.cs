@@ -392,6 +392,16 @@ public partial class MainWindow : Window
    ("ComboBorderBrush",light?"#8061BA":dark?"#7586B9":"#946BDE"),
    ("ComboFocusBrush",light?"#3076BC":"#52E9FF")
   })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
+  // Theme-aware Social and scrollbar surfaces; keep official brand icon colors unchanged.
+  foreach(var (key,value) in new[]{
+   ("SocialSurfaceBrush",light?"#F0F4FC":dark?"#202634":"#0B1027"),
+   ("SocialButtonBrush",light?"#FFFFFF":dark?"#2A3242":"#12172D"),
+   ("SocialBorderBrush",light?"#879BC1":dark?"#647695":"#A15DFF"),
+   ("SocialLabelBrush",light?"#174B80":dark?"#B6D7E8":"#86F4FF"),
+   ("WaveSurfaceBrush",light?"#E2EAF7":dark?"#151C2A":"#0D132A"),
+   ("ScrollRailBrush",light?"#DCE5F4":dark?"#222C3C":"#141B35"),
+   ("ScrollThumbBrush",light?"#718CB9":dark?"#7189AB":"#8154C8")
+  })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
   var installBg=light?"#E2F8EA":dark?"#18372C":"#0D3729";
   var removeBg=light?"#F9E4F7":dark?"#392B40":"#392044";
   var launchBg=light?"#E3F7FB":dark?"#1B3841":"#0C3846";
