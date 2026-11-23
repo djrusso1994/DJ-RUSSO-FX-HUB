@@ -407,13 +407,19 @@ public partial class MainWindow : Window
    ("ChipTrackBrush",light?"#693DA1":dark?"#D8B7F4":"#D58BFF"),
    ("ChipIconBrush",light?"#146B8A":dark?"#8FE6EE":"#7DEFFF")
   })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
+  foreach(var (key,value) in new[]{
+   ("ChipBorderBrush",light?"#879BC1":dark?"#647695":"#A36AFF"),
+   ("PluginUpdateSurfaceBrush",light?"#E3F7FB":dark?"#243548":"#112A40"),
+   ("PluginUpdateBorderBrush",light?"#17788B":dark?"#7A9CB7":"#3FEFFF"),
+   ("PluginUpdateTextBrush",light?"#164D59":"#FFFFFF")
+  })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
   var installBg=light?"#E2F8EA":dark?"#18372C":"#0D3729";
   var removeBg=light?"#F9E4F7":dark?"#392B40":"#392044";
   var launchBg=light?"#E3F7FB":dark?"#1B3841":"#0C3846";
-  foreach(var b in new[]{ShellInstallButton,MeterPanelInstallButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(installBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#16804D":"#24E977"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#173B2A":"#FFFFFF"));}
-  foreach(var b in new[]{ShellRemoveButton,MeterPanelRemoveButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(removeBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#9D3A96":"#E13AF5"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#50254D":"#FFFFFF"));}
+  foreach(var b in new[]{ShellInstallButton,MeterPanelInstallButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(installBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#16804D":dark?"#669F7F":"#24E977"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#173B2A":"#FFFFFF"));}
+  foreach(var b in new[]{ShellRemoveButton,MeterPanelRemoveButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(removeBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#9D3A96":dark?"#96749B":"#E13AF5"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#50254D":"#FFFFFF"));}
   MeterPanelLaunchButton.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(launchBg));
-  MeterPanelLaunchButton.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#17788B":"#3FEFFF"));
+  MeterPanelLaunchButton.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#17788B":dark?"#789EAD":"#3FEFFF"));
   MeterPanelLaunchButton.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#164D59":"#FFFFFF"));
   if(MiniWaveCanvas!=null)BuildMiniWave();
   Resources["HeadingBrush"] = new LinearGradientBrush((Color)ColorConverter.ConvertFromString(light?"#065C91":"#71F4FF"),(Color)ColorConverter.ConvertFromString(light?"#7A3CC9":"#D58BFF"),0);
