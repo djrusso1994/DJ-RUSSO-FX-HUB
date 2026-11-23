@@ -583,6 +583,16 @@ public partial class MainWindow : Window
   };
   var vstStatus=Directory.Exists(vst)?T("diagVstFound"):T("diagVstMissing");
   var meterStatus=File.Exists(MeterExePath)?T("diagMeterFound"):T("diagMeterMissing");
+  var reverbState=ReverbInstaller.GetState();
+  var localizedReverbState=reverbState switch{
+   ReverbInstaller.State.Missing=>T("diagShellMissing"),
+   ReverbInstaller.State.Managed=>T("diagShellManaged"),
+   ReverbInstaller.State.ExternalSameBinary=>T("diagShellExternal"),
+   ReverbInstaller.State.Conflict=>T("diagShellConflict"),
+   ReverbInstaller.State.ModifiedManaged=>T("diagShellModified"),
+   _=>T("diagShellUnknown")
+  };
+  var reverbPackageStatus=ReverbInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var packageStatus=ShellInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var flStatus=flPaths.Any(Directory.Exists)?T("diagFlFound"):T("diagFlMissing");
   // Read-only detection of known standalone file names. Presence does not prove VST3 identity.
@@ -593,13 +603,13 @@ public partial class MainWindow : Window
   }).ToArray();
   var detectionHeading=new[]{"Standalone VST3 candidates (filename only)","Possibili VST3 indipendenti (solo nome file)","Posibles VST3 independientes (solo nombre)","VST3 indépendants possibles (nom uniquement)","Mögliche eigenständige VST3 (nur Dateiname)"}[Index];
   var detectionList=foundStandalone.Length==0?"—":string.Join(", ",foundStandalone);
-  var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
+  var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nREVERB X v1.3: {localizedReverbState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\nREVERB X payload: {reverbPackageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.39");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.40");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
