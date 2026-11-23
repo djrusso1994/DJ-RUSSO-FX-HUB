@@ -35,7 +35,16 @@ Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it 
 
 The FX HUB itself is a Windows application, **not a VST3 plugin**.
 
-## Coming next: DJ RUSSO REVERB X v1.3\n\n**DJ RUSSO REVERB X v1.3** is the next VST3 addition planned for **DJ RUSSO FX HUB v0.8.40**. The compiled Windows VST3 package has been received and is being prepared for HUB integration.\n\n- **Reverb X card:** retain its existing position in the catalog; replace the *Coming Soon* status only after installation support is verified.\n- **Visual identity:** use the original REVERB X logo at the same visual size as the other plugin cards.\n- **Plugin features:** Neon Ghost interface, six controls with progressive glow, stereo IN/OUT meters, presets and FL Studio automation support.\n- **Release status:** v0.8.40 is **not yet published**. The new VST3 is not available through the current public HUB installer until integration and Windows tests are complete.\n\n## What's new in v0.8.39
+## Coming next: DJ RUSSO REVERB X v1.3
+
+**DJ RUSSO REVERB X v1.3** is planned as the next standalone VST3 effect in **DJ RUSSO FX HUB v0.8.40**.
+
+- **Dedicated catalog card:** the existing Reverb X card will stay in its current position, using its original logo at the same size as the other plugins.
+- **Reverb features:** Neon Ghost interface, six adjustable controls with progressive glow, stereo IN/OUT meters, presets and FL Studio automation support.
+- **Separate installation:** Reverb X will be installed independently from FX SHELL, with file integrity checks and confirmation before changes.
+- **Current availability:** v0.8.40 is still being prepared in a [development pull request](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/pull/21). It is **not yet available** in the latest published HUB installer.
+
+## What's new in v0.8.39
 
 - **Improved theme consistency:** refined contrast, borders, buttons and text readability across **Neon Ghost**, **Dark Professional** and **Light Modern**.
 - **More readable controls:** improved dropdown presentation, plugin-update button and selected-tool panel styling.
