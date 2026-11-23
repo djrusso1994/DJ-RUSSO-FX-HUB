@@ -400,7 +400,12 @@ public partial class MainWindow : Window
    ("SocialLabelBrush",light?"#174B80":dark?"#B6D7E8":"#86F4FF"),
    ("WaveSurfaceBrush",light?"#E2EAF7":dark?"#151C2A":"#0D132A"),
    ("ScrollRailBrush",light?"#DCE5F4":dark?"#222C3C":"#141B35"),
-   ("ScrollThumbBrush",light?"#718CB9":dark?"#7189AB":"#8154C8")
+   ("ScrollThumbBrush",light?"#718CB9":dark?"#7189AB":"#8154C8"),
+   ("GitHubGlyphBrush",light?"#1F2B42":"#F7F8FF"),
+   ("ChipSurfaceBrush",light?"#E4EDFA":dark?"#202A3A":"#11132B"),
+   ("ChipTitleBrush",light?"#135B7B":dark?"#B7EBF4":"#7DEFFF"),
+   ("ChipTrackBrush",light?"#693DA1":dark?"#D8B7F4":"#D58BFF"),
+   ("ChipIconBrush",light?"#146B8A":dark?"#8FE6EE":"#7DEFFF")
   })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
   var installBg=light?"#E2F8EA":dark?"#18372C":"#0D3729";
   var removeBg=light?"#F9E4F7":dark?"#392B40":"#392044";
@@ -410,6 +415,7 @@ public partial class MainWindow : Window
   MeterPanelLaunchButton.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(launchBg));
   MeterPanelLaunchButton.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#17788B":"#3FEFFF"));
   MeterPanelLaunchButton.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#164D59":"#FFFFFF"));
+  if(MiniWaveCanvas!=null)BuildMiniWave();
   Resources["HeadingBrush"] = new LinearGradientBrush((Color)ColorConverter.ConvertFromString(light?"#065C91":"#71F4FF"),(Color)ColorConverter.ConvertFromString(light?"#7A3CC9":"#D58BFF"),0);
  }
 
@@ -862,8 +868,9 @@ public partial class MainWindow : Window
   if(MiniWaveCanvas==null)return;
   MiniWaveCanvas.Children.Clear();waveBars.Clear();
   int count=Math.Max(8,(int)(MiniWaveCanvas.ActualWidth/5));
+  bool lightWave=theme=="light";
   for(int i=0;i<count;i++){
-   var bar=new System.Windows.Shapes.Rectangle{Width=2.7,Height=2,RadiusX=1.3,RadiusY=1.3,Fill=new SolidColorBrush((Color)ColorConverter.ConvertFromString(i%3==0?"#E756FA":"#48ECFF"))};
+   var bar=new System.Windows.Shapes.Rectangle{Width=2.7,Height=2,RadiusX=1.3,RadiusY=1.3,Fill=new SolidColorBrush((Color)ColorConverter.ConvertFromString(lightWave?(i%3==0?"#9D2A9F":"#087D9A"):(i%3==0?"#E756FA":"#48ECFF")))};
    System.Windows.Controls.Canvas.SetLeft(bar,i*5);System.Windows.Controls.Canvas.SetTop(bar,23);
    MiniWaveCanvas.Children.Add(bar);waveBars.Add(bar);
   }
