@@ -616,14 +616,24 @@ public partial class MainWindow : Window
   var packageStatus=ShellInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var flStatus=flPaths.Any(Directory.Exists)?T("diagFlFound"):T("diagFlMissing");
   // Read-only detection of known standalone file names. Presence does not prove VST3 identity.
-  var knownVst3Names=new[]{"DJ RUSSO SIDECHAIN X.vst3","DJ RUSSO REVERSE FX.vst3","DJ RUSSO STUTTER FX.vst3","DJ RUSSO VOCAL FX.vst3"};
+  var knownVst3Names=new[]{"DJ RUSSO SIDECHAIN X.vst3","DJ RUSSO REVERSE FX.vst3","DJ RUSSO STUTTER FX.vst3","DJ RUSSO VOCAL FX.vst3","DJ RUSSO REVERB X.vst3"};
   var foundStandalone=knownVst3Names.Where(name=>{
     var path=Path.Combine(vst,name);
     return File.Exists(path)||Directory.Exists(path);
   }).ToArray();
   var detectionHeading=new[]{"Standalone VST3 candidates (filename only)","Possibili VST3 indipendenti (solo nome file)","Posibles VST3 independientes (solo nombre)","VST3 indépendants possibles (nom uniquement)","Mögliche eigenständige VST3 (nur Dateiname)"}[Index];
   var detectionList=foundStandalone.Length==0?"—":string.Join(", ",foundStandalone);
-  var report=$"{T("diagVstFolder")}: {vstStatus}\n{vst}\n\nFX SHELL: {localizedShellState}\nREVERB X v1.3: {localizedReverbState}\nMETER X: {meterStatus}\n{T("diagPackage")}: {packageStatus}\nREVERB X payload: {reverbPackageStatus}\n\n{T("diagFlLocations")}: {flStatus}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
+  // Consistent sentence-case statuses and aligned sections across all five UI languages.
+  static string Readable(string value){
+   if(string.IsNullOrWhiteSpace(value))return value;
+   value=value.Trim();
+   return value.Length==1?value.ToUpperInvariant():char.ToUpperInvariant(value[0])+value[1..].ToLowerInvariant();
+  }
+  var packageHeading=new[]{"FX SHELL package","Pacchetto FX SHELL","Paquete FX SHELL","Paquet FX SHELL","FX SHELL-Paket"}[Index];
+  var reverbHeading=new[]{"REVERB X package","Pacchetto REVERB X","Paquete REVERB X","Paquet REVERB X","REVERB X-Paket"}[Index];
+  var installedHeading=new[]{"Installed components","Componenti installati","Componentes instalados","Composants installés","Installierte Komponenten"}[Index];
+  var packageGroup=new[]{"Package integrity","Integrità dei pacchetti","Integridad de paquetes","Intégrité des paquets","Paketintegrität"}[Index];
+  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL: {Readable(localizedShellState)}\nREVERB X v1.3: {Readable(localizedReverbState)}\nMETER X: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
