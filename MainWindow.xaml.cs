@@ -814,7 +814,13 @@ public partial class MainWindow : Window
      foreach(var entry in entries){
        if(entry.GetProperty("id").GetString()==packageId){found=entry;break;}
      }
-     if(found.ValueKind==JsonValueKind.Undefined)throw new InvalidDataException("Plugin not found in official catalog.");
+     if(found.ValueKind==JsonValueKind.Undefined){
+       if(packageId=="reverb-x"){
+         NeonToast.Show(this,Index==1?"REVERB X v1.3 è incluso in questa build di prova. Il catalogo pubblico degli aggiornamenti sarà disponibile dopo la pubblicazione della v0.8.40. Nessun file è stato modificato.":"REVERB X v1.3 is bundled with this test build. The public update catalog will be available after v0.8.40 is released. No files were changed.");
+         return;
+       }
+       throw new InvalidDataException("Plugin not found in official catalog.");
+     }
      var version=found.GetProperty("version").GetString()??"";
      var available=found.GetProperty("downloadAvailable").GetBoolean();
      var installedVersion=packageId=="fx-shell"?ShellInstaller.VersionLabel:packageId=="reverb-x"?ReverbInstaller.VersionLabel:"1.2.6";
