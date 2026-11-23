@@ -866,7 +866,14 @@ public partial class MainWindow : Window
      }
      if(found.ValueKind==JsonValueKind.Undefined){
        if(packageId=="reverb-x"){
-         NeonToast.Show(this,Index==1?"REVERB X v1.3 è incluso in questa build di prova. Il catalogo pubblico degli aggiornamenti sarà disponibile dopo la pubblicazione della v0.8.40. Nessun file è stato modificato.":"REVERB X v1.3 is bundled with this test build. The public update catalog will be available after v0.8.40 is released. No files were changed.");
+         var stagedNotice=new[]{
+           "REVERB X v1.3 — test build.\nThe public update catalog is not yet published.\nNo files were changed.",
+           "REVERB X v1.3 — versione di prova.\nCatalogo aggiornamenti non ancora pubblicato.\nNessun file modificato.",
+           "REVERB X v1.3 — versión de prueba.\nCatálogo de actualizaciones aún no publicado.\nNo se modificaron archivos.",
+           "REVERB X v1.3 — version d'essai.\nCatalogue des mises à jour non encore publié.\nAucun fichier modifié.",
+           "REVERB X v1.3 — Testversion.\nUpdate-Katalog noch nicht veröffentlicht.\nKeine Dateien geändert."
+         }[Index];
+         NeonToast.Show(this,stagedNotice);
          return;
        }
        throw new InvalidDataException("Plugin not found in official catalog.");
@@ -874,9 +881,15 @@ public partial class MainWindow : Window
      var version=found.GetProperty("version").GetString()??"";
      var available=found.GetProperty("downloadAvailable").GetBoolean();
      var installedVersion=packageId=="fx-shell"?ShellInstaller.VersionLabel:packageId=="reverb-x"?ReverbInstaller.VersionLabel:"1.2.6";
-     var message=Index==1
-       ? $"Pacchetto: {packageId}\\nVersione inclusa di riferimento: {installedVersion}\\nUltima versione nel catalogo: {version}\\n\\n"+(available?"Pacchetto pubblicato: l'installazione automatica richiede ancora verifica di integrità e compatibilità.":"Nessun aggiornamento autonomo del plugin disponibile. I file installati non saranno modificati.")
-       : $"Package: {packageId}\\nBundled reference version: {installedVersion}\\nCatalog version: {version}\\n\\n"+(available?"Published package: automatic installation requires integrity and compatibility validation.":"No standalone plugin update available. Installed files will not be modified.");
+     var displayName=packageId switch {"fx-shell"=>"FX SHELL","meter-x"=>"METER X","reverb-x"=>"REVERB X",_=>packageId.ToUpperInvariant()};
+     var labels=new[]{
+       new[]{"Bundled","Catalog","Update published; automatic installation is not yet enabled.","Up to date. No files changed."},
+       new[]{"Inclusa","Catalogo","Aggiornamento pubblicato; installazione automatica non ancora attiva.","Già aggiornato. Nessun file modificato."},
+       new[]{"Incluida","Catálogo","Actualización publicada; instalación automática aún no activa.","Actualizado. Ningún archivo modificado."},
+       new[]{"Incluse","Catalogue","Mise à jour publiée ; installation automatique non activée.","À jour. Aucun fichier modifié."},
+       new[]{"Enthalten","Katalog","Update veröffentlicht; automatische Installation noch nicht aktiv.","Aktuell. Keine Dateien geändert."}
+     }[Index];
+     var message=$"{displayName}\n{labels[0]}: v{installedVersion}  •  {labels[1]}: v{version}\n{(available?labels[2]:labels[3])}";
      NeonToast.Show(this,message);
    }catch(Exception ex){
      NeonDialog.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
