@@ -69,7 +69,7 @@
   </Style.Triggers>
  </Style>
  <Style x:Key="SocialNeonButton" TargetType="Button">
-  <Setter Property="Height" Value="64"/><Setter Property="Margin" Value="4"/><Setter Property="Padding" Value="7,5"/>
+  <Setter Property="Height" Value="60"/><Setter Property="Margin" Value="3"/><Setter Property="Padding" Value="7,4"/>
   <Setter Property="Background" Value="#12172D"/><Setter Property="BorderBrush" Value="#7656E6"/><Setter Property="BorderThickness" Value="1.3"/>
   <Setter Property="Cursor" Value="Hand"/><Setter Property="FontSize" Value="10"/><Setter Property="FontWeight" Value="SemiBold"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
