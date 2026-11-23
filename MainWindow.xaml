@@ -255,9 +255,9 @@
         </ToggleButton>
        </Grid>
       </Border>
-      <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
+      <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" PlacementTarget="{Binding ElementName=ComboFrame}" Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
        <Border x:Name="PopupFrame" MinWidth="{Binding ActualWidth, ElementName=ComboFrame}" MaxHeight="{TemplateBinding MaxDropDownHeight}" Background="{DynamicResource ComboSurfaceBrush}" BorderBrush="{DynamicResource ComboBorderBrush}" BorderThickness="1.5" CornerRadius="9" Padding="3" SnapsToDevicePixels="True">
-        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly" ScrollViewer.IsDeferredScrollingEnabled="False">
          <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
         </ScrollViewer>
        </Border>
