@@ -35,17 +35,17 @@ Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it 
 
 The FX HUB itself is a Windows application, **not a VST3 plugin**.
 
-## What's new in v0.8.27
+## What's new in v0.8.38
 
-- **Update-window preview:** open the actual Neon Ghost download dialog without downloading or installing anything. The preview shows simulated progress (63%) and allows testing the **Cancel** button.
-- **Two entry points:** **ANTEPRIMA AGGIORNAMENTO** in the left sidebar, and **PREVIEW DOWNLOAD WINDOW / ANTEPRIMA** in **Settings**.
-- **Borderless update dialog:** the custom dark/purple title area replaces the native white Windows title bar for update downloads.
-- **VirusTotal:** the security button opens the VirusTotal **manual file upload** page instead of an SHA-256 report that might not exist. **No file is uploaded automatically.** The official GitHub installer SHA-256 can still be copied from Settings.
-- **Installer and version:** Windows x64 installer is published through GitHub Releases after the main-branch Windows workflow completes successfully.
+- **Coming Soon artwork:** cleaned detached transparent fragments from six planned plugin logos (Compressor X, Drive X, EQ X, Pitch X, Stereo X and Transient X).
+- **Neon Ghost interface:** recent releases improved card and sidebar hover behavior, dropdown readability, the guide window and update-dialog preview.
+- **Existing plugins preserved:** this update does not change the bundled audio DSP, plugin identities, installer paths or update logic.
+
+For the exact version history, see [CHANGELOG.txt](CHANGELOG.txt). The download and release status are always shown on [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases).
 
 ### Test the update-window preview
 
-Install **v0.8.27** from [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) after it is published, open the left sidebar and select **ANTEPRIMA AGGIORNAMENTO**. You can also find the preview under **Settings**. This is a visual simulation, not an actual update; it does not download, install or replace any files.
+Open the left sidebar and select **ANTEPRIMA AGGIORNAMENTO**, or use the preview control in **Settings**. This is a visual simulation, not an actual update; it does not download, install or replace any files.
 
 ### VirusTotal and installer safety
 
