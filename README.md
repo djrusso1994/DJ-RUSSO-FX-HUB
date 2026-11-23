@@ -35,11 +35,15 @@ Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it 
 
 The FX HUB itself is a Windows application, **not a VST3 plugin**.
 
-## What's new in v0.8.38
+## What's new in v0.8.39
 
-- **Coming Soon artwork:** cleaned detached transparent fragments from six planned plugin logos (Compressor X, Drive X, EQ X, Pitch X, Stereo X and Transient X).
-- **Neon Ghost interface:** recent releases improved card and sidebar hover behavior, dropdown readability, the guide window and update-dialog preview.
-- **Existing plugins preserved:** this update does not change the bundled audio DSP, plugin identities, installer paths or update logic.
+- **Improved theme consistency:** refined contrast, borders, buttons and text readability across **Neon Ghost**, **Dark Professional** and **Light Modern**.
+- **More readable controls:** improved dropdown presentation, plugin-update button and selected-tool panel styling.
+- **Responsive notifications:** adjusted toast positioning to remain visible across different Windows screen resolutions and taskbar layouts.
+- **Interface localization:** refined multilingual labels and update-status translations.
+- **Existing audio tools preserved:** no changes to VST3 audio DSP, plugin identities or installer paths.
+
+The v0.8.39 Windows build was tested before its stable public release.
 
 For the exact version history, see [CHANGELOG.txt](CHANGELOG.txt). The download and release status are always shown on [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases).
 
@@ -56,7 +60,7 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 - Install and remove supported DJ RUSSO tools.
 - View installation status and launch supported applications.
 - Search and filter the audio-tool catalog.
-- Choose interface language and visual theme.
+- Choose interface language and one of three visual themes: Neon Ghost, Dark Professional or Light Modern.
 - Check GitHub Releases for newer versions, including preview releases.
 - Open diagnostics, backup tools and the VST3 directory.
 - Neon Ghost visual design and mini chip player.
