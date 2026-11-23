@@ -119,7 +119,7 @@ jobs:
   release:
     name: Publish approved public release
     needs: build
-    if: ${{ github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true) }}
+    if: ${{ (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.publish_release == true) }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -143,7 +143,7 @@ jobs:
           VERSION: ${{ steps.version.outputs.value }}
           EVENT: ${{ github.event_name }}
         run: |
-          echo "Publishing a preview on push, or approved stable release on manual dispatch, for v$VERSION"
+          echo "Publishing approved stable release from main or manual dispatch, for v$VERSION"
 
       - name: Download tested installer
         shell: bash
@@ -175,7 +175,7 @@ jobs:
             exit 0
           fi
           EXTRA_ARGS=()
-          if [ "${{ github.event_name }}" = push ]; then EXTRA_ARGS+=(--prerelease); else EXTRA_ARGS+=(--latest); fi
+          EXTRA_ARGS+=(--latest)
           gh release create "$TAG" "release-assets/DJ_RUSSO_FX_HUB_Setup_v$VERSION.exe" \
             --repo "$GITHUB_REPOSITORY" \
             --target "$GITHUB_SHA" \
