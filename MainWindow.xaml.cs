@@ -427,6 +427,16 @@ public partial class MainWindow : Window
   Resources["HeadingBrush"] = new LinearGradientBrush((Color)ColorConverter.ConvertFromString(light?"#065C91":"#71F4FF"),(Color)ColorConverter.ConvertFromString(light?"#7A3CC9":"#D58BFF"),0);
  }
 
+ private string BulkStatus(string key)=>key switch{
+  "installed"=>new[]{"Installed","Installato","Instalado","Installé","Installiert"}[Index],
+  "already"=>new[]{"Already installed","Già installato","Ya instalado","Déjà installé","Bereits installiert"}[Index],
+  "removed"=>new[]{"Removed","Rimosso","Eliminado","Supprimé","Entfernt"}[Index],
+  "notInstalled"=>new[]{"Not installed","Non installato","No instalado","Non installé","Nicht installiert"}[Index],
+  "notManaged"=>new[]{"Not managed by HUB","Non gestito dall'HUB","No gestionado por HUB","Non géré par HUB","Nicht von HUB verwaltet"}[Index],
+  "missing"=>new[]{"Package missing","Pacchetto mancante","Paquete ausente","Paquet manquant","Paket fehlt"}[Index],
+  "conflict"=>new[]{"Unmanaged file or conflict","File non gestito o conflitto","Archivo no gestionado o conflicto","Fichier non géré ou conflit","Nicht verwaltete Datei oder Konflikt"}[Index],
+  _=>key
+ };
  private static readonly string[] BulkInstallLabels={"INSTALL ALL","INSTALLA TUTTO","INSTALAR TODO","TOUT INSTALLER","ALLES INSTALLIEREN"};
  private static readonly string[] BulkRemoveLabels={"REMOVE ALL","RIMUOVI TUTTO","ELIMINAR TODO","TOUT SUPPRIMER","ALLES ENTFERNEN"};
  private static readonly string[] BulkTitleLabels={"AVAILABLE SOFTWARE","SOFTWARE DISPONIBILI","SOFTWARE DISPONIBLE","LOGICIELS DISPONIBLES","VERFÜGBARE SOFTWARE"};
@@ -435,12 +445,12 @@ public partial class MainWindow : Window
  private string BundledMeterPath=>Path.Combine(AppContext.BaseDirectory,"Payload","DJ RUSSO METER X.exe");
  private bool InstallMeterFile(out string detail){
   detail="";
-  if(File.Exists(MeterExePath)){detail="METER X: already installed / già installato";return true;}
-  if(!File.Exists(BundledMeterPath)){detail="METER X: EXE missing / EXE incluso mancante";return false;}
+  if(File.Exists(MeterExePath)){detail="METER X: "+BulkStatus("already");return true;}
+  if(!File.Exists(BundledMeterPath)){detail="METER X: "+BulkStatus("missing");return false;}
   try{
    Directory.CreateDirectory(Path.GetDirectoryName(MeterExePath)!);
    File.Copy(BundledMeterPath,MeterExePath,false);
-   detail="METER X: installed / installato";return true;
+   detail="METER X: "+BulkStatus("installed");return true;
   }catch(Exception ex){detail="METER X: "+ex.Message;return false;}
  }
  private void InstallShell_Click(object sender,RoutedEventArgs e){
@@ -455,12 +465,12 @@ public partial class MainWindow : Window
    else{
     var result=RunElevated(ShellInstaller.InstallArgument);
     if(result==0){
-     try{ShellInstaller.SaveReceipt();messages.Add("FX SHELL: OK");}
+     try{ShellInstaller.SaveReceipt();messages.Add("FX SHELL: "+BulkStatus("installed"));}
      catch(Exception ex){messages.Add("FX SHELL: receipt / registrazione: "+ex.Message);}
     }else messages.Add("FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")");
    }
   }else if(state==ShellInstaller.State.Managed || state==ShellInstaller.State.ExternalSameBinary)
-    messages.Add("FX SHELL: already present / già presente");
+    messages.Add("FX SHELL: "+BulkStatus("already"));
   else messages.Add("FX SHELL: "+T("shellConflict"));
   var reverbState=ReverbInstaller.GetState();
   if(reverbState==ReverbInstaller.State.Missing){
@@ -468,13 +478,13 @@ public partial class MainWindow : Window
    else{
     var reverbResult=RunElevated(ReverbInstaller.InstallArgument);
     if(reverbResult==0){
-     try{ReverbInstaller.SaveReceipt();messages.Add("REVERB X: OK");}
+     try{ReverbInstaller.SaveReceipt();messages.Add("REVERB X: "+BulkStatus("installed"));}
      catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
     }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
    }
   }else if(reverbState is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary)
-   messages.Add("REVERB X: already present / già presente");
-  else messages.Add("REVERB X: conflict / file non gestito");
+   messages.Add("REVERB X: "+BulkStatus("already"));
+  else messages.Add("REVERB X: "+BulkStatus("conflict"));
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
   Refresh();
   NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
@@ -488,21 +498,21 @@ public partial class MainWindow : Window
   if(ShellInstaller.GetState()==ShellInstaller.State.Managed){
    var result=RunElevated(ShellInstaller.RemoveArgument);
    if(result==0){
-    try{ShellInstaller.DeleteReceipt();messages.Add("FX SHELL: removed / rimossa");}
+    try{ShellInstaller.DeleteReceipt();messages.Add("FX SHELL: "+BulkStatus("removed"));}
     catch(Exception ex){messages.Add("FX SHELL: receipt / registrazione: "+ex.Message);}
    }else messages.Add("FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")");
-  }else messages.Add("FX SHELL: no HUB-managed file / nessun file gestito dall'HUB");
+  }else messages.Add("FX SHELL: "+BulkStatus("notManaged"));
   if(ReverbInstaller.GetState()==ReverbInstaller.State.Managed){
    var reverbResult=RunElevated(ReverbInstaller.RemoveArgument);
    if(reverbResult==0){
-    try{ReverbInstaller.DeleteReceipt();messages.Add("REVERB X: removed / rimosso");}
+    try{ReverbInstaller.DeleteReceipt();messages.Add("REVERB X: "+BulkStatus("removed"));}
     catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
    }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
-  }else messages.Add("REVERB X: no HUB-managed file / nessun file gestito dall’HUB");
+  }else messages.Add("REVERB X: "+BulkStatus("notManaged"));
   if(File.Exists(MeterExePath)){
-   try{File.Delete(MeterExePath);messages.Add("METER X: removed / rimosso");}
+   try{File.Delete(MeterExePath);messages.Add("METER X: "+BulkStatus("removed"));}
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
-  }else messages.Add("METER X: not installed / non installato");
+  }else messages.Add("METER X: "+BulkStatus("notInstalled"));
   Refresh();
   NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
  }
