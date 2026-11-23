@@ -316,8 +316,8 @@ public partial class MainWindow : Window
      // Explain disabled actions in the selected language.
      ShellInstallButton.ToolTip=BulkHintLabels[Index];
      ShellRemoveButton.ToolTip=BulkHintLabels[Index];
-     ShellInstallButton.IsEnabled=(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()) || (!File.Exists(MeterExePath) && File.Exists(BundledMeterPath));
-     ShellRemoveButton.IsEnabled=shellState==ShellInstaller.State.Managed || File.Exists(MeterExePath);
+     ShellInstallButton.IsEnabled=(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()) || (ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()) || (!File.Exists(MeterExePath) && File.Exists(BundledMeterPath));
+     ShellRemoveButton.IsEnabled=shellState==ShellInstaller.State.Managed || ReverbInstaller.GetState()==ReverbInstaller.State.Managed || File.Exists(MeterExePath);
      // Selected-product controls are updated after the card list is rebuilt.
      bool shellVerified=shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
      var verifiedIds=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -430,7 +430,7 @@ public partial class MainWindow : Window
  private static readonly string[] BulkInstallLabels={"INSTALL ALL","INSTALLA TUTTO","INSTALAR TODO","TOUT INSTALLER","ALLES INSTALLIEREN"};
  private static readonly string[] BulkRemoveLabels={"REMOVE ALL","RIMUOVI TUTTO","ELIMINAR TODO","TOUT SUPPRIMER","ALLES ENTFERNEN"};
  private static readonly string[] BulkTitleLabels={"AVAILABLE SOFTWARE","SOFTWARE DISPONIBILI","SOFTWARE DISPONIBLE","LOGICIELS DISPONIBLES","VERFÜGBARE SOFTWARE"};
- private static readonly string[] BulkHintLabels={"Install bundled FX SHELL VST3 and METER X EXE.","Installa FX SHELL VST3 e METER X EXE inclusi.","Instala FX SHELL y METER X incluidos.","Installez FX SHELL et METER X inclus.","FX SHELL und METER X installieren."};
+ private static readonly string[] BulkHintLabels={"Install bundled FX SHELL, REVERB X and METER X.","Installa FX SHELL, REVERB X e METER X inclusi.","Instala FX SHELL, REVERB X y METER X incluidos.","Installez FX SHELL, REVERB X et METER X inclus.","FX SHELL, REVERB X und METER X installieren."};
  private static readonly string[] MeterInstallLabels={"INSTALL","INSTALLA","INSTALAR","INSTALLER","INSTALLIEREN"};
  private string BundledMeterPath=>Path.Combine(AppContext.BaseDirectory,"Payload","DJ RUSSO METER X.exe");
  private bool InstallMeterFile(out string detail){
@@ -462,6 +462,19 @@ public partial class MainWindow : Window
   }else if(state==ShellInstaller.State.Managed || state==ShellInstaller.State.ExternalSameBinary)
     messages.Add("FX SHELL: already present / già presente");
   else messages.Add("FX SHELL: "+T("shellConflict"));
+  var reverbState=ReverbInstaller.GetState();
+  if(reverbState==ReverbInstaller.State.Missing){
+   if(!ReverbInstaller.HasExpectedPayload())messages.Add("REVERB X: "+T("payloadBad"));
+   else{
+    var reverbResult=RunElevated(ReverbInstaller.InstallArgument);
+    if(reverbResult==0){
+     try{ReverbInstaller.SaveReceipt();messages.Add("REVERB X: OK");}
+     catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
+    }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
+   }
+  }else if(reverbState is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary)
+   messages.Add("REVERB X: already present / già presente");
+  else messages.Add("REVERB X: conflict / file non gestito");
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
   Refresh();
   NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
@@ -479,6 +492,13 @@ public partial class MainWindow : Window
     catch(Exception ex){messages.Add("FX SHELL: receipt / registrazione: "+ex.Message);}
    }else messages.Add("FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")");
   }else messages.Add("FX SHELL: no HUB-managed file / nessun file gestito dall'HUB");
+  if(ReverbInstaller.GetState()==ReverbInstaller.State.Managed){
+   var reverbResult=RunElevated(ReverbInstaller.RemoveArgument);
+   if(reverbResult==0){
+    try{ReverbInstaller.DeleteReceipt();messages.Add("REVERB X: removed / rimosso");}
+    catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
+   }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
+  }else messages.Add("REVERB X: no HUB-managed file / nessun file gestito dall’HUB");
   if(File.Exists(MeterExePath)){
    try{File.Delete(MeterExePath);messages.Add("METER X: removed / rimosso");}
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
@@ -990,6 +1010,8 @@ public partial class MainWindow : Window
              if(package.id=="fx-shell" && package.detector=="bundled-shell-sha256" && verified)
                  foreach(var id in package.effectIds)
                      if(released.Contains(id))found.Add(id);
+         if(released.Contains("reverb-x") && ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary)
+             found.Add("reverb-x");
          // METER X is a standalone EXE, not a VST3. Count it separately and
          // report its own installation state without implying a DAW scan.
          bool meterInstalled=File.Exists(MeterExePath);
@@ -1009,13 +1031,16 @@ public partial class MainWindow : Window
          string meterDetail=meterInstalled
              ? (Index==1?"METER X: INSTALLATO (EXE trovato).":Index==2?"METER X: INSTALADO (EXE encontrado).":Index==3?"METER X : INSTALLÉ (EXE trouvé).":Index==4?"METER X: INSTALLIERT (EXE gefunden).":"METER X: INSTALLED (EXE found).")
              : (Index==1?"METER X: NON INSTALLATO.":Index==2?"METER X: NO INSTALADO.":Index==3?"METER X : NON INSTALLÉ.":Index==4?"METER X: NICHT INSTALLIERT.":"METER X: NOT INSTALLED.");
-         string detail=vstDetail+"\n"+meterDetail;
+         string reverbDetail=found.Contains("reverb-x")
+             ? (Index==1?"REVERB X: INSTALLATO (VST3 verificato).":"REVERB X: INSTALLED (verified VST3).")
+             : (Index==1?"REVERB X: NON INSTALLATO.":"REVERB X: NOT INSTALLED.");
+         string detail=vstDetail+"\n"+reverbDetail+"\n"+meterDetail;
          if(state==ShellInstaller.State.Conflict || state==ShellInstaller.State.ModifiedManaged)
              detail+="\n"+T(state==ShellInstaller.State.ModifiedManaged?"shellModified":"shellOther");
          Refresh();
          ScanResultsHeading.Text=headline;
          ScanResultsDetails.Text=detail;
-         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+MeterExePath;
+         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+MeterExePath;
          ShellSectionStatus.Text=headline;
          StatusText.Text=headline;
          ScanResultsPanel.BorderBrush=(System.Windows.Media.Brush)FindResource("AccentBrush");
