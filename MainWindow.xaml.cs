@@ -445,8 +445,8 @@ public partial class MainWindow : Window
  }
  private void InstallShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
-     "Installare i componenti disponibili? FX SHELL richiede autorizzazione amministratore. Chiudi prima FL Studio.":
-     "Install available components? FX SHELL requires administrator approval. Close FL Studio first.",
+     "Installare FX SHELL, REVERB X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.":
+     "Install available FX SHELL, REVERB X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   var state=ShellInstaller.GetState();
@@ -482,7 +482,7 @@ public partial class MainWindow : Window
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
      "Rimuovere FX SHELL e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
-     "Remove HUB-managed FX SHELL and METER X? External files are untouched. Close FL Studio and METER X.",
+     "Remove HUB-managed FX SHELL, REVERB X and METER X? External files are untouched. Close FL Studio and METER X.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   if(ShellInstaller.GetState()==ShellInstaller.State.Managed){
