@@ -274,10 +274,10 @@
   </Setter>
  </Style>
  <Style TargetType="TextBox">
-  <Setter Property="Foreground" Value="#F7F8FF"/>
-  <Setter Property="Background" Value="#18243C"/>
-  <Setter Property="CaretBrush" Value="#58F5EE"/>
-  <Setter Property="BorderBrush" Value="#9A6CFF"/>
+  <Setter Property="Foreground" Value="{DynamicResource FgBrush}"/>
+  <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+  <Setter Property="CaretBrush" Value="{DynamicResource FgBrush}"/>
+  <Setter Property="BorderBrush" Value="{DynamicResource ComboBorderBrush}"/>
   <Setter Property="BorderThickness" Value="1.5"/>
   <Setter Property="FontSize" Value="15"/>
   <Setter Property="MinHeight" Value="39"/>
@@ -417,8 +417,8 @@
    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
     <TextBlock Text="NEON GHOST  •  " Foreground="{DynamicResource SecondaryBrush}" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
     <TextBlock x:Name="HubVersionText" Foreground="{DynamicResource NeonCyanBrush}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Margin="0,0,18,0"/>
-    <Button Content="&#x2013;" Click="MinimizeWindow_Click" Width="40" Height="32" FontSize="19" Foreground="{DynamicResource FgBrush}" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Minimize" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
-    <Button x:Name="MaximizeWindowButton" Content="&#x25A1;" Click="MaximizeWindow_Click" Width="40" Height="32" FontSize="17" Foreground="{DynamicResource FgBrush}" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Maximize / Restore" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
+    <Button Content="&#x2013;" Click="MinimizeWindow_Click" Width="40" Height="32" FontSize="19" Foreground="#FFFFFF" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Minimize" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
+    <Button x:Name="MaximizeWindowButton" Content="&#x25A1;" Click="MaximizeWindow_Click" Width="40" Height="32" FontSize="17" Foreground="#FFFFFF" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Maximize / Restore" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
     <Button Content="&#x00D7;" Click="CloseWindow_Click" Width="40" Height="32" FontSize="23" Foreground="#FFFFFF" Background="#512039" BorderBrush="#C04B78" BorderThickness="1" ToolTip="Close" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
    </StackPanel>
   </Grid>
@@ -563,7 +563,7 @@
   <Button x:Name="MeterPanelInstallButton" Content="INSTALL / INSTALLA" Style="{StaticResource NeonActionButton}" Click="SelectedProductInstall_Click" Margin="0,0,0,8" BorderBrush="#24E977" Background="#0D3729"/>
   <Button x:Name="MeterPanelRemoveButton" Content="REMOVE / RIMUOVI" Style="{StaticResource NeonActionButton}" Click="SelectedProductRemove_Click" Margin="0,0,0,8" BorderBrush="#E13AF5" Background="#392044"/>
   <Button x:Name="MeterPanelLaunchButton" Content="▶  LAUNCH / AVVIA" Style="{StaticResource NeonActionButton}" Click="SelectedProductLaunch_Click" Margin="0,0,0,12" BorderBrush="#3FEFFF" Background="#0C3846"/>
-  <Button x:Name="PluginUpdatesButton" Content="CHECK PLUGIN UPDATES / CONTROLLA AGGIORNAMENTI PLUGIN" Style="{StaticResource NeonActionButton}" Click="CheckPluginUpdates_Click" Margin="0,0,0,10" BorderBrush="#3FEFFF" Background="#112A40" FontSize="10" />
+  <Button x:Name="PluginUpdatesButton" Foreground="#FFFFFF" Content="CHECK PLUGIN UPDATES / CONTROLLA AGGIORNAMENTI PLUGIN" Style="{StaticResource NeonActionButton}" Click="CheckPluginUpdates_Click" Margin="0,0,0,10" BorderBrush="#3FEFFF" Background="#112A40" FontSize="10" />
   <TextBlock x:Name="MeterPanelState" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SecondaryBrush}" Margin="0,0,0,10" TextWrapping="Wrap"/>
    <Border Margin="0,12,0,0" Padding="9" CornerRadius="8" Background="#11132B" BorderBrush="#A36AFF" BorderThickness="1">
    <Border.Effect><DropShadowEffect Color="#8B45FF" BlurRadius="17" ShadowDepth="0" Opacity="0.5"/></Border.Effect>
