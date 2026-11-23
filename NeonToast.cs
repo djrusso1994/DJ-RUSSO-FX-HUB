@@ -59,19 +59,51 @@ internal static class NeonToast
             MaxWidth = 340
         };
         window.Content = border;
+        // Keep the toast inside both the owning window and the usable desktop area.
+        // WPF coordinates and SystemParameters.WorkArea are device-independent pixels.
         void Position()
         {
-            window.Left = Math.Max(SystemParameters.WorkArea.Left,
-                owner.Left + owner.ActualWidth - window.Width - 22);
-            window.Top = Math.Max(SystemParameters.WorkArea.Top,
-                owner.Top + owner.ActualHeight - window.ActualHeight - 45);
+            var work = SystemParameters.WorkArea;
+            const double inset = 12;
+            const double gap = 16;
+            double ownerLeft = owner.Left;
+            double ownerTop = owner.Top;
+            double ownerWidth = owner.ActualWidth;
+            double ownerHeight = owner.ActualHeight;
+            if (owner.WindowState == WindowState.Maximized)
+            {
+                ownerLeft = work.Left;
+                ownerTop = work.Top;
+                ownerWidth = work.Width;
+                ownerHeight = work.Height;
+            }
+            double left = Math.Max(work.Left, ownerLeft);
+            double right = Math.Min(work.Right, ownerLeft + ownerWidth);
+            double top = Math.Max(work.Top, ownerTop);
+            double bottom = Math.Min(work.Bottom, ownerTop + ownerHeight);
+            if (right <= left || bottom <= top)
+            {
+                left = work.Left;
+                right = work.Right;
+                top = work.Top;
+                bottom = work.Bottom;
+            }
+            window.Width = Math.Max(120, Math.Min(390, Math.Min(work.Width, right - left) - 2 * inset));
+            window.UpdateLayout();
+            double height = window.ActualHeight;
+            double x = right - window.Width - inset;
+            double y = bottom - height - gap;
+            window.Left = Math.Max(work.Left, Math.Min(x, work.Right - window.Width));
+            window.Top = Math.Max(work.Top, Math.Min(y, work.Bottom - height));
         }
         window.Loaded += (_, _) => Position();
         owner.LocationChanged += OwnerMoved;
         owner.SizeChanged += OwnerResized;
+        owner.StateChanged += OwnerStateChanged;
         owner.Closed += OwnerClosed;
         void OwnerMoved(object? sender, EventArgs args) { if (window.IsVisible) Position(); }
         void OwnerResized(object? sender, SizeChangedEventArgs args) { if (window.IsVisible) Position(); }
+        void OwnerStateChanged(object? sender, EventArgs args) { if (window.IsVisible) Position(); }
         void OwnerClosed(object? sender, EventArgs args) { if (window.IsVisible) window.Close(); }
         var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4.5) };
         timer.Tick += (_, _) => { timer.Stop(); window.Close(); };
@@ -80,6 +112,7 @@ internal static class NeonToast
             timer.Stop();
             owner.LocationChanged -= OwnerMoved;
             owner.SizeChanged -= OwnerResized;
+            owner.StateChanged -= OwnerStateChanged;
             owner.Closed -= OwnerClosed;
         };
         window.Show();

@@ -70,14 +70,14 @@ public partial class MainWindow : Window
   ["completed"]=["Operation completed. Restart your DAW to rescan plugins.","Operazione completata. Riavvia la DAW per rilevare i plugin.","Operación completada. Reinicia la DAW.","Opération terminée. Redémarrez la DAW.","Fertig. DAW für Plugin-Scan neu starten."],
   ["settings"]=["SETTINGS","IMPOSTAZIONI","AJUSTES","PARAMÈTRES","EINSTELLUNGEN"],
   ["settingshint"]=["Interface language","Lingua dell'interfaccia","Idioma de la interfaz","Langue de l’interface","Sprache der Oberfläche"],
-  ["source"]=["Update source: official GitHub Releases","Fonte aggiornamenti: GitHub Releases ufficiali","Fuente: GitHub Releases (sin configurar)","Source : GitHub Releases (non configurée)","Quelle: GitHub Releases (nicht konfiguriert)"],
+  ["source"]=["Update source: official GitHub Releases","Fonte aggiornamenti: GitHub Releases ufficiali","Fuente de actualizaciones: versiones oficiales de GitHub","Source des mises à jour : versions officielles GitHub","Updatequelle: offizielle GitHub-Releases"],
   ["shellfound"]=["FX SHELL detected; individual effects not verified","FX SHELL rilevato; singoli effetti non verificati","FX SHELL detectado; efectos individuales sin verificar","FX SHELL détecté ; effets individuels non vérifiés","FX SHELL erkannt; einzelne Effekte nicht geprüft"],
   ["subtitle"]=["14 PLUGINS • ONE CREATIVE ECOSYSTEM","14 PLUGIN • UN UNICO ECOSISTEMA CREATIVO","14 PLUGINS • UN ECOSISTEMA CREATIVO","14 PLUGINS • UN ÉCOSYSTÈME CRÉATIF","14 PLUGINS • EIN KREATIVES ÖKOSYSTEM"],
   ["updates"]=["CHECK UPDATES","CONTROLLA AGGIORNAMENTI","BUSCAR ACTUALIZACIONES","VÉRIFIER LES MISES À JOUR","UPDATES PRÜFEN"],
   ["folder"]=["OPEN VST3 FOLDER","APRI CARTELLA VST3","ABRIR CARPETA VST3","OUVRIR DOSSIER VST3","VST3-ORDNER ÖFFNEN"],
   ["scan"]=["SCAN INSTALLED SOFTWARE","RILEVA SOFTWARE INSTALLATI","BUSCAR SOFTWARE INSTALADO","DÉTECTER LES LOGICIELS INSTALLÉS","INSTALLIERTE SOFTWARE SUCHEN"],
   ["language"]=["Language","Lingua","Idioma","Langue","Sprache"],
-  ["ready"]=["Ready • Local FX SHELL install available; GitHub release check enabled.","Pronto • Installazione locale FX SHELL disponibile; controllo aggiornamenti GitHub attivo.","Listo • Instalación local de FX SHELL disponible; GitHub pendiente.","Prêt • Installation locale de FX SHELL disponible ; GitHub à configurer.","Bereit • Lokale FX SHELL-Installation verfügbar; GitHub noch nicht eingerichtet."],
+  ["ready"]=["Ready • Local FX SHELL install available; GitHub release check enabled.","Pronto • Installazione locale FX SHELL disponibile; controllo aggiornamenti GitHub attivo.","Listo • Instalación local de FX SHELL disponible; comprobación de versiones de GitHub activa.","Prêt • Installation locale de FX SHELL disponible ; vérification des versions GitHub active.","Bereit • Lokale FX SHELL-Installation verfügbar; GitHub-Versionsprüfung aktiv."],
   ["planned"]=["COMING SOON","IN ARRIVO","PRÓXIMAMENTE","PROCHAINEMENT","DEMNÄCHST"],
   ["available"]=["READY FOR TESTING","PRONTO PER I TEST","LISTO PARA PRUEBAS","PRÊT POUR LES TESTS","TESTBEREIT"],
   ["installed"]=["INSTALLED (FILE FOUND)","INSTALLATO (FILE TROVATO)","INSTALADO (ARCHIVO ENCONTRADO)","INSTALLÉ (FICHIER TROUVÉ)","INSTALLIERT (DATEI GEFUNDEN)"],
@@ -298,7 +298,9 @@ public partial class MainWindow : Window
      CopyInstallerHashButton.Content=new[]{"Copy SHA-256","Copia SHA-256","Copiar SHA-256","Copier SHA-256","SHA-256 kopieren"}[Index];
      SourceText.Text=T("source");Subtitle.Text=T("subtitle");
      UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");OpenBackupFolderButton.Content="▣   "+new[]{"OPEN BACKUPS","APRI BACKUP","ABRIR COPIAS","OUVRIR SAUVEGARDES","BACKUPS ÖFFNEN"}[Index];OpenBackupFolderButton.ToolTip=new[]{"Open the most recent backup folder","Apri la cartella dell'ultimo backup","Abrir la carpeta de la última copia","Ouvrir le dossier de la dernière sauvegarde","Letzten Backup-Ordner öffnen"}[Index];FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
-     ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
+     PluginUpdatesButton.Content=new[]{"PLUGIN UPDATES","AGGIORNAMENTI PLUGIN","ACTUALIZAR PLUGINS","MAJ PLUGINS","PLUGIN-UPDATES"}[Index];
+      PluginUpdatesButton.ToolTip=new[]{"Check for plugin updates","Controlla aggiornamenti plugin","Buscar actualizaciones de plugins","Vérifier les mises à jour des plugins","Plugin-Updates prüfen"}[Index];
+      ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
      ShellInstallButton.Content=BulkInstallLabels[Index]; ShellRemoveButton.Content=BulkRemoveLabels[Index];
      StatusText.Text=T("ready");
      ((ComboBoxItem)SettingsThemeBox.Items[0]).Content=T("neon");((ComboBoxItem)SettingsThemeBox.Items[1]).Content=T("dark");((ComboBoxItem)SettingsThemeBox.Items[2]).Content=T("light");
@@ -392,14 +394,36 @@ public partial class MainWindow : Window
    ("ComboBorderBrush",light?"#8061BA":dark?"#7586B9":"#946BDE"),
    ("ComboFocusBrush",light?"#3076BC":"#52E9FF")
   })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
+  // Theme-aware Social and scrollbar surfaces; keep official brand icon colors unchanged.
+  foreach(var (key,value) in new[]{
+   ("SocialSurfaceBrush",light?"#F0F4FC":dark?"#202634":"#0B1027"),
+   ("SocialButtonBrush",light?"#FFFFFF":dark?"#2A3242":"#12172D"),
+   ("SocialBorderBrush",light?"#879BC1":dark?"#647695":"#A15DFF"),
+   ("SocialLabelBrush",light?"#174B80":dark?"#B6D7E8":"#86F4FF"),
+   ("WaveSurfaceBrush",light?"#E2EAF7":dark?"#151C2A":"#0D132A"),
+   ("ScrollRailBrush",light?"#DCE5F4":dark?"#222C3C":"#141B35"),
+   ("ScrollThumbBrush",light?"#718CB9":dark?"#7189AB":"#8154C8"),
+   ("GitHubGlyphBrush",light?"#1F2B42":"#F7F8FF"),
+   ("ChipSurfaceBrush",light?"#E4EDFA":dark?"#202A3A":"#11132B"),
+   ("ChipTitleBrush",light?"#135B7B":dark?"#B7EBF4":"#7DEFFF"),
+   ("ChipTrackBrush",light?"#693DA1":dark?"#D8B7F4":"#D58BFF"),
+   ("ChipIconBrush",light?"#146B8A":dark?"#8FE6EE":"#7DEFFF")
+  })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
+  foreach(var (key,value) in new[]{
+   ("ChipBorderBrush",light?"#879BC1":dark?"#647695":"#A36AFF"),
+   ("PluginUpdateSurfaceBrush",light?"#E3F7FB":dark?"#243548":"#112A40"),
+   ("PluginUpdateBorderBrush",light?"#17788B":dark?"#7A9CB7":"#3FEFFF"),
+   ("PluginUpdateTextBrush",light?"#164D59":"#FFFFFF")
+  })Resources[key]=new SolidColorBrush((Color)ColorConverter.ConvertFromString(value));
   var installBg=light?"#E2F8EA":dark?"#18372C":"#0D3729";
   var removeBg=light?"#F9E4F7":dark?"#392B40":"#392044";
   var launchBg=light?"#E3F7FB":dark?"#1B3841":"#0C3846";
-  foreach(var b in new[]{ShellInstallButton,MeterPanelInstallButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(installBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#16804D":"#24E977"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#173B2A":"#FFFFFF"));}
-  foreach(var b in new[]{ShellRemoveButton,MeterPanelRemoveButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(removeBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#9D3A96":"#E13AF5"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#50254D":"#FFFFFF"));}
+  foreach(var b in new[]{ShellInstallButton,MeterPanelInstallButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(installBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#16804D":dark?"#669F7F":"#24E977"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#173B2A":"#FFFFFF"));}
+  foreach(var b in new[]{ShellRemoveButton,MeterPanelRemoveButton}){b.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(removeBg));b.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#9D3A96":dark?"#96749B":"#E13AF5"));b.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#50254D":"#FFFFFF"));}
   MeterPanelLaunchButton.Background=new SolidColorBrush((Color)ColorConverter.ConvertFromString(launchBg));
-  MeterPanelLaunchButton.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#17788B":"#3FEFFF"));
+  MeterPanelLaunchButton.BorderBrush=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#17788B":dark?"#789EAD":"#3FEFFF"));
   MeterPanelLaunchButton.Foreground=new SolidColorBrush((Color)ColorConverter.ConvertFromString(light?"#164D59":"#FFFFFF"));
+  if(MiniWaveCanvas!=null)BuildMiniWave();
   Resources["HeadingBrush"] = new LinearGradientBrush((Color)ColorConverter.ConvertFromString(light?"#065C91":"#71F4FF"),(Color)ColorConverter.ConvertFromString(light?"#7A3CC9":"#D58BFF"),0);
  }
 
@@ -575,7 +599,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.38");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.39");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -593,6 +617,8 @@ public partial class MainWindow : Window
      Version? newest=null;
      foreach(var release in doc.RootElement.EnumerateArray()){
        if(release.TryGetProperty("draft",out var draft) && draft.GetBoolean())continue;
+        // Do not offer preview builds through the stable updater.
+        if(release.TryGetProperty("prerelease",out var prerelease) && prerelease.GetBoolean())continue;
        var tagName=release.GetProperty("tag_name").GetString()??"";
        if(!Version.TryParse(tagName.TrimStart('v','V'),out var parsed))continue;
        if(newest==null || parsed>newest){newest=parsed;root=release;}
@@ -852,8 +878,9 @@ public partial class MainWindow : Window
   if(MiniWaveCanvas==null)return;
   MiniWaveCanvas.Children.Clear();waveBars.Clear();
   int count=Math.Max(8,(int)(MiniWaveCanvas.ActualWidth/5));
+  bool lightWave=theme=="light";
   for(int i=0;i<count;i++){
-   var bar=new System.Windows.Shapes.Rectangle{Width=2.7,Height=2,RadiusX=1.3,RadiusY=1.3,Fill=new SolidColorBrush((Color)ColorConverter.ConvertFromString(i%3==0?"#E756FA":"#48ECFF"))};
+   var bar=new System.Windows.Shapes.Rectangle{Width=2.7,Height=2,RadiusX=1.3,RadiusY=1.3,Fill=new SolidColorBrush((Color)ColorConverter.ConvertFromString(lightWave?(i%3==0?"#9D2A9F":"#087D9A"):(i%3==0?"#E756FA":"#48ECFF")))};
    System.Windows.Controls.Canvas.SetLeft(bar,i*5);System.Windows.Controls.Canvas.SetTop(bar,23);
    MiniWaveCanvas.Children.Add(bar);waveBars.Add(bar);
   }

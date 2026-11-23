@@ -16,6 +16,21 @@
  <SolidColorBrush x:Key="CardStrokeBrush" Color="#7864DD"/>
  <SolidColorBrush x:Key="SidebarBrush" Color="#101127"/>
  <SolidColorBrush x:Key="NavSelectedBrush" Color="#213352"/>
+ <SolidColorBrush x:Key="SocialSurfaceBrush" Color="#0B1027"/>
+ <SolidColorBrush x:Key="SocialButtonBrush" Color="#12172D"/>
+ <SolidColorBrush x:Key="SocialBorderBrush" Color="#A15DFF"/>
+ <SolidColorBrush x:Key="SocialLabelBrush" Color="#86F4FF"/>
+ <SolidColorBrush x:Key="WaveSurfaceBrush" Color="#0D132A"/>
+ <SolidColorBrush x:Key="ScrollRailBrush" Color="#141B35"/>
+ <SolidColorBrush x:Key="ScrollThumbBrush" Color="#8154C8"/>
+ <SolidColorBrush x:Key="GitHubGlyphBrush" Color="#F7F8FF"/>
+ <SolidColorBrush x:Key="ChipSurfaceBrush" Color="#11132B"/>
+ <SolidColorBrush x:Key="ChipTitleBrush" Color="#7DEFFF"/>
+ <SolidColorBrush x:Key="ChipTrackBrush" Color="#D58BFF"/>
+ <SolidColorBrush x:Key="ChipIconBrush" Color="#7DEFFF"/>
+ <SolidColorBrush x:Key="PluginUpdateSurfaceBrush" Color="#112A40"/>
+ <SolidColorBrush x:Key="PluginUpdateBorderBrush" Color="#3FEFFF"/>
+ <SolidColorBrush x:Key="PluginUpdateTextBrush" Color="#FFFFFF"/>
  <LinearGradientBrush x:Key="CardFillBrush" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#14152D" Offset="0"/><GradientStop Color="#111329" Offset="0.6"/><GradientStop Color="#1A0C2D" Offset="1"/></LinearGradientBrush>
  <LinearGradientBrush x:Key="HeaderFillBrush" StartPoint="0,0" EndPoint="1,0"><GradientStop Color="#080B1E" Offset="0"/><GradientStop Color="#16112B" Offset="0.55"/><GradientStop Color="#080B1E" Offset="1"/></LinearGradientBrush>
  <Style x:Key="NavNeonButton" TargetType="Button">
@@ -70,7 +85,7 @@
  </Style>
  <Style x:Key="SocialNeonButton" TargetType="Button">
   <Setter Property="Height" Value="64"/><Setter Property="Margin" Value="4"/><Setter Property="Padding" Value="7,5"/>
-  <Setter Property="Background" Value="#12172D"/><Setter Property="BorderBrush" Value="#7656E6"/><Setter Property="BorderThickness" Value="1.3"/>
+  <Setter Property="Background" Value="{DynamicResource SocialButtonBrush}"/><Setter Property="BorderBrush" Value="{DynamicResource SocialBorderBrush}"/><Setter Property="BorderThickness" Value="1.3"/>
   <Setter Property="Cursor" Value="Hand"/><Setter Property="FontSize" Value="10"/><Setter Property="FontWeight" Value="SemiBold"/>
   <Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button">
    <Border x:Name="Frame" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="15" Padding="{TemplateBinding Padding}" RenderTransformOrigin="0.5,0.5">
@@ -255,9 +270,9 @@
         </ToggleButton>
        </Grid>
       </Border>
-      <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
+      <Popup x:Name="PART_Popup" AllowsTransparency="True" Placement="Bottom" PlacementTarget="{Binding ElementName=ComboFrame}" Focusable="False" IsOpen="{TemplateBinding IsDropDownOpen}" PopupAnimation="Fade">
        <Border x:Name="PopupFrame" MinWidth="{Binding ActualWidth, ElementName=ComboFrame}" MaxHeight="{TemplateBinding MaxDropDownHeight}" Background="{DynamicResource ComboSurfaceBrush}" BorderBrush="{DynamicResource ComboBorderBrush}" BorderThickness="1.5" CornerRadius="9" Padding="3" SnapsToDevicePixels="True">
-        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <ScrollViewer CanContentScroll="True" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" PanningMode="VerticalOnly" ScrollViewer.IsDeferredScrollingEnabled="False">
          <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
         </ScrollViewer>
        </Border>
@@ -274,10 +289,10 @@
   </Setter>
  </Style>
  <Style TargetType="TextBox">
-  <Setter Property="Foreground" Value="#F7F8FF"/>
-  <Setter Property="Background" Value="#18243C"/>
-  <Setter Property="CaretBrush" Value="#58F5EE"/>
-  <Setter Property="BorderBrush" Value="#9A6CFF"/>
+  <Setter Property="Foreground" Value="{DynamicResource FgBrush}"/>
+  <Setter Property="Background" Value="{DynamicResource PanelBrush}"/>
+  <Setter Property="CaretBrush" Value="{DynamicResource FgBrush}"/>
+  <Setter Property="BorderBrush" Value="{DynamicResource ComboBorderBrush}"/>
   <Setter Property="BorderThickness" Value="1.5"/>
   <Setter Property="FontSize" Value="15"/>
   <Setter Property="MinHeight" Value="39"/>
@@ -339,12 +354,12 @@
   <Setter Property="Background" Value="Transparent"/>
   <Setter Property="Template"><Setter.Value>
    <ControlTemplate TargetType="ScrollBar">
-    <Border x:Name="ScrollLane" Background="#141B35" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="2,8,5,8" SnapsToDevicePixels="True">
+    <Border x:Name="ScrollLane" Background="{DynamicResource ScrollRailBrush}" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="2,8,5,8" SnapsToDevicePixels="True">
      <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
       <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageUpCommand" Opacity="0" Focusable="False"/></Track.DecreaseRepeatButton>
       <Track.Thumb><Thumb Cursor="Hand">
        <Thumb.Template><ControlTemplate TargetType="Thumb">
-        <Border x:Name="ScrollThumb" Background="#8154C8" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5" SnapsToDevicePixels="True"/>
+        <Border x:Name="ScrollThumb" Background="{DynamicResource ScrollThumbBrush}" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5" SnapsToDevicePixels="True"/>
         <ControlTemplate.Triggers>
          <Trigger Property="IsMouseOver" Value="True">
           <Setter TargetName="ScrollThumb" Property="Background" Value="#A869E9"/>
@@ -372,11 +387,11 @@
     <Setter Property="Height" Value="15"/>
     <Setter Property="Template"><Setter.Value>
      <ControlTemplate TargetType="ScrollBar">
-      <Border x:Name="ScrollLaneHorizontal" Background="#141B35" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="8,2,8,5">
+      <Border x:Name="ScrollLaneHorizontal" Background="{DynamicResource ScrollRailBrush}" BorderBrush="#36476B" BorderThickness="0.6" CornerRadius="6" Margin="8,2,8,5">
        <Track x:Name="PART_Track" Orientation="Horizontal" IsDirectionReversed="False" Minimum="{TemplateBinding Minimum}" Maximum="{TemplateBinding Maximum}" Value="{TemplateBinding Value}" ViewportSize="{TemplateBinding ViewportSize}">
         <Track.DecreaseRepeatButton><RepeatButton Command="ScrollBar.PageLeftCommand" Opacity="0" Focusable="False"/></Track.DecreaseRepeatButton>
         <Track.Thumb><Thumb Cursor="Hand"><Thumb.Template><ControlTemplate TargetType="Thumb">
-         <Border x:Name="HorizontalThumb" Background="#8154C8" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5"/>
+         <Border x:Name="HorizontalThumb" Background="{DynamicResource ScrollThumbBrush}" BorderBrush="#8B9DE6" BorderThickness="0.8" CornerRadius="5"/>
          <ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True">
           <Setter TargetName="HorizontalThumb" Property="Background" Value="#A869E9"/>
           <Setter TargetName="HorizontalThumb" Property="BorderBrush" Value="#5CEBFF"/>
@@ -417,8 +432,8 @@
    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
     <TextBlock Text="NEON GHOST  •  " Foreground="{DynamicResource SecondaryBrush}" FontWeight="Bold" FontSize="11" VerticalAlignment="Center"/>
     <TextBlock x:Name="HubVersionText" Foreground="{DynamicResource NeonCyanBrush}" FontWeight="Bold" FontSize="13" VerticalAlignment="Center" Margin="0,0,18,0"/>
-    <Button Content="&#x2013;" Click="MinimizeWindow_Click" Width="40" Height="32" FontSize="19" Foreground="{DynamicResource FgBrush}" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Minimize" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
-    <Button x:Name="MaximizeWindowButton" Content="&#x25A1;" Click="MaximizeWindow_Click" Width="40" Height="32" FontSize="17" Foreground="{DynamicResource FgBrush}" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Maximize / Restore" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
+    <Button Content="&#x2013;" Click="MinimizeWindow_Click" Width="40" Height="32" FontSize="19" Foreground="#FFFFFF" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Minimize" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
+    <Button x:Name="MaximizeWindowButton" Content="&#x25A1;" Click="MaximizeWindow_Click" Width="40" Height="32" FontSize="17" Foreground="#FFFFFF" Background="#202843" BorderBrush="#4D6488" BorderThickness="1" Margin="0,0,6,0" ToolTip="Maximize / Restore" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
     <Button Content="&#x00D7;" Click="CloseWindow_Click" Width="40" Height="32" FontSize="23" Foreground="#FFFFFF" Background="#512039" BorderBrush="#C04B78" BorderThickness="1" ToolTip="Close" Cursor="Hand" Style="{StaticResource WindowControlButton}"/>
    </StackPanel>
   </Grid>
@@ -435,8 +450,8 @@
    <Button x:Name="SettingsButton" Click="Settings_Click" Style="{StaticResource SettingsNavButton}" Foreground="{DynamicResource FgBrush}"/>
    <Button x:Name="GuideButton" Click="Guide_Click" Style="{StaticResource NavNeonButton}" Foreground="{DynamicResource FgBrush}"/>
    <Border Height="1" Background="{DynamicResource NeonPinkBrush}" Opacity="0.6" Margin="0,17,0,17"/>
-   <Border Margin="0,3,0,0" Padding="8" CornerRadius="13" Background="#0B1027" BorderBrush="#A15DFF" BorderThickness="1.5">
-    <StackPanel><TextBlock Text="✦ FOLLOW DJ RUSSO" Foreground="#86F4FF" FontWeight="ExtraBold" FontSize="11" Margin="3,3,0,9"/>
+   <Border Margin="0,3,0,0" Padding="8" CornerRadius="13" Background="{DynamicResource SocialSurfaceBrush}" BorderBrush="{DynamicResource SocialBorderBrush}" BorderThickness="1.5">
+    <StackPanel><TextBlock Text="✦ FOLLOW DJ RUSSO" Foreground="{DynamicResource SocialLabelBrush}" FontWeight="ExtraBold" FontSize="11" Margin="3,3,0,9"/>
      <UniformGrid Columns="2">
       <Button Style="{StaticResource SocialNeonButton}" Click="Social_Click" Tag="https://www.youtube.com/user/MrDjrusso" ToolTip="YouTube"><Viewbox Width="44" Height="44" Stretch="Uniform" SnapsToDevicePixels="True"><Canvas Width="64" Height="64"><Rectangle Canvas.Left="4" Canvas.Top="13" Width="56" Height="38" RadiusX="12" RadiusY="12" Fill="#FF0033"/>
  <Path Data="M 27,22 L 44,32 27,42 Z" Fill="#FFFFFF"/></Canvas></Viewbox></Button>
@@ -460,14 +475,14 @@
  <Path Data="M 10,46 L 24,35 M 54,46 L 40,35" Stroke="#D2B1FF" StrokeThickness="3" Fill="Transparent"/></Canvas></Viewbox></Button>
      </UniformGrid></StackPanel>
    </Border>
-   <Border Margin="0,10,0,0" Padding="8,7" CornerRadius="11" Background="#0B1027" BorderBrush="#7155D9" BorderThickness="1">
-    <StackPanel><TextBlock Text="NEON MINI WAVEFORM" Foreground="#7DEFFF" FontWeight="Bold" FontSize="10" Margin="2,0,0,5"/>
-     <Canvas x:Name="MiniWaveCanvas" Height="48" ClipToBounds="True" Background="#0D132A" SizeChanged="MiniWave_SizeChanged"/>
+   <Border Margin="0,10,0,0" Padding="8,7" CornerRadius="11" Background="{DynamicResource SocialSurfaceBrush}" BorderBrush="{DynamicResource SocialBorderBrush}" BorderThickness="1">
+    <StackPanel><TextBlock Text="NEON MINI WAVEFORM" Foreground="{DynamicResource SocialLabelBrush}" FontWeight="Bold" FontSize="10" Margin="2,0,0,5"/>
+     <Canvas x:Name="MiniWaveCanvas" Height="48" ClipToBounds="True" Background="{DynamicResource WaveSurfaceBrush}" SizeChanged="MiniWave_SizeChanged"/>
     </StackPanel>
    </Border>
    <Button x:Name="GitHubProjectButton" Style="{StaticResource SocialNeonButton}" Click="Social_Click" Tag="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB" ToolTip="Open the official GitHub project" HorizontalAlignment="Center" Width="82" Height="68" Margin="6,18,6,10">
     <Viewbox Width="48" Height="48" Stretch="Uniform" SnapsToDevicePixels="True"><Canvas Width="24" Height="24">
-      <Path Fill="#F7F8FF" Data="M 12,0.3 C 5.4,0.3 0,5.7 0,12.3 C 0,17.6 3.4,22.1 8.2,23.7 C 8.8,23.8 9,23.4 9,23.1 L 9,20.9 C 5.7,21.6 5,19.5 5,19.5 C 4.4,18.1 3.6,17.7 3.6,17.7 C 2.5,17 3.7,17 3.7,17 C 4.9,17.1 5.5,18.2 5.5,18.2 C 6.6,20.1 8.4,19.5 9.1,19.2 C 9.2,18.4 9.5,17.9 9.8,17.6 C 7.1,17.3 4.3,16.3 4.3,11.7 C 4.3,10.6 4.7,9.8 5.3,9.1 C 5.2,8.8 4.9,7.9 5.4,6.6 C 5.4,6.6 6.2,6.4 9,8 C 10,7.8 11,7.7 12,7.7 C 13,7.7 14,7.8 15,8 C 17.8,6.4 18.6,6.6 18.6,6.6 C 19.1,7.9 18.8,8.8 18.7,9.1 C 19.3,9.8 19.7,10.6 19.7,11.7 C 19.7,16.3 16.9,17.3 14.2,17.6 C 14.6,18 15,18.7 15,19.9 L 15,23.1 C 15,23.4 15.2,23.8 15.8,23.7 C 20.6,22.1 24,17.6 24,12.3 C 24,5.7 18.6,0.3 12,0.3 Z"/>
+      <Path Fill="{DynamicResource GitHubGlyphBrush}" Data="M 12,0.3 C 5.4,0.3 0,5.7 0,12.3 C 0,17.6 3.4,22.1 8.2,23.7 C 8.8,23.8 9,23.4 9,23.1 L 9,20.9 C 5.7,21.6 5,19.5 5,19.5 C 4.4,18.1 3.6,17.7 3.6,17.7 C 2.5,17 3.7,17 3.7,17 C 4.9,17.1 5.5,18.2 5.5,18.2 C 6.6,20.1 8.4,19.5 9.1,19.2 C 9.2,18.4 9.5,17.9 9.8,17.6 C 7.1,17.3 4.3,16.3 4.3,11.7 C 4.3,10.6 4.7,9.8 5.3,9.1 C 5.2,8.8 4.9,7.9 5.4,6.6 C 5.4,6.6 6.2,6.4 9,8 C 10,7.8 11,7.7 12,7.7 C 13,7.7 14,7.8 15,8 C 17.8,6.4 18.6,6.6 18.6,6.6 C 19.1,7.9 18.8,8.8 18.7,9.1 C 19.3,9.8 19.7,10.6 19.7,11.7 C 19.7,16.3 16.9,17.3 14.2,17.6 C 14.6,18 15,18.7 15,19.9 L 15,23.1 C 15,23.4 15.2,23.8 15.8,23.7 C 20.6,22.1 24,17.6 24,12.3 C 24,5.7 18.6,0.3 12,0.3 Z"/>
     </Canvas></Viewbox>
    </Button>
 
@@ -563,17 +578,17 @@
   <Button x:Name="MeterPanelInstallButton" Content="INSTALL / INSTALLA" Style="{StaticResource NeonActionButton}" Click="SelectedProductInstall_Click" Margin="0,0,0,8" BorderBrush="#24E977" Background="#0D3729"/>
   <Button x:Name="MeterPanelRemoveButton" Content="REMOVE / RIMUOVI" Style="{StaticResource NeonActionButton}" Click="SelectedProductRemove_Click" Margin="0,0,0,8" BorderBrush="#E13AF5" Background="#392044"/>
   <Button x:Name="MeterPanelLaunchButton" Content="▶  LAUNCH / AVVIA" Style="{StaticResource NeonActionButton}" Click="SelectedProductLaunch_Click" Margin="0,0,0,12" BorderBrush="#3FEFFF" Background="#0C3846"/>
-  <Button x:Name="PluginUpdatesButton" Content="CHECK PLUGIN UPDATES / CONTROLLA AGGIORNAMENTI PLUGIN" Style="{StaticResource NeonActionButton}" Click="CheckPluginUpdates_Click" Margin="0,0,0,10" BorderBrush="#3FEFFF" Background="#112A40" FontSize="10" />
+  <Button x:Name="PluginUpdatesButton" Foreground="{DynamicResource PluginUpdateTextBrush}" Content="AGGIORNAMENTI PLUGIN" Style="{StaticResource NeonActionButton}" Click="CheckPluginUpdates_Click" Margin="0,0,0,10" BorderBrush="{DynamicResource PluginUpdateBorderBrush}" Background="{DynamicResource PluginUpdateSurfaceBrush}" FontSize="9" ToolTip="Controlla aggiornamenti plugin / Check plugin updates" />
   <TextBlock x:Name="MeterPanelState" FontSize="12" FontWeight="Bold" Foreground="{DynamicResource SecondaryBrush}" Margin="0,0,0,10" TextWrapping="Wrap"/>
-   <Border Margin="0,12,0,0" Padding="9" CornerRadius="8" Background="#11132B" BorderBrush="#A36AFF" BorderThickness="1">
+   <Border Margin="0,12,0,0" Padding="9" CornerRadius="8" Background="{DynamicResource ChipSurfaceBrush}" BorderBrush="{DynamicResource SocialBorderBrush}" BorderThickness="1">
    <Border.Effect><DropShadowEffect Color="#8B45FF" BlurRadius="17" ShadowDepth="0" Opacity="0.5"/></Border.Effect>
    <StackPanel>
-    <TextBlock Text="✦ NEON CHIP PLAYER ✦" Foreground="#7DEFFF" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11"/>
-    <TextBlock x:Name="ChipTrackLabel" Text="GHOST CHIP 01" Foreground="#D58BFF" HorizontalAlignment="Center" FontSize="10" Margin="0,3,0,5"/>
+    <TextBlock Text="✦ NEON CHIP PLAYER ✦" Foreground="{DynamicResource ChipTitleBrush}" HorizontalAlignment="Center" FontWeight="Bold" FontSize="11"/>
+    <TextBlock x:Name="ChipTrackLabel" Text="GHOST CHIP 01" Foreground="{DynamicResource ChipTrackBrush}" HorizontalAlignment="Center" FontSize="10" Margin="0,3,0,5"/>
     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-     <Button x:Name="ChipPlayButton" Width="47" Height="36" Padding="0" Margin="0,0,5,0" Click="ChipPlay_Click" ToolTip="Play / Pause"><Grid Width="26" Height="26"><Path x:Name="ChipPauseIcon" Fill="#7DEFFF" Stretch="Uniform" Data="M 4,2 L 10,2 10,22 4,22 Z M 14,2 L 20,2 20,22 14,22 Z"/><Path x:Name="ChipResumeIcon" Fill="#7DEFFF" Stretch="Uniform" Data="M 4,2 L 22,12 4,22 Z" Visibility="Collapsed"/></Grid></Button>
-     <Button Width="47" Height="36" Padding="0" Margin="0,0,5,0" Click="ChipNext_Click" ToolTip="Next track"><Path Width="26" Height="26" Fill="#7DEFFF" Stretch="Uniform" Data="M 1,3 L 11,12 1,21 Z M 11,3 L 21,12 11,21 Z M 22,3 L 25,3 25,21 22,21 Z"/></Button>
-     <Button x:Name="ChipMuteButton" Width="47" Height="36" Padding="0" Margin="0" Click="ChipMute_Click" ToolTip="Mute"><Grid Width="26" Height="26"><Path Fill="#7DEFFF" Stretch="Uniform" Data="M 2,8 L 8,8 15,2 15,22 8,16 2,16 Z"/><Path x:Name="ChipSoundWaves" Stroke="#7DEFFF" StrokeThickness="2" StrokeStartLineCap="Round" Fill="Transparent" Stretch="Uniform" Data="M 17,7 C 20,9 20,15 17,17 M 20,3 C 25,8 25,16 20,21"/><Path x:Name="ChipMutedMark" Stroke="#FF87D9" StrokeThickness="3" Stretch="Uniform" Data="M 17,5 L 24,19 M 24,5 L 17,19" Visibility="Collapsed"/></Grid></Button>
+     <Button x:Name="ChipPlayButton" Width="47" Height="36" Padding="0" Margin="0,0,5,0" Click="ChipPlay_Click" ToolTip="Play / Pause"><Grid Width="26" Height="26"><Path x:Name="ChipPauseIcon" Fill="{DynamicResource ChipIconBrush}" Stretch="Uniform" Data="M 4,2 L 10,2 10,22 4,22 Z M 14,2 L 20,2 20,22 14,22 Z"/><Path x:Name="ChipResumeIcon" Fill="{DynamicResource ChipIconBrush}" Stretch="Uniform" Data="M 4,2 L 22,12 4,22 Z" Visibility="Collapsed"/></Grid></Button>
+     <Button Width="47" Height="36" Padding="0" Margin="0,0,5,0" Click="ChipNext_Click" ToolTip="Next track"><Path Width="26" Height="26" Fill="{DynamicResource ChipIconBrush}" Stretch="Uniform" Data="M 1,3 L 11,12 1,21 Z M 11,3 L 21,12 11,21 Z M 22,3 L 25,3 25,21 22,21 Z"/></Button>
+     <Button x:Name="ChipMuteButton" Width="47" Height="36" Padding="0" Margin="0" Click="ChipMute_Click" ToolTip="Mute"><Grid Width="26" Height="26"><Path Fill="{DynamicResource ChipIconBrush}" Stretch="Uniform" Data="M 2,8 L 8,8 15,2 15,22 8,16 2,16 Z"/><Path x:Name="ChipSoundWaves" Stroke="{DynamicResource ChipIconBrush}" StrokeThickness="2" StrokeStartLineCap="Round" Fill="Transparent" Stretch="Uniform" Data="M 17,7 C 20,9 20,15 17,17 M 20,3 C 25,8 25,16 20,21"/><Path x:Name="ChipMutedMark" Stroke="#FF87D9" StrokeThickness="3" Stretch="Uniform" Data="M 17,5 L 24,19 M 24,5 L 17,19" Visibility="Collapsed"/></Grid></Button>
      <Slider x:Name="ChipVolumeSlider" Minimum="0" Maximum="100" Value="10" Width="65" Margin="9,0,0,0" VerticalAlignment="Center" ValueChanged="ChipVolume_Changed" ToolTip="Music volume"/>
     </StackPanel>
    </StackPanel>
