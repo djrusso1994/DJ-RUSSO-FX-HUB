@@ -65,7 +65,7 @@ jobs:
           if (-not (Test-Path -LiteralPath $shell -PathType Leaf)) { throw "FX SHELL VST3 missing from publish output." }
           $reverb = "publish/Payload/DJ RUSSO REVERB X.vst3"
           if (-not (Test-Path -LiteralPath $reverb -PathType Leaf)) { throw "REVERB X v1.3 payload missing; do not publish incomplete HUB." }
-          $expected = "e806986b839dd61dfccbf00f9210d5c0bf3dc83a9cdd965ad4030ffc144aaf85"
+          $expected = "1e74946b3ea145bc9959f3d198f581361c9597d4efbe84869d02684bdf84b017"
           $actual = (Get-FileHash -LiteralPath $reverb -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($actual -ne $expected) { throw "REVERB X payload SHA-256 mismatch; refusing release." }
           $delay = "publish/Payload/DJ RUSSO DELAY X.vst3"

@@ -12,7 +12,7 @@ internal static class ReverbInstaller
 {
     public const string VersionLabel = "1.3"; // reported by the user-supplied PE strings; FL Studio test is independent
     public const string PluginFileName = "DJ RUSSO REVERB X.vst3";
-    public const string ExpectedSha256 = "e806986b839dd61dfccbf00f9210d5c0bf3dc83a9cdd965ad4030ffc144aaf85";
+    public const string ExpectedSha256 = "1e74946b3ea145bc9959f3d198f581361c9597d4efbe84869d02684bdf84b017";
     public const string InstallArgument = "--djrusso-install-reverb";
     public const string RemoveArgument = "--djrusso-remove-reverb";
 
