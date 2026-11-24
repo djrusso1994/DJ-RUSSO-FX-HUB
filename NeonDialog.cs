@@ -254,7 +254,7 @@ internal static class NeonDialog
         var secondary=R("SecondaryBrush", fg);
         bool light=bg is SolidColorBrush b && (b.Color.R*0.2126+b.Color.G*0.7152+b.Color.B*0.0722)>150;
         var dialog=new Window {
-            Owner=owner, Title=caption, Width=720, MaxWidth=Math.Max(320,owner.ActualWidth-24),
+            Owner=owner, Title=caption, Width=780, MaxWidth=Math.Max(320,owner.ActualWidth-24),
             MaxHeight=Math.Max(300,Math.Min(760,SystemParameters.WorkArea.Height-48)),
             SizeToContent=SizeToContent.Height, WindowStartupLocation=WindowStartupLocation.CenterOwner,
             WindowStyle=WindowStyle.None, AllowsTransparency=true, Background=Brushes.Transparent,
@@ -262,11 +262,12 @@ internal static class NeonDialog
             FontFamily=new FontFamily("Segoe UI"), UseLayoutRounding=true, SnapsToDevicePixels=true
         };
         var root=new DockPanel();
-        var title=new TextBlock {Text=caption,FontSize=19,FontWeight=FontWeights.SemiBold,
+        var title=new TextBlock {Text=caption,FontSize=23,FontWeight=FontWeights.SemiBold,
             Foreground=secondary,Margin=new Thickness(22,16,22,16),TextWrapping=TextWrapping.Wrap};
         title.MouseLeftButtonDown+=(_,_)=>{try{dialog.DragMove();}catch(InvalidOperationException){}};
         DockPanel.SetDock(title,Dock.Top);root.Children.Add(title);
-        var close=MakeButton("OK",panel,fg,accent);
+        int language=owner is MainWindow mw?mw.DialogLanguageIndex:0;
+        var close=MakeButton(new[]{"Close","Chiudi","Cerrar","Fermer","Schließen"}[language],panel,fg,accent);
         close.Width=110;close.Height=40;close.IsDefault=true;close.IsCancel=true;
         close.HorizontalAlignment=HorizontalAlignment.Right;close.Margin=new Thickness(18,10,22,18);
         close.Click+=(_,_)=>dialog.Close();
@@ -283,7 +284,37 @@ internal static class NeonDialog
         TextBlock Label(string value,Brush brush,double size=14)=>new TextBlock{
             Text=value,Foreground=brush,FontSize=size,TextWrapping=TextWrapping.Wrap,
             VerticalAlignment=VerticalAlignment.Center};
-        foreach(var block in report.Split(new[]{"\n\n"},StringSplitOptions.RemoveEmptyEntries)){
+        var blocks=report.Split(new[]{"\n\n"},StringSplitOptions.RemoveEmptyEntries);
+        var subtle=new SolidColorBrush(light?Color.FromRgb(210,214,225):Color.FromRgb(54,52,72));
+        var success=new SolidColorBrush(light?Color.FromRgb(0,110,62):Color.FromRgb(110,230,166));
+        var muted=new SolidColorBrush(light?Color.FromRgb(85,91,110):Color.FromRgb(166,163,188));
+        string Status(string line){int i=line.IndexOf(": ",StringComparison.Ordinal);return i<0?"":line.Substring(i+2);}
+        bool Is(string[] values,string value)=>Array.Exists(values,x=>string.Equals(x,value,StringComparison.Ordinal));
+        // Summary uses only the existing report, never additional filesystem checks.
+        if(blocks.Length>=6){
+            var components=blocks[1].Split('\n');
+            var packages=blocks[2].Split('\n');
+            int installed=0,valid=0,attention=0;
+            for(int i=1;i<components.Length;i++){
+                var value=Status(components[i]);
+                if(Is(good,value))installed++;
+                if(Is(warning,value)||Is(bad,value))attention++;
+            }
+            for(int i=1;i<packages.Length;i++)if(Is(good,Status(packages[i])))valid++;
+            var summary=new UniformGrid{Columns=3,Margin=new Thickness(0,0,0,14)};
+            void Metric(string number,string label,Brush color){
+                var content=new StackPanel();
+                var count=Label(number,color,27);count.FontWeight=FontWeights.SemiBold;
+                content.Children.Add(count);content.Children.Add(Label(label,muted,12));
+                summary.Children.Add(new Border{Child=content,Background=panel,CornerRadius=new CornerRadius(10),
+                    BorderBrush=subtle,BorderThickness=new Thickness(1),Padding=new Thickness(13),Margin=new Thickness(3,0,3,0)});
+            }
+            Metric(installed+"/"+(components.Length-1),new[]{"Installed packages","Pacchetti installati","Paquetes instalados","Paquets installés","Installierte Pakete"}[language],secondary);
+            Metric(valid+"/"+(packages.Length-1),new[]{"Valid integrity","Integrità valida","Integridad válida","Intégrité valide","Integrität gültig"}[language],valid==packages.Length-1?success:fg);
+            Metric(attention.ToString(),new[]{"Component issues","Problemi componenti","Problemas de componentes","Problèmes composants","Komponentenprobleme"}[language],attention==0?success:fg);
+            stack.Children.Add(summary);
+        }
+        foreach(var block in blocks){
             var lines=block.Split('\n');
             var section=new StackPanel();
             foreach(var line in lines){
@@ -292,10 +323,26 @@ internal static class NeonDialog
                 bool Has(string[] values)=>Array.Exists(values,x=>string.Equals(x,value,StringComparison.Ordinal));
                 bool ok=Has(good), idle=Has(neutral), warn=Has(warning), error=Has(bad);
                 if(split>=0&&(ok||idle||warn||error)){
-                    var row=new Grid{Margin=new Thickness(0,5,0,5)};
+                    var row=new Grid{Margin=new Thickness(0,8,0,8)};
                     row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
                     row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
-                    row.Children.Add(Label(line.Substring(0,split),fg));
+                    var name=line.Substring(0,split);
+                    var namePanel=new StackPanel{Orientation=Orientation.Horizontal};
+                    var iconFrame=new Border{Width=30,Height=30,CornerRadius=new CornerRadius(7),Background=bg,Margin=new Thickness(0,0,10,0)};
+                    string geometry=name.StartsWith("FX SHELL")?"M2,6 L10,2 L18,6 L10,10 Z M2,10 L10,14 L18,10 M2,14 L10,18 L18,14":
+                        name.StartsWith("REVERB")?"M2,10 Q6,0 10,10 T18,10":
+                        name.StartsWith("DELAY")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
+                        name.StartsWith("METER")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
+                        "M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z";
+                    iconFrame.Child=new Path{Data=Geometry.Parse(geometry),Stroke=secondary,StrokeThickness=1.5,
+                        Width=17,Height=17,Stretch=Stretch.Uniform,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center};
+                    namePanel.Children.Add(iconFrame);
+                    var names=new StackPanel{VerticalAlignment=VerticalAlignment.Center};
+                    int versionAt=name.LastIndexOf(" v",StringComparison.Ordinal);
+                    var nameText=Label(versionAt>0?name.Substring(0,versionAt):name,fg);
+                    nameText.FontWeight=FontWeights.SemiBold;names.Children.Add(nameText);
+                    if(versionAt>0)names.Children.Add(Label(name.Substring(versionAt+1),muted,12));
+                    namePanel.Children.Add(names);row.Children.Add(namePanel);
                     var color=ok?new SolidColorBrush(light?Color.FromRgb(0,110,62):Color.FromRgb(110,230,166)):
                         warn?new SolidColorBrush(light?Color.FromRgb(145,83,0):Color.FromRgb(255,205,91)):
                         error?new SolidColorBrush(light?Color.FromRgb(170,25,48):Color.FromRgb(255,119,149)):fg;
@@ -304,14 +351,14 @@ internal static class NeonDialog
                     Grid.SetColumn(status,1);row.Children.Add(status);section.Children.Add(row);
                 }else{
                     bool heading=lines.Length>1&&line==lines[0]&&split<0;
-                    var label=Label(line,heading?secondary:fg,heading?15:13);
+                    var label=Label(line,heading?secondary:fg,heading?16:13);
                     if(heading)label.FontWeight=FontWeights.SemiBold;
                     label.Margin=new Thickness(0,3,0,heading?9:3);
                     section.Children.Add(label);
                 }
             }
-            stack.Children.Add(new Border{Child=section,Background=panel,BorderBrush=accent,
-                BorderThickness=new Thickness(0.7),CornerRadius=new CornerRadius(9),
+            stack.Children.Add(new Border{Child=section,Background=panel,BorderBrush=subtle,
+                BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(9),
                 Padding=new Thickness(14,10,14,10),Margin=new Thickness(0,0,0,9)});
         }
         root.Children.Add(scroll);
