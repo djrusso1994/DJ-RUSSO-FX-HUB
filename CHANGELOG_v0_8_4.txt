@@ -1,5 +1,0 @@
-DJ RUSSO FX HUB v0.8.4 - UI hotfix
-- Removed decorative HOME panel from sidebar to make social panel and mini waveform more visible.
-- Product filter choices localized dynamically in English, Italian, Spanish, French, German.
-- Preserved existing functionality, assets and audio.
-- Windows compilation and runtime testing required.
