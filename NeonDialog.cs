@@ -195,7 +195,7 @@ internal static class NeonDialog
                 int separator=line.IndexOf(": ",StringComparison.Ordinal);
                 var text=new TextBlock{Text=line,Foreground=fg,FontSize=14,TextWrapping=TextWrapping.Wrap,LineHeight=22};
                 var item=new Border{Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(12),
-                    Margin=new Thickness(0,0,0,7),Child=text};
+                    Margin=new Thickness(0,0,0,7)};
                 if(summary && separator>0){
                     var status=line.Substring(separator+2);
                     bool success=successfulStatuses!=null&&Array.Exists(successfulStatuses,x=>x==status);
@@ -207,7 +207,7 @@ internal static class NeonDialog
                     var statusText=new TextBlock{Text=(success?"✓  ":"")+status,TextWrapping=TextWrapping.Wrap,
                         TextAlignment=TextAlignment.Right,Foreground=success?cyan:fg,FontSize=14,Margin=new Thickness(10,0,0,0)};
                     Grid.SetColumn(statusText,1);grid.Children.Add(statusText);item.Child=grid;
-                }
+                }else item.Child=text;
                 content.Children.Add(item);
             }
             messageScroll.Content=content;
