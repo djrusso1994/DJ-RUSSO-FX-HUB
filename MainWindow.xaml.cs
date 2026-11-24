@@ -691,7 +691,11 @@ public partial class MainWindow : Window
   var installedHeading=new[]{"Installed components","Componenti installati","Componentes instalados","Composants installés","Installierte Komponenten"}[Index];
   var packageGroup=new[]{"Package integrity","Integrità dei pacchetti","Integridad de paquetes","Intégrité des paquets","Paketintegrität"}[Index];
   var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL {VersionDisplay("fx-shell")}: {Readable(localizedShellState)}\nREVERB X {VersionDisplay("reverb-x")}: {Readable(localizedReverbState)}\nDELAY X {VersionDisplay("delay-x")}: {Readable(localizedDelayState)}\nMETER X {VersionDisplay("meter-x")}: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
-  NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.ShowDiagnostics(this,report,"DJ RUSSO • "+T("diagTitle"),
+   new[]{"diagVstFound","diagMeterFound","diagShellManaged","diagShellExternal","diagPackageValid","diagFlFound"}.Select(k=>Readable(T(k))).ToArray(),
+   new[]{"diagShellMissing","diagMeterMissing","diagShellUnknown"}.Select(k=>Readable(T(k))).ToArray(),
+   new[]{"diagShellConflict","diagShellModified","diagFlMissing"}.Select(k=>Readable(T(k))).ToArray(),
+   new[]{"diagVstMissing","diagPackageInvalid"}.Select(k=>Readable(T(k))).ToArray());
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
