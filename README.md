@@ -7,9 +7,11 @@
 
 **Manage DJ RUSSO audio tools in one place.**
 
+### [Latest stable release · v0.8.40](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+
 [**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Latest stable release](https://img.shields.io/github/v/release/djrusso1994/DJ-RUSSO-FX-HUB?label=Latest%20stable&color=BA68FF&cacheSeconds=300)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5)
 
 </div>
 
@@ -88,7 +90,7 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 4. Close your DAW before installing or removing VST3 effects.
 5. Open FL Studio's Plugin Manager and rescan plugins after installation.
 
-**Latest published build:** see [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases). The version badge above shows the latest stable release; GitHub and badge-provider caches may update at different times.
+**Latest published build:** see [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases). The release link above opens the latest stable release.
 
 ## Compatibility and important notes
 
@@ -104,7 +106,7 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 
 ## Development and release process
 
-The latest published version is displayed automatically by the release badge at the top of this page. See [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) for the current installer, release notes and whether a release is marked as a pre-release.
+The latest stable release link at the top of this page always opens the current stable GitHub release. See [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) for the current installer, release notes and whether a release is marked as a pre-release.
 
 GitHub Actions builds the Windows application from source. A successful build verifies compilation, **not** correct behavior on every Windows PC. Stable releases require approval after Windows testing. GitHub Actions artifacts and published GitHub Releases are separate download channels.
 
