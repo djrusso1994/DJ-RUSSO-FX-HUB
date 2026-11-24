@@ -675,7 +675,17 @@ public partial class MainWindow : Window
   var delayHeading=new[]{"DELAY X package","Pacchetto DELAY X","Paquete DELAY X","Paquet DELAY X","DELAY X-Paket"}[Index];
   var installedHeading=new[]{"Installed components","Componenti installati","Componentes instalados","Composants installés","Installierte Komponenten"}[Index];
   var packageGroup=new[]{"Package integrity","Integrità dei pacchetti","Integridad de paquetes","Intégrité des paquets","Paketintegrität"}[Index];
-  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL: {Readable(localizedShellState)}\nREVERB X v1.3: {Readable(localizedReverbState)}\nDELAY X v1.3: {Readable(localizedDelayState)}\nMETER X: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
+  var meterVersion="1.2.6";
+  try{
+   using var catalog=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"plugin-updates.json")));
+   foreach(var package in catalog.RootElement.GetProperty("packages").EnumerateArray())
+    if(package.GetProperty("id").GetString()=="meter-x"){
+     var version=package.GetProperty("version").GetString();
+     if(!string.IsNullOrWhiteSpace(version))meterVersion=version;
+     break;
+    }
+  }catch{}
+  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL v{ShellInstaller.VersionLabel}: {Readable(localizedShellState)}\nREVERB X v{ReverbInstaller.VersionLabel}: {Readable(localizedReverbState)}\nDELAY X v{DelayInstaller.VersionLabel}: {Readable(localizedDelayState)}\nMETER X v{meterVersion}: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
