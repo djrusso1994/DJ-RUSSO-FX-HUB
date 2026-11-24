@@ -68,7 +68,10 @@ jobs:
           $expected = "e806986b839dd61dfccbf00f9210d5c0bf3dc83a9cdd965ad4030ffc144aaf85"
           $actual = (Get-FileHash -LiteralPath $reverb -Algorithm SHA256).Hash.ToLowerInvariant()
           if ($actual -ne $expected) { throw "REVERB X payload SHA-256 mismatch; refusing release." }
-          Write-Host "METER X, FX SHELL and REVERB X payloads verified."
+          $delay = "publish/Payload/DJ RUSSO DELAY X.vst3"
+          if (-not (Test-Path -LiteralPath $delay -PathType Leaf)) { throw "DELAY X v1.3 payload missing; do not publish incomplete HUB." }
+          if ((Get-FileHash -LiteralPath $delay -Algorithm SHA256).Hash.ToLowerInvariant() -ne "b442f60efb91dee6978af07ddb79f8f208b51107bc7775eec18d25d47f60b6d1") { throw "DELAY X payload SHA-256 mismatch; refusing release." }
+          Write-Host "METER X, FX SHELL, REVERB X and DELAY X payloads verified."
 
       # Early smoke check for WPF resource/XAML parse failures before packaging or releasing.
       - name: Smoke-test FX HUB WPF startup
@@ -101,13 +104,13 @@ jobs:
           if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
           & $iscc "installer\\DJ_RUSSO_FX_HUB.iss"
           if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed." }
-          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.40.exe")) { throw "Installer output missing." }
+          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.41.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: DJ_RUSSO_FX_HUB_Setup_v0.8.40
-          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.40.exe
+          name: DJ_RUSSO_FX_HUB_Setup_v0.8.41
+          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.41.exe
           if-no-files-found: error
 
       - name: Create ZIP

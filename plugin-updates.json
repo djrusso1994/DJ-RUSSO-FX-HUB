@@ -29,6 +29,15 @@
       ],
       "downloadAvailable": false,
       "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
+    },
+    {
+      "id": "delay-x",
+      "version": "1.3",
+      "effectIds": [
+        "delay-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
     }
   ]
 }

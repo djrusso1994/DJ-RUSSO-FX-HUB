@@ -316,8 +316,8 @@ public partial class MainWindow : Window
      // Explain disabled actions in the selected language.
      ShellInstallButton.ToolTip=BulkHintLabels[Index];
      ShellRemoveButton.ToolTip=BulkHintLabels[Index];
-     ShellInstallButton.IsEnabled=(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()) || (ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()) || (!File.Exists(MeterExePath) && File.Exists(BundledMeterPath));
-     ShellRemoveButton.IsEnabled=shellState==ShellInstaller.State.Managed || ReverbInstaller.GetState()==ReverbInstaller.State.Managed || File.Exists(MeterExePath);
+     ShellInstallButton.IsEnabled=(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()) || (ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()) || (DelayInstaller.GetState()==DelayInstaller.State.Missing && DelayInstaller.HasExpectedPayload()) || (!File.Exists(MeterExePath) && File.Exists(BundledMeterPath));
+     ShellRemoveButton.IsEnabled=shellState==ShellInstaller.State.Managed || ReverbInstaller.GetState()==ReverbInstaller.State.Managed || DelayInstaller.GetState()==DelayInstaller.State.Managed || File.Exists(MeterExePath);
      // Selected-product controls are updated after the card list is rebuilt.
      bool shellVerified=shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
      var verifiedIds=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -329,9 +329,9 @@ public partial class MainWindow : Window
      foreach(var fx in plugins)
      {
          bool planned=fx.status=="Planned" && fx.id!="meter-x";
-         var logo=fx.id switch {"sidechain-x"=>Asset("sidechain"),"reverse-fx"=>Asset(theme=="light"?"reverse_light":"reverse"),"stutter-fx"=>Asset("stutter"),"meter-x"=>Asset("meter-x"),"reverb-x"=>Asset("logo-reverb-x"),_=>Asset(fx.id)};
+         var logo=fx.id switch {"sidechain-x"=>Asset("sidechain"),"reverse-fx"=>Asset(theme=="light"?"reverse_light":"reverse"),"stutter-fx"=>Asset("stutter"),"meter-x"=>Asset("meter-x"),"reverb-x"=>Asset("logo-reverb-x"),"delay-x"=>Asset("logo-delay-x"),_=>Asset(fx.id)};
          var category=fx.category switch {"Dynamics"=>"dynamics","Creative FX"=>"creative","Analysis"=>"analysis","Mastering"=>"mastering","Vocal"=>"vocal","EQ"=>"eq","Spatial"=>"spatial","Saturation"=>"saturation","AI Offline"=>"ai",_=>"creative"};
-         bool installed=fx.id=="meter-x" ? File.Exists(MeterExePath) : fx.id=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : (!planned && verifiedIds.Contains(fx.id));
+         bool installed=fx.id=="meter-x" ? File.Exists(MeterExePath) : fx.id=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : fx.id=="delay-x" ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : (!planned && verifiedIds.Contains(fx.id));
          bool conflict=VstConflict(fx.id),external=VstExternal(fx.id);
          cards.Add(new PluginCard {
              Id=fx.id,IsSelected=fx.id==selectedProductId,IsReady=false,
@@ -340,7 +340,7 @@ public partial class MainWindow : Window
              BadgeTip=conflict?ConflictLabel:external?ExternalLabel:installed?(Index==1?"Installato e verificato":"Installed and verified"):
                  (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
              FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?103:77,LogoMaxWidth=planned?165:150,Category=T(category),
-             Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+(fx.id=="reverb-x"?ReverbInstaller.VersionLabel:ShellInstaller.VersionLabel)
+             Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+(fx.id=="reverb-x"?ReverbInstaller.VersionLabel:fx.id=="delay-x"?DelayInstaller.VersionLabel:ShellInstaller.VersionLabel)
          });
      }
      var term=ProductSearch?.Text?.Trim()??"";
@@ -441,7 +441,7 @@ public partial class MainWindow : Window
  private static readonly string[] BulkInstallLabels={"INSTALL ALL","INSTALLA TUTTO","INSTALAR TODO","TOUT INSTALLER","ALLES INSTALLIEREN"};
  private static readonly string[] BulkRemoveLabels={"REMOVE ALL","RIMUOVI TUTTO","ELIMINAR TODO","TOUT SUPPRIMER","ALLES ENTFERNEN"};
  private static readonly string[] BulkTitleLabels={"AVAILABLE SOFTWARE","SOFTWARE DISPONIBILI","SOFTWARE DISPONIBLE","LOGICIELS DISPONIBLES","VERFÜGBARE SOFTWARE"};
- private static readonly string[] BulkHintLabels={"Install bundled FX SHELL, REVERB X and METER X.","Installa FX SHELL, REVERB X e METER X inclusi.","Instala FX SHELL, REVERB X y METER X incluidos.","Installez FX SHELL, REVERB X et METER X inclus.","FX SHELL, REVERB X und METER X installieren."};
+ private static readonly string[] BulkHintLabels={"Install bundled FX SHELL, REVERB X, DELAY X and METER X.","Installa FX SHELL, REVERB X, DELAY X e METER X inclusi.","Instala FX SHELL, REVERB X, DELAY X y METER X incluidos.","Installez FX SHELL, REVERB X, DELAY X et METER X inclus.","FX SHELL, REVERB X, DELAY X und METER X installieren."};
  private static readonly string[] MeterInstallLabels={"INSTALL","INSTALLA","INSTALAR","INSTALLER","INSTALLIEREN"};
  private string BundledMeterPath=>Path.Combine(AppContext.BaseDirectory,"Payload","DJ RUSSO METER X.exe");
  private bool InstallMeterFile(out string detail){
@@ -456,8 +456,8 @@ public partial class MainWindow : Window
  }
  private void InstallShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
-     "Installare FX SHELL, REVERB X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.":
-     "Install available FX SHELL, REVERB X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
+     "Installare FX SHELL, REVERB X, DELAY X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.":
+     "Install available FX SHELL, REVERB X, DELAY X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   var state=ShellInstaller.GetState();
@@ -486,14 +486,27 @@ public partial class MainWindow : Window
   }else if(reverbState is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary)
    messages.Add("REVERB X: "+BulkStatus("already"));
   else messages.Add("REVERB X: "+BulkStatus("conflict"));
+  var delayState=DelayInstaller.GetState();
+  if(delayState==DelayInstaller.State.Missing){
+   if(!DelayInstaller.HasExpectedPayload())messages.Add("DELAY X: "+T("payloadBad"));
+   else{
+    var delayResult=RunElevated(DelayInstaller.InstallArgument);
+    if(delayResult==0){
+     try{DelayInstaller.SaveReceipt();messages.Add("DELAY X: "+BulkStatus("installed"));}
+     catch(Exception ex){messages.Add("DELAY X: receipt / registrazione: "+ex.Message);}
+    }else messages.Add("DELAY X: "+T(delayResult==9?"cancelled":"ioError")+" ("+delayResult+")");
+   }
+  }else if(delayState is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary)
+   messages.Add("DELAY X: "+BulkStatus("already"));
+  else messages.Add("DELAY X: "+BulkStatus("conflict"));
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
   Refresh();
   NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
-     "Rimuovere FX SHELL, REVERB X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
-     "Remove HUB-managed FX SHELL, REVERB X and METER X? External files are untouched. Close FL Studio and METER X.",
+     "Rimuovere FX SHELL, REVERB X, DELAY X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
+     "Remove HUB-managed FX SHELL, REVERB X, DELAY X and METER X? External files are untouched. Close FL Studio and METER X.",
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   if(ShellInstaller.GetState()==ShellInstaller.State.Managed){
@@ -510,6 +523,13 @@ public partial class MainWindow : Window
     catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
    }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
   }else messages.Add("REVERB X: "+BulkStatus("notManaged"));
+  if(DelayInstaller.GetState()==DelayInstaller.State.Managed){
+   var delayResult=RunElevated(DelayInstaller.RemoveArgument);
+   if(delayResult==0){
+    try{DelayInstaller.DeleteReceipt();messages.Add("DELAY X: "+BulkStatus("removed"));}
+    catch(Exception ex){messages.Add("DELAY X: receipt / registrazione: "+ex.Message);}
+   }else messages.Add("DELAY X: "+T(delayResult==9?"cancelled":"ioError")+" ("+delayResult+")");
+  }else messages.Add("DELAY X: "+BulkStatus("notManaged"));
   if(File.Exists(MeterExePath)){
    try{File.Delete(MeterExePath);messages.Add("METER X: "+BulkStatus("removed"));}
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
@@ -624,10 +644,20 @@ public partial class MainWindow : Window
    _=>T("diagShellUnknown")
   };
   var reverbPackageStatus=ReverbInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
+  var delayState=DelayInstaller.GetState();
+  var localizedDelayState=delayState switch{
+   DelayInstaller.State.Missing=>T("diagShellMissing"),
+   DelayInstaller.State.Managed=>T("diagShellManaged"),
+   DelayInstaller.State.ExternalSameBinary=>T("diagShellExternal"),
+   DelayInstaller.State.Conflict=>T("diagShellConflict"),
+   DelayInstaller.State.ModifiedManaged=>T("diagShellModified"),
+   _=>T("diagShellUnknown")
+  };
+  var delayPackageStatus=DelayInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var packageStatus=ShellInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var flStatus=flPaths.Any(Directory.Exists)?T("diagFlFound"):T("diagFlMissing");
   // Read-only detection of known standalone file names. Presence does not prove VST3 identity.
-  var knownVst3Names=new[]{"DJ RUSSO SIDECHAIN X.vst3","DJ RUSSO REVERSE FX.vst3","DJ RUSSO STUTTER FX.vst3","DJ RUSSO VOCAL FX.vst3","DJ RUSSO REVERB X.vst3"};
+  var knownVst3Names=new[]{"DJ RUSSO SIDECHAIN X.vst3","DJ RUSSO REVERSE FX.vst3","DJ RUSSO STUTTER FX.vst3","DJ RUSSO VOCAL FX.vst3","DJ RUSSO REVERB X.vst3","DJ RUSSO DELAY X.vst3"};
   var foundStandalone=knownVst3Names.Where(name=>{
     var path=Path.Combine(vst,name);
     return File.Exists(path)||Directory.Exists(path);
@@ -642,15 +672,16 @@ public partial class MainWindow : Window
   }
   var packageHeading=new[]{"FX SHELL package","Pacchetto FX SHELL","Paquete FX SHELL","Paquet FX SHELL","FX SHELL-Paket"}[Index];
   var reverbHeading=new[]{"REVERB X package","Pacchetto REVERB X","Paquete REVERB X","Paquet REVERB X","REVERB X-Paket"}[Index];
+  var delayHeading=new[]{"DELAY X package","Pacchetto DELAY X","Paquete DELAY X","Paquet DELAY X","DELAY X-Paket"}[Index];
   var installedHeading=new[]{"Installed components","Componenti installati","Componentes instalados","Composants installés","Installierte Komponenten"}[Index];
   var packageGroup=new[]{"Package integrity","Integrità dei pacchetti","Integridad de paquetes","Intégrité des paquets","Paketintegrität"}[Index];
-  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL: {Readable(localizedShellState)}\nREVERB X v1.3: {Readable(localizedReverbState)}\nMETER X: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
+  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL: {Readable(localizedShellState)}\nREVERB X v1.3: {Readable(localizedReverbState)}\nDELAY X v1.3: {Readable(localizedDelayState)}\nMETER X: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.40");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.41");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -812,8 +843,8 @@ public partial class MainWindow : Window
    Refresh();
   }
  }
- private bool VstConflict(string id)=>id=="reverb-x"?ReverbInstaller.GetState() is ReverbInstaller.State.Conflict or ReverbInstaller.State.ModifiedManaged:IsShellProduct(id) && ShellInstaller.GetState() is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged;
- private bool VstExternal(string id)=>id=="reverb-x"?ReverbInstaller.GetState()==ReverbInstaller.State.ExternalSameBinary:IsShellProduct(id) && ShellInstaller.GetState()==ShellInstaller.State.ExternalSameBinary;
+ private bool VstConflict(string id)=>id=="reverb-x"?ReverbInstaller.GetState() is ReverbInstaller.State.Conflict or ReverbInstaller.State.ModifiedManaged:id=="delay-x"?DelayInstaller.GetState() is DelayInstaller.State.Conflict or DelayInstaller.State.ModifiedManaged:IsShellProduct(id) && ShellInstaller.GetState() is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged;
+ private bool VstExternal(string id)=>id=="reverb-x"?ReverbInstaller.GetState()==ReverbInstaller.State.ExternalSameBinary:id=="delay-x"?DelayInstaller.GetState()==DelayInstaller.State.ExternalSameBinary:IsShellProduct(id) && ShellInstaller.GetState()==ShellInstaller.State.ExternalSameBinary;
  private string ConflictLabel=>new[]{"VST3 conflict","Conflitto VST3","Conflicto VST3","Conflit VST3","VST3-Konflikt"}[Index];
  private string ExternalLabel=>new[]{"Installed externally","Installato esternamente","Instalado externamente","Installé séparément","Extern installiert"}[Index];
  private void ResolveVstConflict(){
@@ -832,36 +863,36 @@ public partial class MainWindow : Window
   var fx=plugins.FirstOrDefault(p=>p.id==selectedProductId);
   if(fx==null){selectedProductId="meter-x";fx=plugins.FirstOrDefault(p=>p.id=="meter-x");}
   if(fx==null)return;
-  bool meter=fx.id=="meter-x",shell=IsShellProduct(fx.id),reverb=fx.id=="reverb-x";
+  bool meter=fx.id=="meter-x",shell=IsShellProduct(fx.id),reverb=fx.id=="reverb-x",delay=fx.id=="delay-x";
   var shellState=ShellInstaller.GetState();
-  bool installed=meter?File.Exists(MeterExePath):reverb ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
+  bool installed=meter?File.Exists(MeterExePath):reverb ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : delay ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
   ProductPanelTitle.Text=fx.name;
-  var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter","reverb-x"=>"logo-reverb-x",_=>fx.id});
-  var comingSoon=!meter && !shell && !reverb;
+  var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter","reverb-x"=>"logo-reverb-x","delay-x"=>"logo-delay-x",_=>fx.id});
+  var comingSoon=!meter && !shell && !reverb && !delay;
   // Use the same cached transparent-pixel crop already used in the catalog.
   // This keeps the artwork itself legible, not merely its oversized PNG canvas.
   ProductPanelLogo.Source=comingSoon?CardLogo(fx.id,productAsset,true):productAsset;
   ProductPanelLogo.Height=comingSoon?216:132;
   ProductPanelLogo.Width=comingSoon?240:double.NaN;
   ProductPanelLogo.Stretch=Stretch.Uniform;
-  ProductPanelVersion.Text=meter?"v1.2.6 • NEON GHOST":shell?ShellInstaller.VersionLabel:reverb?"v1.3 • NEON GHOST":"COMING SOON / IN ARRIVO";
+  ProductPanelVersion.Text=meter?"v1.2.6 • NEON GHOST":shell?ShellInstaller.VersionLabel:(reverb||delay)?"v1.3 • NEON GHOST":"COMING SOON / IN ARRIVO";
   ProductPanelDescription.Text=meter?
     "Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation":
     shell?(Index==1?"Questo effetto è incluso nel pacchetto FX SHELL VST3. L'installazione riguarda tutti e tre gli effetti.":"This effect is part of the FX SHELL VST3 package. Installing it installs all three effects."):
-    reverb?(Index==1?"Riverbero Neon Ghost v1.3 con preset, meter stereo e automazioni FL Studio.":"Neon Ghost reverb v1.3 with presets, stereo meters and FL Studio automation."):(Index==1?"Plugin in sviluppo. Nessun file installabile incluso.":"Plugin in development. No installable package bundled.");
-  MeterPanelInstallButton.Content=meter?(Index==1?"INSTALLA METER X":"INSTALL METER X"):shell?(Index==1?"INSTALLA FX SHELL":"INSTALL FX SHELL"):reverb?(Index==1?"INSTALLA REVERB X":"INSTALL REVERB X"):(Index==1?"IN ARRIVO":"COMING SOON");
-  MeterPanelRemoveButton.Content=meter?(Index==1?"RIMUOVI METER X":"REMOVE METER X"):reverb?(Index==1?"RIMUOVI REVERB X":"REMOVE REVERB X"):(Index==1?"RIMUOVI FX SHELL":"REMOVE FX SHELL");
+    reverb?(Index==1?"Riverbero Neon Ghost v1.3 con preset, meter stereo e automazioni FL Studio.":"Neon Ghost reverb v1.3 with presets, stereo meters and FL Studio automation."):delay?new[]{"Neon Ghost delay v1.3 with tempo sync, presets, stereo meters and FL Studio automation.","Delay Neon Ghost v1.3 con sincronizzazione BPM, preset, meter stereo e automazioni FL Studio.","Delay Neon Ghost v1.3 con sincronización BPM, presets, medidores estéreo y automatización en FL Studio.","Delay Neon Ghost v1.3 avec synchronisation BPM, presets, vu-mètres stéréo et automation FL Studio.","Neon Ghost Delay v1.3 mit BPM-Synchronisation, Presets, Stereo-Pegeln und FL-Studio-Automation."}[Index]:(Index==1?"Plugin in sviluppo. Nessun file installabile incluso.":"Plugin in development. No installable package bundled.");
+  MeterPanelInstallButton.Content=meter?(Index==1?"INSTALLA METER X":"INSTALL METER X"):shell?(Index==1?"INSTALLA FX SHELL":"INSTALL FX SHELL"):reverb?(Index==1?"INSTALLA REVERB X":"INSTALL REVERB X"):delay?new[]{"INSTALL DELAY X","INSTALLA DELAY X","INSTALAR DELAY X","INSTALLER DELAY X","DELAY X INSTALLIEREN"}[Index]:(Index==1?"IN ARRIVO":"COMING SOON");
+  MeterPanelRemoveButton.Content=meter?(Index==1?"RIMUOVI METER X":"REMOVE METER X"):reverb?(Index==1?"RIMUOVI REVERB X":"REMOVE REVERB X"):delay?new[]{"REMOVE DELAY X","RIMUOVI DELAY X","ELIMINAR DELAY X","SUPPRIMER DELAY X","DELAY X ENTFERNEN"}[Index]:(Index==1?"RIMUOVI FX SHELL":"REMOVE FX SHELL");
   MeterPanelLaunchButton.Content=Index==1?"▶  AVVIA":"▶  LAUNCH";
-  MeterPanelInstallButton.IsEnabled=meter?(!installed && File.Exists(BundledMeterPath)):shell?(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()):reverb?(ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()):false;
+  MeterPanelInstallButton.IsEnabled=meter?(!installed && File.Exists(BundledMeterPath)):shell?(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()):reverb?(ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()):delay?(DelayInstaller.GetState()==DelayInstaller.State.Missing && DelayInstaller.HasExpectedPayload()):false;
   if(VstConflict(fx.id)){
    MeterPanelInstallButton.Content=new[]{"RESOLVE CONFLICT","RISOLVI CONFLITTO","RESOLVER CONFLICTO","RÉSOUDRE LE CONFLIT","KONFLIKT LÖSEN"}[Index];
    MeterPanelInstallButton.IsEnabled=true;
   }
-  MeterPanelRemoveButton.IsEnabled=meter?installed:reverb?ReverbInstaller.GetState()==ReverbInstaller.State.Managed:shell && shellState==ShellInstaller.State.Managed;
+  MeterPanelRemoveButton.IsEnabled=meter?installed:reverb?ReverbInstaller.GetState()==ReverbInstaller.State.Managed:delay?DelayInstaller.GetState()==DelayInstaller.State.Managed:shell && shellState==ShellInstaller.State.Managed;
   MeterPanelLaunchButton.Visibility=meter?Visibility.Visible:Visibility.Collapsed;
   MeterPanelLaunchButton.IsEnabled=meter && installed;
-  MeterPanelRemoveButton.Visibility=meter||shell||reverb?Visibility.Visible:Visibility.Collapsed;
-  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?(Index==1?"● Installato":"● Installed"):meter||shell||reverb?(Index==1?"○ Non installato":"○ Not installed"):(Index==1?"◌ In arrivo":"◌ Coming soon");
+  MeterPanelRemoveButton.Visibility=meter||shell||reverb||delay?Visibility.Visible:Visibility.Collapsed;
+  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?(Index==1?"● Installato":"● Installed"):meter||shell||reverb||delay?(Index==1?"○ Non installato":"○ Not installed"):(Index==1?"◌ In arrivo":"◌ Coming soon");
  }
  private async void CheckPluginUpdates_Click(object sender,RoutedEventArgs e){
    if(hubUpdateInProgress)return;
@@ -871,7 +902,7 @@ public partial class MainWindow : Window
      var packageId=IsShellProduct(id)?"fx-shell":id;
      var installed=packageId=="fx-shell"
        ? ShellInstaller.GetState() is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary
-       : packageId=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : packageId=="meter-x" && File.Exists(MeterExePath);
+       : packageId=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : packageId=="delay-x" ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : packageId=="meter-x" && File.Exists(MeterExePath);
      if(!installed){
        NeonToast.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.",warning:true);
        return;
@@ -897,12 +928,23 @@ public partial class MainWindow : Window
          NeonToast.Show(this,stagedNotice);
          return;
        }
+       if(packageId=="delay-x"){
+         var stagedNotice=new[]{
+           "DELAY X v1.3\nThe public update catalog is not yet published.\nNo files were changed.",
+           "DELAY X v1.3\nCatalogo aggiornamenti non ancora pubblicato.\nNessun file modificato.",
+           "DELAY X v1.3\nCatálogo de actualizaciones aún no publicado.\nNo se modificaron archivos.",
+           "DELAY X v1.3\nCatalogue des mises à jour non encore publié.\nAucun fichier modifié.",
+           "DELAY X v1.3\nUpdate-Katalog noch nicht veröffentlicht.\nKeine Dateien geändert."
+         }[Index];
+         NeonToast.Show(this,stagedNotice);
+         return;
+       }
        throw new InvalidDataException("Plugin not found in official catalog.");
      }
      var version=found.GetProperty("version").GetString()??"";
      var available=found.GetProperty("downloadAvailable").GetBoolean();
-     var installedVersion=packageId=="fx-shell"?ShellInstaller.VersionLabel:packageId=="reverb-x"?ReverbInstaller.VersionLabel:"1.2.6";
-     var displayName=packageId switch {"fx-shell"=>"FX SHELL","meter-x"=>"METER X","reverb-x"=>"REVERB X",_=>packageId.ToUpperInvariant()};
+     var installedVersion=packageId=="fx-shell"?ShellInstaller.VersionLabel:packageId=="reverb-x"?ReverbInstaller.VersionLabel:packageId=="delay-x"?DelayInstaller.VersionLabel:"1.2.6";
+     var displayName=packageId switch {"fx-shell"=>"FX SHELL","meter-x"=>"METER X","reverb-x"=>"REVERB X","delay-x"=>"DELAY X",_=>packageId.ToUpperInvariant()};
      var labels=new[]{
        new[]{"Bundled","Catalog","Update published; automatic installation is not yet enabled.","Up to date. No files changed."},
        new[]{"Inclusa","Catalogo","Aggiornamento pubblicato; installazione automatica non ancora attiva.","Già aggiornato. Nessun file modificato."},
@@ -917,11 +959,12 @@ public partial class MainWindow : Window
    }finally{PluginUpdatesButton.IsEnabled=true;}
  }
  private void SelectedProductInstall_Click(object sender,RoutedEventArgs e){
-  ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();
+  ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();DelayInstaller.InvalidateStateCache();
   if(VstConflict(selectedProductId)){ResolveVstConflict();Refresh();return;}
   if(selectedProductId=="meter-x"){MeterImport_Click(sender,e);return;}
   if(IsShellProduct(selectedProductId)){InstallSelectedShell();return;}
   if(selectedProductId=="reverb-x"){InstallSelectedReverb();return;}
+  if(selectedProductId=="delay-x"){InstallSelectedDelay();return;}
  }
  private void InstallSelectedReverb(){
   if(ReverbInstaller.GetState()!=ReverbInstaller.State.Missing || !ReverbInstaller.HasExpectedPayload())return;
@@ -929,6 +972,14 @@ public partial class MainWindow : Window
   int result=RunElevated(ReverbInstaller.InstallArgument);
   if(result==0){try{ReverbInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"REVERB X");}}
   else NeonDialog.Show(this,"REVERB X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","REVERB X");
+  Refresh();
+ }
+ private void InstallSelectedDelay(){
+  if(DelayInstaller.GetState()!=DelayInstaller.State.Missing || !DelayInstaller.HasExpectedPayload())return;
+  if(NeonDialog.Show(this,new[]{"Install DELAY X v1.3? Close FL Studio.","Installare DELAY X v1.3? Chiudi FL Studio.","¿Instalar DELAY X v1.3? Cierra FL Studio.","Installer DELAY X v1.3 ? Fermez FL Studio.","DELAY X v1.3 installieren? FL Studio schließen."}[Index],"DELAY X",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  int result=RunElevated(DelayInstaller.InstallArgument);
+  if(result==0){try{DelayInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"DELAY X");}}
+  else NeonDialog.Show(this,"DELAY X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","DELAY X");
   Refresh();
  }
  private void InstallSelectedShell(){
@@ -942,6 +993,7 @@ public partial class MainWindow : Window
  private void SelectedProductRemove_Click(object sender,RoutedEventArgs e){
   if(selectedProductId=="meter-x"){MeterRemove_Click(sender,e);return;}
   if(selectedProductId=="reverb-x"){RemoveSelectedReverb();return;}
+  if(selectedProductId=="delay-x"){RemoveSelectedDelay();return;}
   if(!IsShellProduct(selectedProductId) || ShellInstaller.GetState()!=ShellInstaller.State.Managed)return;
   if(NeonDialog.Show(this,Index==1?"Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.":"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.RemoveArgument);
@@ -955,6 +1007,14 @@ public partial class MainWindow : Window
   int result=RunElevated(ReverbInstaller.RemoveArgument);
   if(result==0){try{ReverbInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"REVERB X");}}
   else NeonDialog.Show(this,"REVERB X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","REVERB X");
+  Refresh();
+ }
+ private void RemoveSelectedDelay(){
+  if(DelayInstaller.GetState()!=DelayInstaller.State.Managed)return;
+  if(NeonDialog.Show(this,new[]{"Remove HUB-managed DELAY X? Close FL Studio.","Rimuovere DELAY X installato dall’HUB? Chiudi FL Studio.","¿Eliminar DELAY X gestionado por el HUB? Cierra FL Studio.","Supprimer DELAY X géré par le HUB ? Fermez FL Studio.","Vom HUB verwaltetes DELAY X entfernen? FL Studio schließen."}[Index],"DELAY X",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+  int result=RunElevated(DelayInstaller.RemoveArgument);
+  if(result==0){try{DelayInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"DELAY X");}}
+  else NeonDialog.Show(this,"DELAY X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","DELAY X");
   Refresh();
  }
  private void SelectedProductLaunch_Click(object sender,RoutedEventArgs e){
@@ -1068,6 +1128,8 @@ public partial class MainWindow : Window
                      if(released.Contains(id))found.Add(id);
          if(released.Contains("reverb-x") && ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary)
              found.Add("reverb-x");
+         if(released.Contains("delay-x") && DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary)
+             found.Add("delay-x");
          // METER X is a standalone EXE, not a VST3. Count it separately and
          // report its own installation state without implying a DAW scan.
          bool meterInstalled=File.Exists(MeterExePath);
@@ -1080,7 +1142,7 @@ public partial class MainWindow : Window
              4=>$"ERKANNTE SOFTWARE: {count} / {total}",
              _=>$"SOFTWARE DETECTED: {count} / {total}"
          };
-         var names=plugins.Where(p=>found.Contains(p.id)).Select(p=>p.name).ToArray();
+         var names=plugins.Where(p=>found.Contains(p.id) && IsShellProduct(p.id)).Select(p=>p.name).ToArray();
          string vstDetail=names.Length>0
              ? (Index==1?"FX SHELL (file VST3 rilevato): ":Index==2?"FX SHELL (archivo VST3 detectado): ":Index==3?"FX SHELL (fichier VST3 détecté) : ":Index==4?"FX SHELL (VST3-Datei erkannt): ":"FX SHELL (VST3 file detected): ")+string.Join(", ",names)
              : (Index==1?"FX SHELL: non rilevato.":Index==2?"FX SHELL: no detectado.":Index==3?"FX SHELL : non détecté.":Index==4?"FX SHELL: nicht erkannt.":"FX SHELL: not detected.");
@@ -1090,13 +1152,18 @@ public partial class MainWindow : Window
          string reverbDetail=found.Contains("reverb-x")
              ? (Index==1?"REVERB X: INSTALLATO (VST3 verificato).":"REVERB X: INSTALLED (verified VST3).")
              : (Index==1?"REVERB X: NON INSTALLATO.":"REVERB X: NOT INSTALLED.");
-         string detail=vstDetail+"\n"+reverbDetail+"\n"+meterDetail;
+         string delayDetail=found.Contains("delay-x")
+             ? (new[]{"DELAY X: INSTALLED (verified VST3).","DELAY X: INSTALLATO (VST3 verificato).","DELAY X: INSTALADO (VST3 verificado).","DELAY X : INSTALLÉ (VST3 vérifié).","DELAY X: INSTALLIERT (VST3 geprüft)."}[Index])
+             : (new[]{"DELAY X: NOT INSTALLED.","DELAY X: NON INSTALLATO.","DELAY X: NO INSTALADO.","DELAY X : NON INSTALLÉ.","DELAY X: NICHT INSTALLIERT."}[Index]);
+         string detail=vstDetail+"\n"+reverbDetail+"\n"+delayDetail+"\n"+meterDetail;
+         if(VstConflict("delay-x"))detail+="\nDELAY X: "+ConflictLabel;
+         else if(VstExternal("delay-x"))detail+="\nDELAY X: "+ExternalLabel;
          if(state==ShellInstaller.State.Conflict || state==ShellInstaller.State.ModifiedManaged)
              detail+="\n"+T(state==ShellInstaller.State.ModifiedManaged?"shellModified":"shellOther");
          Refresh();
          ScanResultsHeading.Text=headline;
          ScanResultsDetails.Text=detail;
-         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+MeterExePath;
+         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+MeterExePath;
          ShellSectionStatus.Text=headline;
          StatusText.Text=headline;
          ScanResultsPanel.BorderBrush=(System.Windows.Media.Brush)FindResource("AccentBrush");
@@ -1106,7 +1173,7 @@ public partial class MainWindow : Window
      {
          ScanResultsHeading.Text=Index==1?"ERRORE DURANTE LA SCANSIONE":"SCAN ERROR";
          ScanResultsDetails.Text=ex.Message;
-         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+MeterExePath;
+         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+MeterExePath;
          NeonDialog.Show(this,ex.ToString(),"DJ RUSSO FX HUB v0.6.1 — SCAN ERROR",MessageBoxButton.OK,MessageBoxImage.Error);
      }
  }
@@ -1116,9 +1183,9 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — USER GUIDE
  ABOUT
- Windows x64 hub for five audio tools: Sidechain X, Reverse FX and Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 and METER X v1.2.6.
+ Windows x64 hub for six audio tools: Sidechain X, Reverse FX and Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3 and METER X v1.2.6.
  INSTALLATION AND REMOVAL
- Save projects and close your DAW and METER X. Select a product or Install all. Approve administrator access for VST3 installation. FX SHELL installs all three effects; REVERB X is separate. VST3 location: C:\Program Files\Common Files\VST3. Rescan in your DAW. Remove all removes HUB-managed products; external VST3 copies are protected.
+ Save projects and close your DAW and METER X. Select a product or Install all. Approve administrator access for VST3 installation. FX SHELL installs all three effects; REVERB X and DELAY X are separate. VST3 location: C:\Program Files\Common Files\VST3. Rescan in your DAW. Remove all removes HUB-managed products; external VST3 copies are protected.
  METER X
  Independent portable audio meter, installable from the HUB. WASAPI loopback may not capture exclusive ASIO audio.
  COMPATIBILITY AND REQUIREMENTS
@@ -1137,9 +1204,9 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — GUIDA UTENTE
  INFORMAZIONI
- HUB Windows x64 per cinque strumenti: Sidechain X, Reverse FX e Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 e METER X v1.2.6.
+ HUB Windows x64 per sei strumenti: Sidechain X, Reverse FX e Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3 e METER X v1.2.6.
  INSTALLAZIONE E RIMOZIONE
- Salva i progetti e chiudi la DAW e METER X. Seleziona un prodotto oppure Installa tutto. Autorizza l'amministratore per i VST3. FX SHELL installa tutti e tre gli effetti; REVERB X è separato. Percorso VST3: C:\Program Files\Common Files\VST3. Ripeti la scansione nella DAW. Rimuovi tutto rimuove i prodotti gestiti dall'HUB; le copie VST3 esterne sono protette.
+ Salva i progetti e chiudi la DAW e METER X. Seleziona un prodotto oppure Installa tutto. Autorizza l'amministratore per i VST3. FX SHELL installa tutti e tre gli effetti; REVERB X e DELAY X sono separati. Percorso VST3: C:\Program Files\Common Files\VST3. Ripeti la scansione nella DAW. Rimuovi tutto rimuove i prodotti gestiti dall'HUB; le copie VST3 esterne sono protette.
  METER X
  Misuratore audio portable indipendente, installabile dall'HUB. Il loopback WASAPI potrebbe non acquisire audio tramite ASIO esclusivo.
  COMPATIBILITÀ E REQUISITI
@@ -1158,9 +1225,9 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — GUÍA DEL USUARIO
  INFORMACIÓN
- HUB Windows x64 para cinco herramientas: Sidechain X, Reverse FX y Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 y METER X v1.2.6.
+ HUB Windows x64 para seis herramientas: Sidechain X, Reverse FX y Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3 y METER X v1.2.6.
  INSTALACIÓN Y ELIMINACIÓN
- Guarda los proyectos y cierra la DAW y METER X. Selecciona un producto o Instalar todo. Autoriza los permisos de administrador para VST3. FX SHELL instala los tres efectos; REVERB X es independiente. Ruta VST3: C:\Program Files\Common Files\VST3. Vuelve a escanear en la DAW. Eliminar todo elimina los productos gestionados por el HUB y protege las copias VST3 externas.
+ Guarda los proyectos y cierra la DAW y METER X. Selecciona un producto o Instalar todo. Autoriza los permisos de administrador para VST3. FX SHELL instala los tres efectos; REVERB X y DELAY X son independientes. Ruta VST3: C:\Program Files\Common Files\VST3. Vuelve a escanear en la DAW. Eliminar todo elimina los productos gestionados por el HUB y protege las copias VST3 externas.
  METER X
  Medidor portátil independiente instalable desde el HUB. WASAPI loopback puede no capturar audio ASIO exclusivo.
  COMPATIBILIDAD Y REQUISITOS
@@ -1179,9 +1246,9 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — GUIDE UTILISATEUR
  INFORMATIONS
- HUB Windows x64 pour cinq outils : Sidechain X, Reverse FX et Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 et METER X v1.2.6.
+ HUB Windows x64 pour six outils : Sidechain X, Reverse FX et Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3 et METER X v1.2.6.
  INSTALLATION ET SUPPRESSION
- Enregistrez les projets et fermez la STAN et METER X. Sélectionnez un produit ou Tout installer. Autorisez les droits administrateur pour les VST3. FX SHELL installe les trois effets ; REVERB X est indépendant. Chemin VST3 : C:\Program Files\Common Files\VST3. Relancez la recherche dans la STAN. Tout supprimer retire les produits gérés par le HUB et protège les copies VST3 externes.
+ Enregistrez les projets et fermez la STAN et METER X. Sélectionnez un produit ou Tout installer. Autorisez les droits administrateur pour les VST3. FX SHELL installe les trois effets ; REVERB X et DELAY X sont indépendants. Chemin VST3 : C:\Program Files\Common Files\VST3. Relancez la recherche dans la STAN. Tout supprimer retire les produits gérés par le HUB et protège les copies VST3 externes.
  METER X
  Mesureur audio portable indépendant, installable depuis le HUB. Le loopback WASAPI peut ne pas capturer le signal ASIO exclusif.
  COMPATIBILITÉ ET CONFIGURATION
@@ -1200,9 +1267,9 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — BENUTZERHANDBUCH
  INFORMATIONEN
- Windows-x64-HUB für fünf Werkzeuge: Sidechain X, Reverse FX und Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 und METER X v1.2.6.
+ Windows-x64-HUB für sechs Werkzeuge: Sidechain X, Reverse FX und Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3 und METER X v1.2.6.
  INSTALLATION UND ENTFERNUNG
- Projekte speichern und DAW sowie METER X schließen. Produkt oder Alles installieren wählen. Administratorrechte für VST3 bestätigen. FX SHELL installiert alle drei Effekte; REVERB X ist separat. VST3-Pfad: C:\Program Files\Common Files\VST3. Plugins in der DAW erneut scannen. Alles entfernen entfernt HUB-verwaltete Produkte; externe VST3-Kopien bleiben geschützt.
+ Projekte speichern und DAW sowie METER X schließen. Produkt oder Alles installieren wählen. Administratorrechte für VST3 bestätigen. FX SHELL installiert alle drei Effekte; REVERB X und DELAY X sind separat. VST3-Pfad: C:\Program Files\Common Files\VST3. Plugins in der DAW erneut scannen. Alles entfernen entfernt HUB-verwaltete Produkte; externe VST3-Kopien bleiben geschützt.
  METER X
  Eigenständiges portables Audiometer, über den HUB installierbar. WASAPI-Loopback erfasst möglicherweise kein exklusives ASIO-Audio.
  KOMPATIBILITÄT UND ANFORDERUNGEN
