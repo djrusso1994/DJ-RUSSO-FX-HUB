@@ -1,9 +1,13 @@
-v0.8.41 - DELAY X v1.3 integration (development build, pending Windows testing)
-- Added independent DELAY X VST3 installation, removal and SHA-256 verification, with the original logo in its existing catalog position.
-- Included DELAY X in detection, diagnostics, bulk operations, conflict handling, update catalog and localized guide. Six of fourteen tools available.
-- Corrected detection summary to list only FX SHELL effects under FX SHELL.
-- Preserved existing VST3 binaries and DSP. Public release requires user approval after testing.
-
+v0.8.41 - DELAY X v1.3, professional dialogs and diagnostics (released 24 November 2026)
+- Published official Windows x64 v0.8.41 installer on GitHub Releases after successful automated compilation and user functional testing.
+- Added independent DELAY X v1.3 VST3 with its original logo, individual installation and removal, pinned SHA-256 payload integrity checks and protection against conflicting existing files.
+- Included DELAY X in the product catalog, status detection, installation diagnostics, plugin-update catalog and install-all/remove-all operations. Six of fourteen planned tools now available.
+- Corrected diagnostics summary so FX SHELL lists only the effects contained in its shared VST3 binary.
+- Redesigned the diagnostics dialog with readable sections, component statuses and integrity details, preserving the underlying checks.
+- Refined operation confirmation and summary dialogs for single and bulk installation/removal, with action-specific headings, buttons and status presentation.
+- Fixed a WPF double-parent exception in the operation summary dialog that could close the HUB after successful install-all/remove-all actions.
+- Display bulk-operation results before the product-card refresh for more responsive feedback; preserve file-integrity verification and installer safeguards.
+- No changes to existing effect DSP, plugin identities or existing installer binary behavior.
 v0.8.40 - REVERB X v1.3 and safe VST3 conflict handling (released 24 November 2026)
 - Published official Windows x64 v0.8.40 installer on GitHub Releases.
 - Added independent REVERB X v1.3 VST3 installation and removal with pinned SHA-256 validation; reused its original Neon Ghost logo in the existing catalog position.
