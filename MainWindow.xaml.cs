@@ -340,7 +340,7 @@ public partial class MainWindow : Window
              BadgeTip=conflict?ConflictLabel:external?ExternalLabel:installed?(Index==1?"Installato e verificato":"Installed and verified"):
                  (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
              FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?103:77,LogoMaxWidth=planned?165:150,Category=T(category),
-             Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+(fx.id=="reverb-x"?ReverbInstaller.VersionLabel:fx.id=="delay-x"?DelayInstaller.VersionLabel:ShellInstaller.VersionLabel)
+             Footer=fx.id=="meter-x"? (VersionDisplay("meter-x")+" • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+VersionDisplay(fx.id)
          });
      }
      var term=ProductSearch?.Text?.Trim()??"";
@@ -619,6 +619,21 @@ public partial class MainWindow : Window
    });
   }catch(Exception ex){NeonDialog.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
+ private static string BundledVersion(string id){
+  if(id=="reverb-x")return ReverbInstaller.VersionLabel;
+  if(id=="delay-x")return DelayInstaller.VersionLabel;
+  if(id!="meter-x")return ShellInstaller.VersionLabel;
+  try{
+   using var catalog=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"plugin-updates.json")));
+   foreach(var package in catalog.RootElement.GetProperty("packages").EnumerateArray())
+    if(package.GetProperty("id").GetString()=="meter-x"){
+     var version=package.GetProperty("version").GetString();
+     if(!string.IsNullOrWhiteSpace(version))return version;
+    }
+  }catch{}
+  return "1.2.6";
+ }
+ private static string VersionDisplay(string id)=>"v"+BundledVersion(id).TrimStart('v','V');
  private void Diagnostics_Click(object sender,RoutedEventArgs e){
   // Display only localized text; the underlying tests remain read-only and unchanged.
   var vst=VstDir;
@@ -675,17 +690,7 @@ public partial class MainWindow : Window
   var delayHeading=new[]{"DELAY X package","Pacchetto DELAY X","Paquete DELAY X","Paquet DELAY X","DELAY X-Paket"}[Index];
   var installedHeading=new[]{"Installed components","Componenti installati","Componentes instalados","Composants installés","Installierte Komponenten"}[Index];
   var packageGroup=new[]{"Package integrity","Integrità dei pacchetti","Integridad de paquetes","Intégrité des paquets","Paketintegrität"}[Index];
-  var meterVersion="1.2.6";
-  try{
-   using var catalog=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"plugin-updates.json")));
-   foreach(var package in catalog.RootElement.GetProperty("packages").EnumerateArray())
-    if(package.GetProperty("id").GetString()=="meter-x"){
-     var version=package.GetProperty("version").GetString();
-     if(!string.IsNullOrWhiteSpace(version))meterVersion=version;
-     break;
-    }
-  }catch{}
-  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL v{ShellInstaller.VersionLabel}: {Readable(localizedShellState)}\nREVERB X v{ReverbInstaller.VersionLabel}: {Readable(localizedReverbState)}\nDELAY X v{DelayInstaller.VersionLabel}: {Readable(localizedDelayState)}\nMETER X v{meterVersion}: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
+  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL {VersionDisplay("fx-shell")}: {Readable(localizedShellState)}\nREVERB X {VersionDisplay("reverb-x")}: {Readable(localizedReverbState)}\nDELAY X {VersionDisplay("delay-x")}: {Readable(localizedDelayState)}\nMETER X {VersionDisplay("meter-x")}: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   NeonDialog.Show(this,report,"DJ RUSSO • "+T("diagTitle"),MessageBoxButton.OK,MessageBoxImage.Information);
  }
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
@@ -885,7 +890,7 @@ public partial class MainWindow : Window
   ProductPanelLogo.Height=comingSoon?216:132;
   ProductPanelLogo.Width=comingSoon?240:double.NaN;
   ProductPanelLogo.Stretch=Stretch.Uniform;
-  ProductPanelVersion.Text=meter?"v1.2.6 • NEON GHOST":shell?ShellInstaller.VersionLabel:(reverb||delay)?"v1.3 • NEON GHOST":"COMING SOON / IN ARRIVO";
+  ProductPanelVersion.Text=meter?VersionDisplay("meter-x")+" • NEON GHOST":shell?VersionDisplay("fx-shell"):reverb?VersionDisplay("reverb-x")+" • NEON GHOST":delay?VersionDisplay("delay-x")+" • NEON GHOST":"COMING SOON / IN ARRIVO";
   ProductPanelDescription.Text=meter?
     "Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation":
     shell?(Index==1?"Questo effetto è incluso nel pacchetto FX SHELL VST3. L'installazione riguarda tutti e tre gli effetti.":"This effect is part of the FX SHELL VST3 package. Installing it installs all three effects."):
@@ -953,7 +958,7 @@ public partial class MainWindow : Window
      }
      var version=found.GetProperty("version").GetString()??"";
      var available=found.GetProperty("downloadAvailable").GetBoolean();
-     var installedVersion=packageId=="fx-shell"?ShellInstaller.VersionLabel:packageId=="reverb-x"?ReverbInstaller.VersionLabel:packageId=="delay-x"?DelayInstaller.VersionLabel:"1.2.6";
+     var installedVersion=BundledVersion(packageId);
      var displayName=packageId switch {"fx-shell"=>"FX SHELL","meter-x"=>"METER X","reverb-x"=>"REVERB X","delay-x"=>"DELAY X",_=>packageId.ToUpperInvariant()};
      var labels=new[]{
        new[]{"Bundled","Catalog","Update published; automatic installation is not yet enabled.","Up to date. No files changed."},
