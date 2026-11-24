@@ -867,11 +867,11 @@ public partial class MainWindow : Window
      if(found.ValueKind==JsonValueKind.Undefined){
        if(packageId=="reverb-x"){
          var stagedNotice=new[]{
-           "REVERB X v1.3 — test build.\nThe public update catalog is not yet published.\nNo files were changed.",
-           "REVERB X v1.3 — versione di prova.\nCatalogo aggiornamenti non ancora pubblicato.\nNessun file modificato.",
-           "REVERB X v1.3 — versión de prueba.\nCatálogo de actualizaciones aún no publicado.\nNo se modificaron archivos.",
-           "REVERB X v1.3 — version d'essai.\nCatalogue des mises à jour non encore publié.\nAucun fichier modifié.",
-           "REVERB X v1.3 — Testversion.\nUpdate-Katalog noch nicht veröffentlicht.\nKeine Dateien geändert."
+           "REVERB X v1.3\nThe public update catalog is not yet published.\nNo files were changed.",
+           "REVERB X v1.3\nCatalogo aggiornamenti non ancora pubblicato.\nNessun file modificato.",
+           "REVERB X v1.3\nCatálogo de actualizaciones aún no publicado.\nNo se modificaron archivos.",
+           "REVERB X v1.3\nCatalogue des mises à jour non encore publié.\nAucun fichier modifié.",
+           "REVERB X v1.3\nUpdate-Katalog noch nicht veröffentlicht.\nKeine Dateien geändert."
          }[Index];
          NeonToast.Show(this,stagedNotice);
          return;
@@ -1090,202 +1090,108 @@ public partial class MainWindow : Window
 
 
  private static readonly string[] GuideTexts = {
- """ 
+ """
  DJ RUSSO FX HUB — USER GUIDE
-
  ABOUT
- FX HUB is a Windows application for managing DJ RUSSO audio tools.
- The FX SHELL package contains three VST3 effects: Sidechain X, Reverse FX and Stutter FX.
-
- INSTALLING VST3 EFFECTS
- 1. Close your DAW.
- 2. Open FX HUB and select INSTALL FX SHELL.
- 3. Approve the Windows administrator prompt.
- 4. The VST3 is copied to C:\Program Files\Common Files\VST3.
- 5. Open your DAW and rescan VST3 plugins if needed.
-
- DAW SUPPORT
- FL Studio is the primary development and testing environment.
- Cubase, Ableton Live, REAPER and other Windows DAWs supporting VST3 may load the effects.
- Compatibility with each DAW/version is not yet guaranteed or fully tested.
- You do not need to install FL Studio to use the HUB.
-
- DETECTION AND REMOVAL
- 'Detect installed plugins' checks the HUB's verified FX SHELL binary at its standard location;
- it does NOT check that a particular DAW has successfully loaded the plugins.
- Uninstall removes only the unmodified installation owned by this HUB.
- Back up your projects and close the DAW before changing plugins.
-
+ Windows x64 hub for five audio tools: Sidechain X, Reverse FX and Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 and METER X v1.2.6.
+ INSTALLATION AND REMOVAL
+ Save projects and close your DAW and METER X. Select a product or Install all. Approve administrator access for VST3 installation. FX SHELL installs all three effects; REVERB X is separate. VST3 location: C:\Program Files\Common Files\VST3. Rescan in your DAW. Remove all removes HUB-managed products; external VST3 copies are protected.
  METER X
- DJ RUSSO METER X is a separate portable Windows audio meter.
- It is not part of the FX SHELL VST3 installer in this version.
- Its planned HUB integration will follow testing. WASAPI loopback may not capture
- audio routed through exclusive ASIO drivers.
-
+ Independent portable audio meter, installable from the HUB. WASAPI loopback may not capture exclusive ASIO audio.
+ COMPATIBILITY AND REQUIREMENTS
+ Windows x64 and a compatible VST3 x64 host for effects. FL Studio is the primary test host; Cubase, Ableton Live and REAPER are not fully tested. FL Studio is not required for the HUB.
+ DETECTION AND DIAGNOSTICS
+ Detection counts installed tools; diagnostics checks paths, package integrity, installation status and known VST3 filenames. Neither guarantees successful DAW loading.
+ UPDATES AND SETTINGS
+ Internet access is required for online update checks. Plugin checks compare bundled and catalog versions; automatic installation may not be available. Settings offer themes and five languages.
  TROUBLESHOOTING
- If effects are missing: rescan VST3 plugins in the DAW, check the standard folder,
- restart the DAW, and ensure you use a Windows x64 VST3 host.
- If installation fails: close the DAW and approve administrator access.
- A successful HUB installation does not guarantee DAW compatibility.
-
+ Rescan VST3, check the standard path, restart the DAW and approve administrator access. Use diagnostics before reinstalling.
+ SUPPORT
+ https://github.com/djrusso1994/DJ-RUSSO-FX-HUB
  CREDITS
  Developed by Giuseppe Russo — DJ RUSSO.
  """,
  """
  DJ RUSSO FX HUB — GUIDA UTENTE
-
  INFORMAZIONI
- FX HUB è un'applicazione Windows per gestire gli strumenti audio DJ RUSSO.
- FX SHELL contiene tre effetti VST3: Sidechain X, Reverse FX e Stutter FX.
-
- INSTALLAZIONE VST3
- 1. Chiudi la DAW.
- 2. Apri FX HUB e seleziona INSTALLA FX SHELL.
- 3. Autorizza la richiesta amministratore di Windows.
- 4. Il VST3 viene copiato in C:\Program Files\Common Files\VST3.
- 5. Apri la DAW ed esegui una nuova scansione VST3, se necessario.
-
- COMPATIBILITÀ DAW
- FL Studio è l'ambiente principale di sviluppo e test.
- Cubase, Ableton Live, REAPER e altre DAW Windows che supportano VST3
- possono caricare gli effetti, ma non tutte le versioni sono state testate.
- Non occorre installare FL Studio per utilizzare l'HUB.
-
- RILEVAMENTO E DISINSTALLAZIONE
- 'Rileva plugin installati' verifica il file FX SHELL nella cartella standard;
- NON conferma che una DAW specifica riesca ad aprire i plugin.
- La disinstallazione rimuove soltanto la copia integra gestita dall'HUB.
- Salva i progetti e chiudi la DAW prima di modificare i plugin.
-
+ HUB Windows x64 per cinque strumenti: Sidechain X, Reverse FX e Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 e METER X v1.2.6.
+ INSTALLAZIONE E RIMOZIONE
+ Salva i progetti e chiudi la DAW e METER X. Seleziona un prodotto oppure Installa tutto. Autorizza l'amministratore per i VST3. FX SHELL installa tutti e tre gli effetti; REVERB X è separato. Percorso VST3: C:\Program Files\Common Files\VST3. Ripeti la scansione nella DAW. Rimuovi tutto rimuove i prodotti gestiti dall'HUB; le copie VST3 esterne sono protette.
  METER X
- DJ RUSSO METER X è un misuratore audio portable separato.
- In questa versione non fa parte dell'installer VST3 FX SHELL.
- L'integrazione nell'HUB arriverà dopo i test. Il loopback WASAPI potrebbe
- non acquisire audio instradato tramite driver ASIO esclusivi.
-
+ Misuratore audio portable indipendente, installabile dall'HUB. Il loopback WASAPI potrebbe non acquisire audio tramite ASIO esclusivo.
+ COMPATIBILITÀ E REQUISITI
+ Windows x64 e host VST3 x64 compatibile per gli effetti. FL Studio è l'host principale di test; Cubase, Ableton Live e REAPER non sono stati testati completamente. FL Studio non è necessario per l'HUB.
+ RILEVAMENTO E DIAGNOSTICA
+ Il rilevamento conta gli strumenti installati; la diagnostica verifica percorsi, integrità dei pacchetti, stato di installazione e nomi VST3 conosciuti. Non garantiscono il caricamento nella DAW.
+ AGGIORNAMENTI E IMPOSTAZIONI
+ Internet è necessario per verificare gli aggiornamenti online. Il controllo plugin confronta le versioni incluse e del catalogo; l'installazione automatica potrebbe non essere disponibile. Le impostazioni offrono temi e cinque lingue.
  RISOLUZIONE DEI PROBLEMI
- Se gli effetti non compaiono: ripeti la scansione VST3 nella DAW, verifica
- la cartella standard, riavvia la DAW e usa un host VST3 Windows x64.
- Se l'installazione fallisce: chiudi la DAW e autorizza l'amministratore.
- L'installazione riuscita nell'HUB non garantisce compatibilità con ogni DAW.
-
+ Ripeti la scansione VST3, verifica il percorso standard, riavvia la DAW e autorizza l'amministratore. Usa la diagnostica prima di reinstallare.
+ SUPPORTO
+ https://github.com/djrusso1994/DJ-RUSSO-FX-HUB
  CREDITI
  Sviluppato da Giuseppe Russo — DJ RUSSO.
  """,
  """
  DJ RUSSO FX HUB — GUÍA DEL USUARIO
-
- DESCRIPCIÓN
- FX HUB administra herramientas de audio DJ RUSSO en Windows.
- FX SHELL incluye tres efectos VST3: Sidechain X, Reverse FX y Stutter FX.
-
- INSTALACIÓN
- 1. Cierra tu DAW.
- 2. Abre FX HUB y pulsa INSTALAR FX SHELL.
- 3. Acepta el permiso de administrador de Windows.
- 4. El VST3 se copia en C:\Program Files\Common Files\VST3.
- 5. Abre tu DAW y vuelve a analizar los plugins VST3 si es necesario.
-
- COMPATIBILIDAD
- FL Studio es el entorno principal de desarrollo y pruebas.
- Cubase, Ableton Live, REAPER y otros DAW de Windows compatibles con VST3
- pueden cargar los efectos; no se ha verificado cada versión.
- No es necesario tener FL Studio instalado.
-
- DETECCIÓN Y DESINSTALACIÓN
- La detección comprueba el archivo FX SHELL verificado en la carpeta estándar,
- no confirma que cada DAW pueda cargarlo.
- La desinstalación solo elimina el archivo intacto gestionado por HUB.
- Guarda tus proyectos y cierra el DAW antes de hacer cambios.
-
+ INFORMACIÓN
+ HUB Windows x64 para cinco herramientas: Sidechain X, Reverse FX y Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 y METER X v1.2.6.
+ INSTALACIÓN Y ELIMINACIÓN
+ Guarda los proyectos y cierra la DAW y METER X. Selecciona un producto o Instalar todo. Autoriza los permisos de administrador para VST3. FX SHELL instala los tres efectos; REVERB X es independiente. Ruta VST3: C:\Program Files\Common Files\VST3. Vuelve a escanear en la DAW. Eliminar todo elimina los productos gestionados por el HUB y protege las copias VST3 externas.
  METER X
- DJ RUSSO METER X es una aplicación portable independiente.
- Todavía no está integrada en el instalador FX SHELL.
- WASAPI loopback puede no capturar audio mediante ASIO exclusivo.
-
+ Medidor portátil independiente instalable desde el HUB. WASAPI loopback puede no capturar audio ASIO exclusivo.
+ COMPATIBILIDAD Y REQUISITOS
+ Windows x64 y host VST3 x64 compatible. FL Studio es el host principal de pruebas; Cubase, Ableton Live y REAPER no se han probado completamente. FL Studio no es necesario para el HUB.
+ DETECCIÓN Y DIAGNÓSTICO
+ La detección cuenta las herramientas instaladas; el diagnóstico comprueba rutas, integridad, estado y nombres VST3 conocidos. No garantizan la carga en la DAW.
+ ACTUALIZACIONES Y AJUSTES
+ Se necesita Internet para comprobar actualizaciones. Se comparan versiones incluidas y del catálogo; la instalación automática puede no estar disponible. Hay temas y cinco idiomas.
  SOLUCIÓN DE PROBLEMAS
- Si faltan efectos, vuelve a analizar VST3, revisa la carpeta y reinicia el DAW.
- Usa un host VST3 Windows x64. Para instalar, autoriza al administrador.
- La instalación no garantiza compatibilidad con todos los DAW.
-
+ Repite el escaneo VST3, comprueba la ruta, reinicia la DAW y autoriza los permisos. Usa el diagnóstico antes de reinstalar.
+ SOPORTE
+ https://github.com/djrusso1994/DJ-RUSSO-FX-HUB
  CRÉDITOS
  Desarrollado por Giuseppe Russo — DJ RUSSO.
  """,
  """
  DJ RUSSO FX HUB — GUIDE UTILISATEUR
-
- PRÉSENTATION
- FX HUB gère les outils audio DJ RUSSO sous Windows.
- FX SHELL contient trois effets VST3 : Sidechain X, Reverse FX et Stutter FX.
-
- INSTALLATION
- 1. Fermez votre DAW.
- 2. Ouvrez FX HUB et choisissez INSTALLER FX SHELL.
- 3. Acceptez l'autorisation administrateur Windows.
- 4. Le VST3 est copié dans C:\Program Files\Common Files\VST3.
- 5. Relancez votre DAW et analysez les plugins VST3 si nécessaire.
-
- COMPATIBILITÉ
- FL Studio est l'environnement principal de développement et de test.
- Cubase, Ableton Live, REAPER et d'autres DAW Windows compatibles VST3
- peuvent charger les effets ; toutes les versions ne sont pas testées.
- FL Studio n'est pas requis pour utiliser HUB.
-
- DÉTECTION ET SUPPRESSION
- La détection vérifie le fichier FX SHELL dans le dossier standard,
- mais ne prouve pas qu'un DAW donné puisse charger les effets.
- La suppression concerne uniquement le fichier intact géré par HUB.
- Sauvegardez vos projets et fermez le DAW avant toute modification.
-
+ INFORMATIONS
+ HUB Windows x64 pour cinq outils : Sidechain X, Reverse FX et Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 et METER X v1.2.6.
+ INSTALLATION ET SUPPRESSION
+ Enregistrez les projets et fermez la STAN et METER X. Sélectionnez un produit ou Tout installer. Autorisez les droits administrateur pour les VST3. FX SHELL installe les trois effets ; REVERB X est indépendant. Chemin VST3 : C:\Program Files\Common Files\VST3. Relancez la recherche dans la STAN. Tout supprimer retire les produits gérés par le HUB et protège les copies VST3 externes.
  METER X
- DJ RUSSO METER X est une application portable distincte.
- Elle n'est pas encore intégrée à l'installation FX SHELL.
- WASAPI loopback peut ne pas capter les sorties ASIO exclusives.
-
+ Mesureur audio portable indépendant, installable depuis le HUB. Le loopback WASAPI peut ne pas capturer le signal ASIO exclusif.
+ COMPATIBILITÉ ET CONFIGURATION
+ Windows x64 et hôte VST3 x64 compatible. FL Studio est l'hôte principal de test ; Cubase, Ableton Live et REAPER ne sont pas entièrement testés. FL Studio n'est pas requis pour le HUB.
+ DÉTECTION ET DIAGNOSTIC
+ La détection compte les outils installés ; le diagnostic vérifie les chemins, l'intégrité, l'état et les noms VST3 connus. Ils ne garantissent pas le chargement dans la STAN.
+ MISES À JOUR ET PARAMÈTRES
+ Internet est requis pour vérifier les mises à jour. Les versions incluses et du catalogue sont comparées ; l'installation automatique peut être indisponible. Thèmes et cinq langues sont proposés.
  DÉPANNAGE
- Relancez l'analyse VST3, vérifiez le dossier standard et redémarrez le DAW.
- Utilisez un hôte VST3 Windows x64 et autorisez l'administrateur.
- L'installation ne garantit pas la compatibilité avec chaque DAW.
-
+ Relancez la recherche VST3, vérifiez le chemin, redémarrez la STAN et autorisez les droits administrateur. Utilisez le diagnostic avant de réinstaller.
+ ASSISTANCE
+ https://github.com/djrusso1994/DJ-RUSSO-FX-HUB
  CRÉDITS
  Développé par Giuseppe Russo — DJ RUSSO.
  """,
  """
  DJ RUSSO FX HUB — BENUTZERHANDBUCH
-
- ÜBERBLICK
- FX HUB verwaltet DJ RUSSO Audiowerkzeuge unter Windows.
- FX SHELL enthält drei VST3-Effekte: Sidechain X, Reverse FX und Stutter FX.
-
- INSTALLATION
- 1. Schließe die DAW.
- 2. Öffne FX HUB und wähle FX SHELL INSTALLIEREN.
- 3. Bestätige die Windows-Administratorabfrage.
- 4. Die VST3-Datei wird nach C:\Program Files\Common Files\VST3 kopiert.
- 5. Starte die DAW und scanne die VST3-Plugins bei Bedarf erneut.
-
- DAW-KOMPATIBILITÄT
- FL Studio ist die primäre Entwicklungs- und Testumgebung.
- Cubase, Ableton Live, REAPER und andere Windows-DAWs mit VST3-Unterstützung
- können die Effekte laden. Nicht alle Versionen wurden getestet.
- FL Studio ist für die Nutzung des HUB nicht erforderlich.
-
- ERKENNUNG UND ENTFERNUNG
- Die Erkennung prüft die verifizierte FX SHELL-Datei im Standardordner.
- Sie bestätigt NICHT, dass eine bestimmte DAW die Plugins laden kann.
- Entfernt wird nur die unveränderte, vom HUB verwaltete Installation.
- Projekte sichern und DAW vor Änderungen schließen.
-
+ INFORMATIONEN
+ Windows-x64-HUB für fünf Werkzeuge: Sidechain X, Reverse FX und Stutter FX (FX SHELL v3.0.3), REVERB X v1.3 und METER X v1.2.6.
+ INSTALLATION UND ENTFERNUNG
+ Projekte speichern und DAW sowie METER X schließen. Produkt oder Alles installieren wählen. Administratorrechte für VST3 bestätigen. FX SHELL installiert alle drei Effekte; REVERB X ist separat. VST3-Pfad: C:\Program Files\Common Files\VST3. Plugins in der DAW erneut scannen. Alles entfernen entfernt HUB-verwaltete Produkte; externe VST3-Kopien bleiben geschützt.
  METER X
- DJ RUSSO METER X ist eine separate portable Windows-Anwendung.
- Sie ist noch nicht Teil des FX SHELL-Installers.
- WASAPI-Loopback erfasst möglicherweise kein exklusives ASIO-Audio.
-
+ Eigenständiges portables Audiometer, über den HUB installierbar. WASAPI-Loopback erfasst möglicherweise kein exklusives ASIO-Audio.
+ KOMPATIBILITÄT UND ANFORDERUNGEN
+ Windows x64 und kompatibler VST3-x64-Host. FL Studio ist der primäre Testhost; Cubase, Ableton Live und REAPER sind nicht vollständig getestet. FL Studio ist für den HUB nicht erforderlich.
+ ERKENNUNG UND DIAGNOSE
+ Die Erkennung zählt installierte Werkzeuge; die Diagnose prüft Pfade, Integrität, Installationsstatus und bekannte VST3-Dateinamen. Das Laden in der DAW wird nicht garantiert.
+ UPDATES UND EINSTELLUNGEN
+ Internet ist für Updateprüfungen erforderlich. Enthaltene Versionen werden mit dem Katalog verglichen; automatische Installation ist möglicherweise nicht verfügbar. Designs und fünf Sprachen stehen zur Verfügung.
  FEHLERBEHEBUNG
- Bei fehlenden Effekten VST3 erneut scannen, Ordner prüfen und DAW neu starten.
- Windows-x64-VST3-Host verwenden; Administratorrechte bestätigen.
- Erfolgreiche Installation garantiert keine Kompatibilität mit jeder DAW.
-
+ VST3 erneut scannen, Pfad prüfen, DAW neu starten und Administratorrechte bestätigen. Vor Neuinstallation Diagnose verwenden.
+ SUPPORT
+ https://github.com/djrusso1994/DJ-RUSSO-FX-HUB
  CREDITS
  Entwickelt von Giuseppe Russo — DJ RUSSO.
  """
