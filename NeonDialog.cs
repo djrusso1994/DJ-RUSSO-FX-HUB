@@ -242,6 +242,84 @@ internal static class NeonDialog
         return result;
     }
 
+    // Dedicated diagnostics presentation; ordinary dialogs are unchanged.
+    public static void ShowDiagnostics(Window owner, string report, string caption,
+        string[] good, string[] neutral, string[] warning, string[] bad)
+    {
+        Brush R(string key, Brush fallback) => owner.TryFindResource(key) as Brush ?? fallback;
+        var bg=R("BgBrush", Brushes.Black);
+        var panel=R("PanelBrush", bg);
+        var fg=R("FgBrush", Brushes.White);
+        var accent=R("AccentBrush", Brushes.MediumPurple);
+        var secondary=R("SecondaryBrush", fg);
+        bool light=bg is SolidColorBrush b && (b.Color.R*0.2126+b.Color.G*0.7152+b.Color.B*0.0722)>150;
+        var dialog=new Window {
+            Owner=owner, Title=caption, Width=720, MaxWidth=Math.Max(320,owner.ActualWidth-24),
+            MaxHeight=Math.Max(300,Math.Min(760,SystemParameters.WorkArea.Height-48)),
+            SizeToContent=SizeToContent.Height, WindowStartupLocation=WindowStartupLocation.CenterOwner,
+            WindowStyle=WindowStyle.None, AllowsTransparency=true, Background=Brushes.Transparent,
+            ResizeMode=ResizeMode.NoResize, ShowInTaskbar=false, Foreground=fg,
+            FontFamily=new FontFamily("Segoe UI"), UseLayoutRounding=true, SnapsToDevicePixels=true
+        };
+        var root=new DockPanel();
+        var title=new TextBlock {Text=caption,FontSize=19,FontWeight=FontWeights.SemiBold,
+            Foreground=secondary,Margin=new Thickness(22,16,22,16),TextWrapping=TextWrapping.Wrap};
+        title.MouseLeftButtonDown+=(_,_)=>{try{dialog.DragMove();}catch(InvalidOperationException){}};
+        DockPanel.SetDock(title,Dock.Top);root.Children.Add(title);
+        var close=MakeButton("OK",panel,fg,accent);
+        close.Width=110;close.Height=40;close.IsDefault=true;close.IsCancel=true;
+        close.HorizontalAlignment=HorizontalAlignment.Right;close.Margin=new Thickness(18,10,22,18);
+        close.Click+=(_,_)=>dialog.Close();
+        DockPanel.SetDock(close,Dock.Bottom);root.Children.Add(close);
+        var stack=new StackPanel{Margin=new Thickness(0,0,12,0)};
+        var scroll=new ScrollViewer{Content=stack,Margin=new Thickness(20,0,10,0),
+            VerticalScrollBarVisibility=ScrollBarVisibility.Auto,HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
+            MaxHeight=Math.Max(160,dialog.MaxHeight-150)};
+        if(owner.TryFindResource(typeof(ScrollBar)) is Style style){
+            scroll.Resources[typeof(ScrollBar)]=style;
+            scroll.Resources["ScrollRailBrush"]=R("ScrollRailBrush",panel);
+            scroll.Resources["ScrollThumbBrush"]=R("ScrollThumbBrush",accent);
+        }
+        TextBlock Label(string value,Brush brush,double size=14)=>new TextBlock{
+            Text=value,Foreground=brush,FontSize=size,TextWrapping=TextWrapping.Wrap,
+            VerticalAlignment=VerticalAlignment.Center};
+        foreach(var block in report.Split(new[]{"\n\n"},StringSplitOptions.RemoveEmptyEntries)){
+            var lines=block.Split('\n');
+            var section=new StackPanel();
+            foreach(var line in lines){
+                int split=line.IndexOf(": ",StringComparison.Ordinal);
+                string value=split>=0?line.Substring(split+2):"";
+                bool Has(string[] values)=>Array.Exists(values,x=>string.Equals(x,value,StringComparison.Ordinal));
+                bool ok=Has(good), idle=Has(neutral), warn=Has(warning), error=Has(bad);
+                if(split>=0&&(ok||idle||warn||error)){
+                    var row=new Grid{Margin=new Thickness(0,5,0,5)};
+                    row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+                    row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+                    row.Children.Add(Label(line.Substring(0,split),fg));
+                    var color=ok?new SolidColorBrush(light?Color.FromRgb(0,110,62):Color.FromRgb(110,230,166)):
+                        warn?new SolidColorBrush(light?Color.FromRgb(145,83,0):Color.FromRgb(255,205,91)):
+                        error?new SolidColorBrush(light?Color.FromRgb(170,25,48):Color.FromRgb(255,119,149)):fg;
+                    var status=Label((ok?"✓  ":warn?"!  ":error?"×  ":"–  ")+value,color);
+                    status.TextAlignment=TextAlignment.Right;status.Margin=new Thickness(10,0,0,0);
+                    Grid.SetColumn(status,1);row.Children.Add(status);section.Children.Add(row);
+                }else{
+                    bool heading=lines.Length>1&&line==lines[0]&&split<0;
+                    var label=Label(line,heading?secondary:fg,heading?15:13);
+                    if(heading)label.FontWeight=FontWeights.SemiBold;
+                    label.Margin=new Thickness(0,3,0,heading?9:3);
+                    section.Children.Add(label);
+                }
+            }
+            stack.Children.Add(new Border{Child=section,Background=panel,BorderBrush=accent,
+                BorderThickness=new Thickness(0.7),CornerRadius=new CornerRadius(9),
+                Padding=new Thickness(14,10,14,10),Margin=new Thickness(0,0,0,9)});
+        }
+        root.Children.Add(scroll);
+        dialog.Content=new Border{Child=root,Background=bg,BorderBrush=accent,
+            BorderThickness=new Thickness(1.6),CornerRadius=new CornerRadius(12)};
+        dialog.ShowDialog();
+    }
+
     private static Button MakeButton(string label, Brush background, Brush foreground, Brush border)
     {
         var button = new Button
