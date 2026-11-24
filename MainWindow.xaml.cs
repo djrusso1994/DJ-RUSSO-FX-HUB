@@ -1262,6 +1262,21 @@ public partial class MainWindow : Window
   for(int i=0;i<lines.Length;i++){
    var line=lines[i].Trim();
    if(string.IsNullOrWhiteSpace(line))continue;
+   if(line=="https://github.com/djrusso1994/DJ-RUSSO-FX-HUB"){
+    var link=new System.Windows.Documents.Hyperlink(new System.Windows.Documents.Run(line)){
+     NavigateUri=new Uri(line),Foreground=(Brush)FindResource("SecondaryBrush"),
+     Cursor=System.Windows.Input.Cursors.Hand
+    };
+    link.RequestNavigate+=(_,args)=>{
+     args.Handled=true;
+     try{Process.Start(new ProcessStartInfo(args.Uri.AbsoluteUri){UseShellExecute=true});}
+     catch(Exception ex){NeonDialog.Show(dialog,ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
+    };
+    var linkText=new TextBlock{TextWrapping=TextWrapping.Wrap,FontSize=14,Margin=new Thickness(0,0,0,4)};
+    linkText.Inlines.Add(link);
+    guideBody.Children.Add(linkText);
+    continue;
+   }
    bool heading=i==0 || (line.Any(char.IsLetter) && line==line.ToUpperInvariant() && !line.StartsWith("https://",StringComparison.OrdinalIgnoreCase));
    guideBody.Children.Add(new TextBlock{
     Text=line,TextWrapping=TextWrapping.Wrap,
