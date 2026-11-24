@@ -160,6 +160,13 @@ internal static class NeonDialog
             MaxHeight = 365,
             MaxWidth = 510
         };
+        // Reuse the exact main-window scrollbar template and current theme brushes.
+        if (owner?.TryFindResource(typeof(ScrollBar)) is Style scrollStyle)
+        {
+            messageScroll.Resources[typeof(ScrollBar)] = scrollStyle;
+            messageScroll.Resources["ScrollRailBrush"] = Resource("ScrollRailBrush", panel);
+            messageScroll.Resources["ScrollThumbBrush"] = Resource("ScrollThumbBrush", accent);
+        }
         messageScroll.Content = new TextBlock
         {
             Text = message ?? "",
