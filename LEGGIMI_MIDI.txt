@@ -1,1 +1,0 @@
-24 MIDI originali nella cartella ChipMusic/MIDI. I WAV nella cartella ChipMusic sono rendering 8-bit degli stessi brani e sono riprodotti automaticamente dal NEON CHIP PLAYER. I MIDI possono essere aperti e modificati in una DAW. Nessun brano commerciale è stato copiato.
