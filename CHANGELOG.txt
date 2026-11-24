@@ -1,12 +1,13 @@
-v0.8.40 - REVERB X v1.3 integration (staging; not yet published)
-- The 25,455,616-byte REVERB X VST3 payload has now been uploaded to the staging branch; SHA-256 verification and Windows tests are required before release.
-- Added independent REVERB X v1.3 VST3 installer with pinned SHA-256 and safe install/remove behavior.
-- Kept the existing REVERB X card in its original catalog position and reused Assets/reverb-x.png.
-- Updated product panel, version and available status; installer controls require the exact verified payload.
-- Added Reverb X to package manifests and plugin update catalog without claiming automatic plugin updates.
-- Windows build is blocked if the REVERB X payload is absent or its SHA-256 does not match.
-- Existing FX SHELL, METER X, DSP and unrelated cards are unchanged.
-- This branch is staging only; requires payload commit, Windows build, installer test and release approval.
+v0.8.40 - REVERB X v1.3 and safe VST3 conflict handling (released 24 November 2026)
+- Published official Windows x64 v0.8.40 installer on GitHub Releases.
+- Added independent REVERB X v1.3 VST3 installation and removal with pinned SHA-256 validation; reused its original Neon Ghost logo in the existing catalog position.
+- Added REVERB X to software detection, install-all/remove-all actions, diagnostics and bundled package validation.
+- VST3 card and detail panel distinguish managed installations, external matching binaries and conflicting or modified files.
+- Added localized Resolve Conflict guidance and an optional shortcut to open the standard VST3 folder; existing files are never automatically overwritten or deleted to resolve a conflict.
+- Refined the in-app guide's typography, layout, theme-consistent scrollbar and clickable GitHub support link.
+- Improved multilingual status labels, bulk-operation results, confirmation wording and plugin-update notifications in English, Italian, Spanish, French and German.
+- Preserved the existing FX SHELL, METER X and unrelated plugin DSP and file identities.
+- The staging PR #21 was merged after Windows build and user functional tests; this is a public stable release.
 
 v0.8.38 - Clean future-plugin logo transparency (22 November 2026)
 - Inspected the original PNG assets of all 10 "Coming soon / In arrivo" products.
