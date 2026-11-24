@@ -9,7 +9,7 @@
 
 [**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Latest stable release v0.8.40](https://img.shields.io/badge/Latest%20stable-v0.8.40-BA68FF)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Latest stable release v0.8.40](Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 </div>
 
