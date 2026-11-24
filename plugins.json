@@ -57,7 +57,7 @@
     "id": "delay-x",
     "name": "DELAY X",
     "category": "Spatial",
-    "status": "Planned"
+    "status": "Ready for testing"
   },
   {
     "id": "drive-x",

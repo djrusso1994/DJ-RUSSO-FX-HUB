@@ -9,6 +9,8 @@ public partial class App : Application
             Environment.Exit(ShellInstaller.RunElevatedWorker(e.Args[0]));
         if (e.Args.Length == 1 && ReverbInstaller.IsWorkerArgument(e.Args[0]))
             Environment.Exit(ReverbInstaller.RunElevatedWorker(e.Args[0]));
+        if (e.Args.Length == 1 && DelayInstaller.IsWorkerArgument(e.Args[0]))
+            Environment.Exit(DelayInstaller.RunElevatedWorker(e.Args[0]));
         base.OnStartup(e);
     }
 }

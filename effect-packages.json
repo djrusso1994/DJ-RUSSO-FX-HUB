@@ -16,6 +16,13 @@
       "effectIds": [
         "reverb-x"
       ]
+    },
+    {
+      "id": "delay-x",
+      "detector": "bundled-delay-sha256",
+      "effectIds": [
+        "delay-x"
+      ]
     }
   ]
 }

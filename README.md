@@ -27,6 +27,10 @@ Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it 
 |:---:|:---:|
 | [![DJ RUSSO METER X](screenshots/03-meter-x.png)](screenshots/03-meter-x.png) | [![DJ RUSSO FX HUB — Dark Professional](screenshots/04-dark-professional.png)](screenshots/04-dark-professional.png) |
 
+## v0.8.41 development build (pending Windows testing)
+
+DELAY X v1.3 is integrated as an independent VST3 with its original logo, SHA-256 verification, safe conflict handling, individual and bulk install/remove, detection, diagnostics and plugin-update catalog support. Six of fourteen tools are available in this development build. The latest public stable release remains v0.8.40 until testing and approval.
+
 ## Included tools
 
 **Five available audio tools** are managed through one Windows application:

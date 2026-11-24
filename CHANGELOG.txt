@@ -1,3 +1,9 @@
+v0.8.41 - DELAY X v1.3 integration (development build, pending Windows testing)
+- Added independent DELAY X VST3 installation, removal and SHA-256 verification, with the original logo in its existing catalog position.
+- Included DELAY X in detection, diagnostics, bulk operations, conflict handling, update catalog and localized guide. Six of fourteen tools available.
+- Corrected detection summary to list only FX SHELL effects under FX SHELL.
+- Preserved existing VST3 binaries and DSP. Public release requires user approval after testing.
+
 v0.8.40 - REVERB X v1.3 and safe VST3 conflict handling (released 24 November 2026)
 - Published official Windows x64 v0.8.40 installer on GitHub Releases.
 - Added independent REVERB X v1.3 VST3 installation and removal with pinned SHA-256 validation; reused its original Neon Ghost logo in the existing catalog position.
