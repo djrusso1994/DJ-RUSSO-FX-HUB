@@ -1257,18 +1257,34 @@ public partial class MainWindow : Window
   var header=new TextBlock {Text=T("guide"),FontSize=21,FontWeight=FontWeights.Bold,
    Foreground=(Brush)FindResource("SecondaryBrush"),Margin=new Thickness(0,0,0,12)};
   DockPanel.SetDock(header,Dock.Top);layout.Children.Add(header);
-  var content=new TextBox {
-   Text=GuideTexts[Index],IsReadOnly=true,TextWrapping=TextWrapping.Wrap,
+  var guideBody=new StackPanel {Margin=new Thickness(20,18,18,20)};
+  var lines=GuideTexts[Index].Split('\n');
+  for(int i=0;i<lines.Length;i++){
+   var line=lines[i].Trim();
+   if(string.IsNullOrWhiteSpace(line))continue;
+   bool heading=i==0 || (line.Any(char.IsLetter) && line==line.ToUpperInvariant() && !line.StartsWith("https://",StringComparison.OrdinalIgnoreCase));
+   guideBody.Children.Add(new TextBlock{
+    Text=line,TextWrapping=TextWrapping.Wrap,
+    FontFamily=new FontFamily("Segoe UI"),FontSize=i==0?19:heading?15:14,
+    FontWeight=heading?FontWeights.SemiBold:FontWeights.Normal,
+    Foreground=(Brush)FindResource(heading?"SecondaryBrush":"FgBrush"),
+    LineHeight=22,LineStackingStrategy=LineStackingStrategy.BlockLineHeight,
+    Margin=heading?new Thickness(0,i==0?0:16,0,6):new Thickness(0,0,0,4)
+   });
+  }
+  var guideScroll=new ScrollViewer{
    VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
    HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
-   Background=(Brush)FindResource("PanelBrush"),
-   Foreground=(Brush)FindResource("FgBrush"),
-   BorderBrush=(Brush)FindResource("AccentBrush"),
-   FontFamily=new FontFamily("Segoe UI"),FontSize=14,
-   Padding=new Thickness(14)
+   Content=guideBody,Margin=new Thickness(0,0,5,0)
   };
-  // Keep the existing Guide scrollbar and read-only content unchanged.
-  content.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=(Style)FindResource("NeonGuideScrollBar");
+  guideScroll.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=(Style)FindResource("NeonGuideScrollBar");
+  guideScroll.Resources["ScrollRailBrush"]=FindResource("ScrollRailBrush");
+  guideScroll.Resources["ScrollThumbBrush"]=FindResource("ScrollThumbBrush");
+  var content=new Border{
+   Background=(Brush)FindResource("PanelBrush"),
+   BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1),
+   CornerRadius=new CornerRadius(8),Child=guideScroll
+  };
   layout.Children.Add(content);root.Children.Add(layout);frame.Child=root;dialog.Content=frame;
   dialog.ShowDialog();
  }
