@@ -125,3 +125,13 @@ Windows Release build and runtime verification required.
 v0.8.5: Social icon-only vector buttons; custom ComboBox selected-state styling for contrast. Logos are vector approximations, not official brand assets. Windows build pending.
 
 FIX1: Rebuilt ComboBox ToggleButton control template to avoid deferred XAML deserialization error at startup; retained social vector buttons. Requires Windows runtime verification.
+
+
+Historical development notes (consolidated from legacy TXT files)
+- v0.6.4: integrated METER X v1.2.6 portable payload; existing executable was not automatically overwritten.
+- v0.7.5: corrected invisible sidebar labels while retaining signing configuration.
+- v0.8.0: cached frozen catalog images, debounced search by 250 ms and disposed the timer on window close.
+- v0.8.4: removed decorative HOME panel and localized product filters in five languages.
+- FIX3: isolated startup issues by reverting custom ComboBox templates and temporarily using lightweight social PNG icons.
+- Chip player: expanded from 24 to 40 original procedural compositions, with pre-rendered 16 kHz mono PCM WAV and editable MIDI; eight musical families.
+- Earlier manual METER X import instructions and old guide files are superseded by the current bundled installer and README.
