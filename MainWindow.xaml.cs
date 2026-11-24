@@ -500,8 +500,10 @@ public partial class MainWindow : Window
    messages.Add("DELAY X: "+BulkStatus("already"));
   else messages.Add("DELAY X: "+BulkStatus("conflict"));
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
-  Refresh();
+  // Present the completed operation before rebuilding the product cards.
+  try{
   NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information,operation:"install",successfulStatuses:new[]{BulkStatus("installed"),BulkStatus("already")});
+  }finally{Refresh();}
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
@@ -534,8 +536,10 @@ public partial class MainWindow : Window
    try{File.Delete(MeterExePath);messages.Add("METER X: "+BulkStatus("removed"));}
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
   }else messages.Add("METER X: "+BulkStatus("notInstalled"));
-  Refresh();
+  // Present the completed operation before rebuilding the product cards.
+  try{
   NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information,operation:"remove",successfulStatuses:new[]{BulkStatus("removed")});
+  }finally{Refresh();}
  }
  private int RunElevated(string operation)
  {
