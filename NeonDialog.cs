@@ -113,11 +113,12 @@ internal static class NeonDialog
         DockPanel.SetDock(header, Dock.Top);
         root.Children.Add(header);
 
-        var row = new StackPanel
+        var row = new Grid
         {
-            Orientation = Orientation.Horizontal,
-            Margin = new Thickness(24, 24, 24, 20)
+            Margin = new Thickness(24, 24, 14, 20)
         };
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+        row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
         string glyphPath = image switch
         {
             MessageBoxImage.Warning => "M10,1 L19,18 H1 Z M10,7 V12 M10,15 V16",
@@ -158,7 +159,7 @@ internal static class NeonDialog
             VerticalScrollBarVisibility = ScrollBarVisibility.Auto,
             HorizontalScrollBarVisibility = ScrollBarVisibility.Disabled,
             MaxHeight = 365,
-            MaxWidth = 510
+            HorizontalAlignment = HorizontalAlignment.Stretch
         };
         // Reuse the exact main-window scrollbar template and current theme brushes.
         if (owner?.TryFindResource(typeof(ScrollBar)) is Style scrollStyle)
@@ -174,9 +175,9 @@ internal static class NeonDialog
             FontSize = 15,
             TextWrapping = TextWrapping.Wrap,
             LineHeight = 24,
-            MinWidth = 330,
-            MaxWidth = 490
+            Margin = new Thickness(0, 0, 16, 0)
         };
+        Grid.SetColumn(messageScroll, 1);
         row.Children.Add(messageScroll);
         DockPanel.SetDock(row, Dock.Top);
         root.Children.Add(row);
