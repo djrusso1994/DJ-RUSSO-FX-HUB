@@ -253,9 +253,15 @@ internal static class NeonDialog
         var accent=R("AccentBrush", Brushes.MediumPurple);
         var secondary=R("SecondaryBrush", fg);
         bool light=bg is SolidColorBrush b && (b.Color.R*0.2126+b.Color.G*0.7152+b.Color.B*0.0722)>150;
+        if(caption.StartsWith("DJ RUSSO • ",StringComparison.Ordinal))caption=caption.Substring("DJ RUSSO • ".Length);
+        var cardSurface=panel;
+        if(!light && panel is SolidColorBrush p && bg is SolidColorBrush baseBrush){
+            byte Blend(byte x,byte y)=>(byte)(x*0.82+y*0.18);
+            cardSurface=new SolidColorBrush(Color.FromRgb(Blend(p.Color.R,baseBrush.Color.R),Blend(p.Color.G,baseBrush.Color.G),Blend(p.Color.B,baseBrush.Color.B)));
+        }
         var dialog=new Window {
             Owner=owner, Title=caption, Width=780, MaxWidth=Math.Max(320,owner.ActualWidth-24),
-            MaxHeight=Math.Max(300,Math.Min(760,SystemParameters.WorkArea.Height-48)),
+            MaxHeight=Math.Max(300,Math.Min(880,SystemParameters.WorkArea.Height-48)),
             SizeToContent=SizeToContent.Height, WindowStartupLocation=WindowStartupLocation.CenterOwner,
             WindowStyle=WindowStyle.None, AllowsTransparency=true, Background=Brushes.Transparent,
             ResizeMode=ResizeMode.NoResize, ShowInTaskbar=false, Foreground=fg,
@@ -263,9 +269,14 @@ internal static class NeonDialog
         };
         var root=new DockPanel();
         var title=new TextBlock {Text=caption,FontSize=23,FontWeight=FontWeights.SemiBold,
-            Foreground=secondary,Margin=new Thickness(22,16,22,16),TextWrapping=TextWrapping.Wrap};
-        title.MouseLeftButtonDown+=(_,_)=>{try{dialog.DragMove();}catch(InvalidOperationException){}};
-        DockPanel.SetDock(title,Dock.Top);root.Children.Add(title);
+            Foreground=secondary,Margin=new Thickness(12,0,0,0),TextWrapping=TextWrapping.Wrap};
+        var header=new StackPanel{Orientation=Orientation.Horizontal,Margin=new Thickness(22,16,22,14)};
+        header.Children.Add(new Path{Data=Geometry.Parse("M1,10 H5 L8,3 L12,17 L15,10 H20"),Stroke=secondary,
+            StrokeThickness=1.8,StrokeLineJoin=PenLineJoin.Round,StrokeStartLineCap=PenLineCap.Round,
+            StrokeEndLineCap=PenLineCap.Round,Width=25,Height=25,Stretch=Stretch.Uniform,VerticalAlignment=VerticalAlignment.Center});
+        header.Children.Add(title);
+        header.MouseLeftButtonDown+=(_,_)=>{try{dialog.DragMove();}catch(InvalidOperationException){}};
+        DockPanel.SetDock(header,Dock.Top);root.Children.Add(header);
         int language=owner is MainWindow mw?mw.DialogLanguageIndex:0;
         var close=MakeButton(new[]{"Close","Chiudi","Cerrar","Fermer","Schließen"}[language],panel,fg,accent);
         close.Width=110;close.Height=40;close.IsDefault=true;close.IsCancel=true;
@@ -304,10 +315,10 @@ internal static class NeonDialog
             var summary=new UniformGrid{Columns=3,Margin=new Thickness(0,0,0,14)};
             void Metric(string number,string label,Brush color){
                 var content=new StackPanel();
-                var count=Label(number,color,27);count.FontWeight=FontWeights.SemiBold;
-                content.Children.Add(count);content.Children.Add(Label(label,muted,12));
-                summary.Children.Add(new Border{Child=content,Background=panel,CornerRadius=new CornerRadius(10),
-                    BorderBrush=subtle,BorderThickness=new Thickness(1),Padding=new Thickness(13),Margin=new Thickness(3,0,3,0)});
+                var count=Label(number,color,30);count.FontWeight=FontWeights.SemiBold;
+                content.Children.Add(count);content.Children.Add(Label(label,muted,13));
+                summary.Children.Add(new Border{Child=content,Background=cardSurface,CornerRadius=new CornerRadius(10),
+                    BorderBrush=subtle,BorderThickness=new Thickness(1),Padding=new Thickness(12,9,12,9),Margin=new Thickness(3,0,3,0)});
             }
             Metric(installed+"/"+(components.Length-1),new[]{"Installed packages","Pacchetti installati","Paquetes instalados","Paquets installés","Installierte Pakete"}[language],secondary);
             Metric(valid+"/"+(packages.Length-1),new[]{"Valid integrity","Integrità valida","Integridad válida","Intégrité valide","Integrität gültig"}[language],valid==packages.Length-1?success:fg);
@@ -323,7 +334,7 @@ internal static class NeonDialog
                 bool Has(string[] values)=>Array.Exists(values,x=>string.Equals(x,value,StringComparison.Ordinal));
                 bool ok=Has(good), idle=Has(neutral), warn=Has(warning), error=Has(bad);
                 if(split>=0&&(ok||idle||warn||error)){
-                    var row=new Grid{Margin=new Thickness(0,8,0,8)};
+                    var row=new Grid{Margin=new Thickness(0,5,0,5)};
                     row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
                     row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
                     var name=line.Substring(0,split);
@@ -346,9 +357,13 @@ internal static class NeonDialog
                     var color=ok?new SolidColorBrush(light?Color.FromRgb(0,110,62):Color.FromRgb(110,230,166)):
                         warn?new SolidColorBrush(light?Color.FromRgb(145,83,0):Color.FromRgb(255,205,91)):
                         error?new SolidColorBrush(light?Color.FromRgb(170,25,48):Color.FromRgb(255,119,149)):fg;
-                    var status=Label((ok?"✓  ":warn?"!  ":error?"×  ":"–  ")+value,color);
-                    status.TextAlignment=TextAlignment.Right;status.Margin=new Thickness(10,0,0,0);
-                    Grid.SetColumn(status,1);row.Children.Add(status);section.Children.Add(row);
+                    var displayValue=idle&&name.StartsWith("METER X",StringComparison.Ordinal)&&language==1&&value=="Mancante"?"Non installato":value;
+                    var status=Label((ok?"✓  ":warn?"!  ":error?"×  ":"–  ")+displayValue,idle?muted:color,13);
+                    status.TextAlignment=TextAlignment.Right;
+                    var pill=new Border{Child=status,Background=bg,BorderBrush=subtle,BorderThickness=new Thickness(1),
+                        CornerRadius=new CornerRadius(8),Padding=new Thickness(9,4,9,4),Margin=new Thickness(10,0,0,0),
+                        HorizontalAlignment=HorizontalAlignment.Right,VerticalAlignment=VerticalAlignment.Center};
+                    Grid.SetColumn(pill,1);row.Children.Add(pill);section.Children.Add(row);
                 }else{
                     bool heading=lines.Length>1&&line==lines[0]&&split<0;
                     var label=Label(line,heading?secondary:fg,heading?16:13);
@@ -357,7 +372,7 @@ internal static class NeonDialog
                     section.Children.Add(label);
                 }
             }
-            stack.Children.Add(new Border{Child=section,Background=panel,BorderBrush=subtle,
+            stack.Children.Add(new Border{Child=section,Background=cardSurface,BorderBrush=subtle,
                 BorderThickness=new Thickness(1),CornerRadius=new CornerRadius(9),
                 Padding=new Thickness(14,10,14,10),Margin=new Thickness(0,0,0,9)});
         }
