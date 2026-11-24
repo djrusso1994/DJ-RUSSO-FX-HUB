@@ -1,6 +1,0 @@
-METER X non è ancora compilato in questo ZIP.
-Compila METER_X_v1_2_1_SOURCE_TO_COMPILE.zip in Visual Studio.
-Nell’HUB premi IMPORTA EXE e seleziona il file eseguibile compilato.
-AVVIA apre la copia portable importata. RIMUOVI cancella solo la copia importata dall’HUB.
-Il backup del precedente EXE importato viene salvato con estensione .bak.
-La compatibilità e il funzionamento dell’EXE richiedono test sul PC.
