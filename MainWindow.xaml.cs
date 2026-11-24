@@ -458,7 +458,7 @@ public partial class MainWindow : Window
   if(NeonDialog.Show(this,Index==1?
      "Installare FX SHELL, REVERB X, DELAY X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.":
      "Install available FX SHELL, REVERB X, DELAY X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
-     "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+     "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   var state=ShellInstaller.GetState();
   if(state==ShellInstaller.State.Missing){
@@ -501,13 +501,13 @@ public partial class MainWindow : Window
   else messages.Add("DELAY X: "+BulkStatus("conflict"));
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
   Refresh();
-  NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information,operation:"install",successfulStatuses:new[]{BulkStatus("installed"),BulkStatus("already")});
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,Index==1?
      "Rimuovere FX SHELL, REVERB X, DELAY X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
      "Remove HUB-managed FX SHELL, REVERB X, DELAY X and METER X? External files are untouched. Close FL Studio and METER X.",
-     "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+     "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   if(ShellInstaller.GetState()==ShellInstaller.State.Managed){
    var result=RunElevated(ShellInstaller.RemoveArgument);
@@ -535,7 +535,7 @@ public partial class MainWindow : Window
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
   }else messages.Add("METER X: "+BulkStatus("notInstalled"));
   Refresh();
-  NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,string.Join("\n",messages),"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Information,operation:"remove",successfulStatuses:new[]{BulkStatus("removed")});
  }
  private int RunElevated(string operation)
  {
@@ -987,7 +987,7 @@ public partial class MainWindow : Window
  }
  private void InstallSelectedReverb(){
   if(ReverbInstaller.GetState()!=ReverbInstaller.State.Missing || !ReverbInstaller.HasExpectedPayload())return;
-  if(NeonDialog.Show(this,Index==1?"Installare REVERB X v1.3? Chiudi FL Studio.":"Install REVERB X v1.3? Close FL Studio.","REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,Index==1?"Installare REVERB X v1.3? Chiudi FL Studio.":"Install REVERB X v1.3? Close FL Studio.","REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ReverbInstaller.InstallArgument);
   if(result==0){try{ReverbInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"REVERB X");}}
   else NeonDialog.Show(this,"REVERB X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","REVERB X");
@@ -995,7 +995,7 @@ public partial class MainWindow : Window
  }
  private void InstallSelectedDelay(){
   if(DelayInstaller.GetState()!=DelayInstaller.State.Missing || !DelayInstaller.HasExpectedPayload())return;
-  if(NeonDialog.Show(this,new[]{"Install DELAY X v1.3? Close FL Studio.","Installare DELAY X v1.3? Chiudi FL Studio.","¿Instalar DELAY X v1.3? Cierra FL Studio.","Installer DELAY X v1.3 ? Fermez FL Studio.","DELAY X v1.3 installieren? FL Studio schließen."}[Index],"DELAY X",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,new[]{"Install DELAY X v1.3? Close FL Studio.","Installare DELAY X v1.3? Chiudi FL Studio.","¿Instalar DELAY X v1.3? Cierra FL Studio.","Installer DELAY X v1.3 ? Fermez FL Studio.","DELAY X v1.3 installieren? FL Studio schließen."}[Index],"DELAY X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   int result=RunElevated(DelayInstaller.InstallArgument);
   if(result==0){try{DelayInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"DELAY X");}}
   else NeonDialog.Show(this,"DELAY X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","DELAY X");
@@ -1003,7 +1003,7 @@ public partial class MainWindow : Window
  }
  private void InstallSelectedShell(){
   if(ShellInstaller.GetState()!=ShellInstaller.State.Missing || !ShellInstaller.HasExpectedPayload())return;
-  if(NeonDialog.Show(this,Index==1?"Installare FX SHELL con Sidechain X, Reverse FX e Stutter FX? Chiudi FL Studio.":"Install FX SHELL including Sidechain X, Reverse FX and Stutter FX? Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,Index==1?"Installare FX SHELL con Sidechain X, Reverse FX e Stutter FX? Chiudi FL Studio.":"Install FX SHELL including Sidechain X, Reverse FX and Stutter FX? Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.InstallArgument);
   if(result==0){try{ShellInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"FX SHELL");}}
   else NeonDialog.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
@@ -1014,7 +1014,7 @@ public partial class MainWindow : Window
   if(selectedProductId=="reverb-x"){RemoveSelectedReverb();return;}
   if(selectedProductId=="delay-x"){RemoveSelectedDelay();return;}
   if(!IsShellProduct(selectedProductId) || ShellInstaller.GetState()!=ShellInstaller.State.Managed)return;
-  if(NeonDialog.Show(this,Index==1?"Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.":"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,Index==1?"Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.":"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.RemoveArgument);
   if(result==0){try{ShellInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"FX SHELL");}}
   else NeonDialog.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
@@ -1022,7 +1022,7 @@ public partial class MainWindow : Window
  }
  private void RemoveSelectedReverb(){
   if(ReverbInstaller.GetState()!=ReverbInstaller.State.Managed)return;
-  if(NeonDialog.Show(this,Index==1?"Rimuovere REVERB X installato dall\'HUB? Chiudi FL Studio.":"Remove HUB-managed REVERB X? Close FL Studio.","REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,Index==1?"Rimuovere REVERB X installato dall\'HUB? Chiudi FL Studio.":"Remove HUB-managed REVERB X? Close FL Studio.","REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ReverbInstaller.RemoveArgument);
   if(result==0){try{ReverbInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"REVERB X");}}
   else NeonDialog.Show(this,"REVERB X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","REVERB X");
@@ -1030,7 +1030,7 @@ public partial class MainWindow : Window
  }
  private void RemoveSelectedDelay(){
   if(DelayInstaller.GetState()!=DelayInstaller.State.Managed)return;
-  if(NeonDialog.Show(this,new[]{"Remove HUB-managed DELAY X? Close FL Studio.","Rimuovere DELAY X installato dall’HUB? Chiudi FL Studio.","¿Eliminar DELAY X gestionado por el HUB? Cierra FL Studio.","Supprimer DELAY X géré par le HUB ? Fermez FL Studio.","Vom HUB verwaltetes DELAY X entfernen? FL Studio schließen."}[Index],"DELAY X",MessageBoxButton.YesNo,MessageBoxImage.Warning)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,new[]{"Remove HUB-managed DELAY X? Close FL Studio.","Rimuovere DELAY X installato dall’HUB? Chiudi FL Studio.","¿Eliminar DELAY X gestionado por el HUB? Cierra FL Studio.","Supprimer DELAY X géré par le HUB ? Fermez FL Studio.","Vom HUB verwaltetes DELAY X entfernen? FL Studio schließen."}[Index],"DELAY X",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   int result=RunElevated(DelayInstaller.RemoveArgument);
   if(result==0){try{DelayInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"DELAY X");}}
   else NeonDialog.Show(this,"DELAY X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","DELAY X");
@@ -1044,7 +1044,7 @@ public partial class MainWindow : Window
   if(File.Exists(MeterExePath)){NeonToast.Show(this,Index==1?"METER X è già installato.":"METER X is already installed.");return;}
   InstallMeterFile(out var detail);
   Refresh();
-  NeonDialog.Show(this,detail,"METER X",MessageBoxButton.OK,MessageBoxImage.Information);
+  NeonDialog.Show(this,detail,"METER X",MessageBoxButton.OK,MessageBoxImage.Information,operation:"install",successfulStatuses:new[]{BulkStatus("installed"),BulkStatus("already")});
  }
  private void MeterLaunch_Click(object sender,RoutedEventArgs e){
   try{if(File.Exists(MeterExePath))Process.Start(new ProcessStartInfo{FileName=MeterExePath,WorkingDirectory=Path.GetDirectoryName(MeterExePath)!,UseShellExecute=true});}
@@ -1053,7 +1053,7 @@ public partial class MainWindow : Window
  private void MeterRemove_Click(object sender,RoutedEventArgs e){
   if(!File.Exists(MeterExePath))return;
   var msg=Index==1?"Rimuovere solo la copia di METER X importata nell'HUB?":"Remove only the HUB-imported METER X copy?";
-  if(NeonDialog.Show(this,msg,"METER X",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,msg,"METER X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"remove")!=MessageBoxResult.Yes)return;
   try{File.Delete(MeterExePath);Refresh();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
 
