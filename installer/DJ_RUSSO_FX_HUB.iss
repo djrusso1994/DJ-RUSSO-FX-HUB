@@ -1,6 +1,6 @@
 #define MyAppName "DJ RUSSO FX HUB"
 #ifndef MyAppVersion
-  #define MyAppVersion "0.8.39"
+  #define MyAppVersion "0.8.40"
 #endif
 #define MyAppExeName "DJRussoFXHub.exe"
 

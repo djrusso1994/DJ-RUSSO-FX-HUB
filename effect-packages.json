@@ -9,6 +9,13 @@
         "reverse-fx",
         "stutter-fx"
       ]
+    },
+    {
+      "id": "reverb-x",
+      "detector": "bundled-reverb-sha256",
+      "effectIds": [
+        "reverb-x"
+      ]
     }
   ]
 }
