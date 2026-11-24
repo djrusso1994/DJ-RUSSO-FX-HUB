@@ -19,7 +19,7 @@ internal static class NeonDialog
         => Show(Application.Current?.MainWindow, message, caption, buttons, image);
 
     public static MessageBoxResult Show(Window? owner, string message, string caption = "",
-        MessageBoxButton buttons = MessageBoxButton.OK, MessageBoxImage image = MessageBoxImage.None)
+        MessageBoxButton buttons = MessageBoxButton.OK, MessageBoxImage image = MessageBoxImage.None, string? operation = null, string[]? successfulStatuses = null)
     {
         Brush Resource(string name, Brush fallback)
             => owner?.TryFindResource(name) as Brush ?? fallback;
@@ -31,6 +31,18 @@ internal static class NeonDialog
         var accent = Resource("AccentBrush", new SolidColorBrush(Color.FromRgb(163, 106, 255)));
         var cyan = Resource("SecondaryBrush", new SolidColorBrush(Color.FromRgb(125, 239, 255)));
 
+        int lang=owner is MainWindow window?window.DialogLanguageIndex:0;
+        bool removal=operation=="remove";
+        bool confirmation=operation!=null && buttons==MessageBoxButton.YesNo;
+        bool summary=operation!=null && buttons==MessageBoxButton.OK;
+        string action=removal?new[]{"Remove","Rimuovi","Eliminar","Supprimer","Entfernen"}[lang]:
+            new[]{"Install","Installa","Instalar","Installer","Installieren"}[lang];
+        if(operation!=null){
+            string product=caption=="DJ RUSSO FX HUB"?"":caption;
+            caption=confirmation?action+(product.Length>0?" "+product:" — "+new[]{"all packages","tutti i pacchetti","todos los paquetes","tous les paquets","alle Pakete"}[lang]):
+                (removal?new[]{"Removal report","Esito rimozione","Resultado de eliminación","Résultat de suppression","Entfernungsergebnis"}[lang]:
+                new[]{"Installation report","Esito installazione","Resultado de instalación","Résultat d’installation","Installationsergebnis"}[lang])+(product.Length>0?" • "+product:"");
+        }
         var result = buttons switch
         {
             MessageBoxButton.YesNo => MessageBoxResult.No,
@@ -83,7 +95,7 @@ internal static class NeonDialog
         var title = new TextBlock
         {
             Text = dialog.Title,
-            FontSize = 15,
+            FontSize = operation!=null?19:15,
             FontWeight = FontWeights.SemiBold,
             Foreground = cyan,
             Margin = new Thickness(21, 0, 10, 0),
@@ -177,6 +189,29 @@ internal static class NeonDialog
             LineHeight = 24,
             Margin = new Thickness(0, 0, 16, 0)
         };
+        if(operation!=null){
+            var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
+            foreach(var line in (message??"").Split('\n')){
+                int separator=line.IndexOf(": ",StringComparison.Ordinal);
+                var text=new TextBlock{Text=line,Foreground=fg,FontSize=14,TextWrapping=TextWrapping.Wrap,LineHeight=22};
+                var item=new Border{Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(12),
+                    Margin=new Thickness(0,0,0,7),Child=text};
+                if(summary && separator>0){
+                    var status=line.Substring(separator+2);
+                    bool success=successfulStatuses!=null&&Array.Exists(successfulStatuses,x=>x==status);
+                    var grid=new Grid();
+                    grid.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+                    grid.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+                    text.Text=line.Substring(0,separator);text.FontWeight=FontWeights.SemiBold;
+                    grid.Children.Add(text);
+                    var statusText=new TextBlock{Text=(success?"✓  ":"")+status,TextWrapping=TextWrapping.Wrap,
+                        TextAlignment=TextAlignment.Right,Foreground=success?cyan:fg,FontSize=14,Margin=new Thickness(10,0,0,0)};
+                    Grid.SetColumn(statusText,1);grid.Children.Add(statusText);item.Child=grid;
+                }
+                content.Children.Add(item);
+            }
+            messageScroll.Content=content;
+        }
         Grid.SetColumn(messageScroll, 1);
         row.Children.Add(messageScroll);
         DockPanel.SetDock(row, Dock.Top);
@@ -218,8 +253,8 @@ internal static class NeonDialog
         switch (buttons)
         {
             case MessageBoxButton.YesNo:
-                Add(italian ? "No" : "No", MessageBoxResult.No, cancel: true);
-                Add(italian ? "Sì" : "Yes", MessageBoxResult.Yes, primary: true);
+                Add(confirmation?new[]{"Cancel","Annulla","Cancelar","Annuler","Abbrechen"}[lang]:"No", MessageBoxResult.No, cancel: true);
+                Add(confirmation?action:italian ? "Sì" : "Yes", MessageBoxResult.Yes, primary: true);
                 break;
             case MessageBoxButton.YesNoCancel:
                 Add(italian ? "Annulla" : "Cancel", MessageBoxResult.Cancel, cancel: true);
@@ -231,7 +266,7 @@ internal static class NeonDialog
                 Add("OK", MessageBoxResult.OK, primary: true);
                 break;
             default:
-                Add("OK", MessageBoxResult.OK, primary: true, cancel: true);
+                Add(summary?new[]{"Close","Chiudi","Cerrar","Fermer","Schließen"}[lang]:"OK", MessageBoxResult.OK, primary: true, cancel: true);
                 break;
         }
         DockPanel.SetDock(footer, Dock.Bottom);
