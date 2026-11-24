@@ -332,14 +332,15 @@ public partial class MainWindow : Window
          var logo=fx.id switch {"sidechain-x"=>Asset("sidechain"),"reverse-fx"=>Asset(theme=="light"?"reverse_light":"reverse"),"stutter-fx"=>Asset("stutter"),"meter-x"=>Asset("meter-x"),"reverb-x"=>Asset("logo-reverb-x"),_=>Asset(fx.id)};
          var category=fx.category switch {"Dynamics"=>"dynamics","Creative FX"=>"creative","Analysis"=>"analysis","Mastering"=>"mastering","Vocal"=>"vocal","EQ"=>"eq","Spatial"=>"spatial","Saturation"=>"saturation","AI Offline"=>"ai",_=>"creative"};
          bool installed=fx.id=="meter-x" ? File.Exists(MeterExePath) : fx.id=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : (!planned && verifiedIds.Contains(fx.id));
+         bool conflict=VstConflict(fx.id),external=VstExternal(fx.id);
          cards.Add(new PluginCard {
              Id=fx.id,IsSelected=fx.id==selectedProductId,IsReady=false,
-             BadgeSymbol=installed?"✓":planned?"…":"✕",
-             BadgeBrush=installed?System.Windows.Media.Brushes.LimeGreen:planned?System.Windows.Media.Brushes.MediumPurple:System.Windows.Media.Brushes.IndianRed,
-             BadgeTip=installed?(Index==1?"Installato e verificato":"Installed and verified"):
+             BadgeSymbol=conflict?"!":installed?"✓":planned?"…":"✕",
+             BadgeBrush=conflict?System.Windows.Media.Brushes.Orange:installed?System.Windows.Media.Brushes.LimeGreen:planned?System.Windows.Media.Brushes.MediumPurple:System.Windows.Media.Brushes.IndianRed,
+             BadgeTip=conflict?ConflictLabel:external?ExternalLabel:installed?(Index==1?"Installato e verificato":"Installed and verified"):
                  (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
              FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?103:77,LogoMaxWidth=planned?165:150,Category=T(category),
-             Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+(fx.id=="reverb-x"?ReverbInstaller.VersionLabel:ShellInstaller.VersionLabel)
+             Footer=fx.id=="meter-x"? ("v1.2.6 • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+(fx.id=="reverb-x"?ReverbInstaller.VersionLabel:ShellInstaller.VersionLabel)
          });
      }
      var term=ProductSearch?.Text?.Trim()??"";
@@ -811,6 +812,22 @@ public partial class MainWindow : Window
    Refresh();
   }
  }
+ private bool VstConflict(string id)=>id=="reverb-x"?ReverbInstaller.GetState() is ReverbInstaller.State.Conflict or ReverbInstaller.State.ModifiedManaged:IsShellProduct(id) && ShellInstaller.GetState() is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged;
+ private bool VstExternal(string id)=>id=="reverb-x"?ReverbInstaller.GetState()==ReverbInstaller.State.ExternalSameBinary:IsShellProduct(id) && ShellInstaller.GetState()==ShellInstaller.State.ExternalSameBinary;
+ private string ConflictLabel=>new[]{"VST3 conflict","Conflitto VST3","Conflicto VST3","Conflit VST3","VST3-Konflikt"}[Index];
+ private string ExternalLabel=>new[]{"Installed externally","Installato esternamente","Instalado externamente","Installé séparément","Extern installiert"}[Index];
+ private void ResolveVstConflict(){
+  var message=new[]{
+   "A different or modified VST3 already exists. Close your DAW, back up the existing plugin and move it outside the VST3 folder before retrying. No files will be changed automatically. Open the VST3 folder?",
+   "È presente un VST3 differente o modificato. Chiudi la DAW, salva una copia del plugin e spostalo fuori dalla cartella VST3 prima di riprovare. Nessun file verrà modificato automaticamente. Aprire la cartella VST3?",
+   "Existe un VST3 diferente o modificado. Cierra la DAW, guarda una copia y mueve el plugin fuera de la carpeta VST3 antes de reintentar. No se modificarán archivos automáticamente. ¿Abrir la carpeta VST3?",
+   "Un VST3 différent ou modifié existe. Fermez la STAN, sauvegardez le plugin et déplacez-le hors du dossier VST3 avant de réessayer. Aucun fichier ne sera modifié automatiquement. Ouvrir le dossier VST3 ?",
+   "Eine andere oder geänderte VST3-Datei ist vorhanden. DAW schließen, Plugin sichern und vor erneutem Versuch aus dem VST3-Ordner verschieben. Keine Dateien werden automatisch geändert. VST3-Ordner öffnen?"
+  }[Index];
+  if(NeonDialog.Show(this,message+"\n\n"+VstDir,ConflictLabel,MessageBoxButton.YesNo,MessageBoxImage.Warning)==MessageBoxResult.Yes){
+   try{Process.Start(new ProcessStartInfo(VstDir){UseShellExecute=true});}catch(Exception ex){NeonDialog.Show(this,ex.Message,ConflictLabel);}
+  }
+ }
  private void UpdateSelectedProductPanel(){
   var fx=plugins.FirstOrDefault(p=>p.id==selectedProductId);
   if(fx==null){selectedProductId="meter-x";fx=plugins.FirstOrDefault(p=>p.id=="meter-x");}
@@ -836,11 +853,15 @@ public partial class MainWindow : Window
   MeterPanelRemoveButton.Content=meter?(Index==1?"RIMUOVI METER X":"REMOVE METER X"):reverb?(Index==1?"RIMUOVI REVERB X":"REMOVE REVERB X"):(Index==1?"RIMUOVI FX SHELL":"REMOVE FX SHELL");
   MeterPanelLaunchButton.Content=Index==1?"▶  AVVIA":"▶  LAUNCH";
   MeterPanelInstallButton.IsEnabled=meter?(!installed && File.Exists(BundledMeterPath)):shell?(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()):reverb?(ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()):false;
+  if(VstConflict(fx.id)){
+   MeterPanelInstallButton.Content=new[]{"RESOLVE CONFLICT","RISOLVI CONFLITTO","RESOLVER CONFLICTO","RÉSOUDRE LE CONFLIT","KONFLIKT LÖSEN"}[Index];
+   MeterPanelInstallButton.IsEnabled=true;
+  }
   MeterPanelRemoveButton.IsEnabled=meter?installed:reverb?ReverbInstaller.GetState()==ReverbInstaller.State.Managed:shell && shellState==ShellInstaller.State.Managed;
   MeterPanelLaunchButton.Visibility=meter?Visibility.Visible:Visibility.Collapsed;
   MeterPanelLaunchButton.IsEnabled=meter && installed;
   MeterPanelRemoveButton.Visibility=meter||shell||reverb?Visibility.Visible:Visibility.Collapsed;
-  MeterPanelState.Text=installed?(Index==1?"● Installato":"● Installed"):meter||shell||reverb?(Index==1?"○ Non installato":"○ Not installed"):(Index==1?"◌ In arrivo":"◌ Coming soon");
+  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?(Index==1?"● Installato":"● Installed"):meter||shell||reverb?(Index==1?"○ Non installato":"○ Not installed"):(Index==1?"◌ In arrivo":"◌ Coming soon");
  }
  private async void CheckPluginUpdates_Click(object sender,RoutedEventArgs e){
    if(hubUpdateInProgress)return;
@@ -896,6 +917,8 @@ public partial class MainWindow : Window
    }finally{PluginUpdatesButton.IsEnabled=true;}
  }
  private void SelectedProductInstall_Click(object sender,RoutedEventArgs e){
+  ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();
+  if(VstConflict(selectedProductId)){ResolveVstConflict();Refresh();return;}
   if(selectedProductId=="meter-x"){MeterImport_Click(sender,e);return;}
   if(IsShellProduct(selectedProductId)){InstallSelectedShell();return;}
   if(selectedProductId=="reverb-x"){InstallSelectedReverb();return;}
