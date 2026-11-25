@@ -300,7 +300,7 @@ internal static class NeonDialog
         return result;
     }
 
-    private static Border CreateProductIcon(string name, Brush bg, Brush secondary)
+    internal static Border CreateProductIcon(string name, Brush bg, Brush secondary)
     {
         var iconFrame=new Border{Width=30,Height=30,CornerRadius=new CornerRadius(7),Background=bg,Margin=new Thickness(0,0,10,0)};
         // Use one product glyph in both component and integrity rows, independent of the localized package prefix.

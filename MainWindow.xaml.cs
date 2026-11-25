@@ -1312,7 +1312,13 @@ public partial class MainWindow : Window
      ScanResultsPanel.Visibility=Visibility.Visible;
      ScanResultsHeading.Text=Index==1?"Rilevamento VST3 e METER X in corso…":"Detecting VST3 and METER X…";
      ScanResultsDetails.Text="";
+     ScanResultsDetails.Visibility=Visibility.Collapsed;
+     ScanVisualResults.Children.Clear();
+     ScanPathsExpander.IsExpanded=false;
+     ScanPathsExpander.Header=new[]{"Installation paths","Percorsi di installazione","Rutas de instalación","Chemins d’installation","Installationspfade"}[Index];
+     ScanRepeatButton.Content=new[]{"Scan again","Ripeti rilevamento","Repetir detección","Relancer la détection","Erneut erkennen"}[Index];
      ScanResultsPath.Text="";
+     ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();DelayInstaller.InvalidateStateCache();CompressorInstaller.InvalidateStateCache();EqInstaller.InvalidateStateCache();
      try
      {
          var state=ShellInstaller.GetState();
@@ -1375,6 +1381,7 @@ public partial class MainWindow : Window
          Refresh();
          ScanResultsHeading.Text=headline;
          ScanResultsDetails.Text=detail;
+         RenderScanResults(count,total,found,meterInstalled,state);
          ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+CompressorInstaller.InstalledPath+"\n"+EqInstaller.InstalledPath+"\n"+MeterExePath;
          ShellSectionStatus.Text=headline;
          StatusText.Text=headline;
@@ -1384,12 +1391,46 @@ public partial class MainWindow : Window
      catch(Exception ex)
      {
          ScanResultsHeading.Text=Index==1?"ERRORE DURANTE LA SCANSIONE":"SCAN ERROR";
+         ScanVisualResults.Children.Clear();
+         ScanResultsDetails.Visibility=Visibility.Visible;
          ScanResultsDetails.Text=ex.Message;
          ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+CompressorInstaller.InstalledPath+"\n"+EqInstaller.InstalledPath+"\n"+MeterExePath;
-         NeonDialog.Show(this,ex.ToString(),"DJ RUSSO FX HUB v0.6.1 — SCAN ERROR",MessageBoxButton.OK,MessageBoxImage.Error);
+         NeonDialog.Show(this,ex.ToString(),"DJ RUSSO FX HUB — SCAN ERROR",MessageBoxButton.OK,MessageBoxImage.Error);
      }
  }
 
+
+
+ private void RenderScanResults(int count,int total,HashSet<string> found,bool meterInstalled,ShellInstaller.State shellState){
+  var bg=(Brush)FindResource("BgBrush");var surface=(Brush)FindResource("CardFillBrush");var fg=(Brush)FindResource("FgBrush");var cyan=(Brush)FindResource("SecondaryBrush");
+  bool light=theme=="light";
+  var green=new SolidColorBrush(light?Color.FromRgb(0,110,62):Color.FromRgb(110,230,166));
+  var red=new SolidColorBrush(light?Color.FromRgb(155,28,49):Color.FromRgb(255,135,155));
+  var amber=new SolidColorBrush(light?Color.FromRgb(140,83,0):Color.FromRgb(255,205,91));
+  var metrics=new System.Windows.Controls.Primitives.UniformGrid{Columns=2,Margin=new Thickness(0,0,0,6)};
+  void Metric(string value,string label){
+   var stack=new StackPanel();stack.Children.Add(new TextBlock{Text=value,FontSize=24,FontWeight=FontWeights.Bold,Foreground=cyan});stack.Children.Add(new TextBlock{Text=label,Foreground=fg,TextWrapping=TextWrapping.Wrap});
+   metrics.Children.Add(new Border{Child=stack,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(10),Margin=new Thickness(3)});
+  }
+  Metric(count+" / "+total,new[]{"Detected","Rilevati","Detectados","Détectés","Erkannt"}[Index]);
+  Metric((total-count).ToString(),new[]{"Not verified","Non verificati","No verificados","Non vérifiés","Nicht verifiziert"}[Index]);
+  ScanVisualResults.Children.Add(metrics);
+  ScanVisualResults.Children.Add(new ProgressBar{Minimum=0,Maximum=Math.Max(1,total),Value=count,Height=7,Foreground=cyan,Background=surface,Margin=new Thickness(3,0,3,8)});
+  var rows=new System.Windows.Controls.Primitives.UniformGrid{Columns=2};
+  void Product(string id,string name,bool installed,bool conflict,bool external,string extra=""){
+   var grid=new Grid();grid.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});grid.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+   grid.Children.Add(NeonDialog.CreateProductIcon(name,bg,cyan));
+   var stack=new StackPanel{VerticalAlignment=VerticalAlignment.Center};
+   stack.Children.Add(new TextBlock{Text=name+" "+VersionDisplay(id)+extra,Foreground=fg,FontWeight=FontWeights.SemiBold,TextWrapping=TextWrapping.Wrap});
+   string label=conflict?"! "+ConflictLabel:external?"✓ "+ExternalLabel:installed?new[]{"✓ Installed","✓ Installato","✓ Instalado","✓ Installé","✓ Installiert"}[Index]:new[]{"✕ Not installed","✕ Non installato","✕ No instalado","✕ Non installé","✕ Nicht installiert"}[Index];
+   stack.Children.Add(new TextBlock{Text=label,Foreground=conflict?amber:installed?green:red,FontSize=12,TextWrapping=TextWrapping.Wrap});
+   Grid.SetColumn(stack,1);grid.Children.Add(stack);rows.Children.Add(new Border{Child=grid,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(7),Margin=new Thickness(3)});
+  }
+  Product("fx-shell","FX SHELL",found.Any(IsShellProduct),shellState is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged,shellState==ShellInstaller.State.ExternalSameBinary," · "+new[]{"3 effects","3 effetti","3 efectos","3 effets","3 Effekte"}[Index]);
+  foreach(var p in new[]{("reverb-x","REVERB X"),("delay-x","DELAY X"),("compressor-x","COMPRESSOR X"),("eq-x","EQ X")})Product(p.Item1,p.Item2,found.Contains(p.Item1),VstConflict(p.Item1),VstExternal(p.Item1));
+  Product("meter-x","METER X",meterInstalled,false,false);
+  ScanVisualResults.Children.Add(rows);
+ }
 
  private static readonly string[] GuideTexts = {
  """
@@ -1398,6 +1439,22 @@ public partial class MainWindow : Window
  Windows x64 hub for eight audio tools: Sidechain X, Reverse FX and Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 and METER X v1.2.6.
  INSTALLATION AND REMOVAL
  Save projects and close your DAW and METER X. Select a product or Install all. Approve administrator access for VST3 installation. FX SHELL installs all three effects; REVERB X, DELAY X and COMPRESSOR X, EQ X are separate. VST3 location: C:\Program Files\Common Files\VST3. Rescan in your DAW. Remove all removes HUB-managed products; external VST3 copies are protected.
+ SIDECHAIN X
+ Rhythmic volume ducking and sidechain shaping.
+ REVERSE FX
+ Reverse audio effects for creative transitions.
+ STUTTER FX
+ Rhythmic cuts and repeats.
+ REVERB X
+ Spatial reverb with presets and stereo meters.
+ DELAY X
+ Tempo-synced delay with presets and stereo meters.
+ FX HUB UPDATES
+ Checks official GitHub releases for the HUB installer. Installation requires confirmation.
+ PLUGIN UPDATES
+ Checks the plugin catalog; automatic replacement is not enabled.
+ SECURITY AND SHA-256
+ SHA-256 checks file integrity, not malware. VirusTotal uploads are manual and may share the file with that service.
  METER X
  Independent portable audio meter, installable from the HUB. WASAPI loopback may not capture exclusive ASIO audio.
  COMPRESSOR X
@@ -1424,6 +1481,22 @@ public partial class MainWindow : Window
  HUB Windows x64 per otto strumenti: Sidechain X, Reverse FX e Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 e METER X v1.2.6.
  INSTALLAZIONE E RIMOZIONE
  Salva i progetti e chiudi la DAW e METER X. Seleziona un prodotto oppure Installa tutto. Autorizza l'amministratore per i VST3. FX SHELL installa tutti e tre gli effetti; REVERB X, DELAY X e COMPRESSOR X, EQ X sono separati. Percorso VST3: C:\Program Files\Common Files\VST3. Ripeti la scansione nella DAW. Rimuovi tutto rimuove i prodotti gestiti dall'HUB; le copie VST3 esterne sono protette.
+ SIDECHAIN X
+ Ducking ritmico del volume ed effetti sidechain.
+ REVERSE FX
+ Effetti audio al contrario per transizioni creative.
+ STUTTER FX
+ Tagli e ripetizioni ritmiche.
+ REVERB X
+ Riverbero spaziale con preset e meter stereo.
+ DELAY X
+ Delay sincronizzato al tempo con preset e meter stereo.
+ AGGIORNAMENTI FX HUB
+ Controlla le release ufficiali GitHub del programma. L'installazione richiede conferma.
+ AGGIORNAMENTI PLUGIN
+ Controlla il catalogo dei plugin; la sostituzione automatica non è attiva.
+ SICUREZZA E SHA-256
+ SHA-256 verifica l'integrità del file, non l'assenza di malware. Il caricamento su VirusTotal è manuale e può condividere il file con il servizio.
  METER X
  Misuratore audio portable indipendente, installabile dall'HUB. Il loopback WASAPI potrebbe non acquisire audio tramite ASIO esclusivo.
  COMPRESSOR X
@@ -1450,6 +1523,22 @@ public partial class MainWindow : Window
  HUB Windows x64 para ocho herramientas: Sidechain X, Reverse FX y Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 y METER X v1.2.6.
  INSTALACIÓN Y ELIMINACIÓN
  Guarda los proyectos y cierra la DAW y METER X. Selecciona un producto o Instalar todo. Autoriza los permisos de administrador para VST3. FX SHELL instala los tres efectos; REVERB X, DELAY X y COMPRESSOR X, EQ X son independientes. Ruta VST3: C:\Program Files\Common Files\VST3. Vuelve a escanear en la DAW. Eliminar todo elimina los productos gestionados por el HUB y protege las copias VST3 externas.
+ SIDECHAIN X
+ Reducción rítmica de volumen y efectos sidechain.
+ REVERSE FX
+ Efectos de audio invertido para transiciones.
+ STUTTER FX
+ Cortes y repeticiones rítmicas.
+ REVERB X
+ Reverberación espacial con presets y medidores estéreo.
+ DELAY X
+ Delay sincronizado al tempo con presets y medidores estéreo.
+ ACTUALIZACIONES FX HUB
+ Consulta las versiones oficiales de GitHub. La instalación requiere confirmación.
+ ACTUALIZACIONES PLUGIN
+ Consulta el catálogo; el reemplazo automático no está habilitado.
+ SEGURIDAD Y SHA-256
+ SHA-256 verifica la integridad, no la ausencia de malware. La subida manual a VirusTotal puede compartir el archivo con el servicio.
  METER X
  Medidor portátil independiente instalable desde el HUB. WASAPI loopback puede no capturar audio ASIO exclusivo.
  COMPRESSOR X
@@ -1476,6 +1565,22 @@ public partial class MainWindow : Window
  HUB Windows x64 pour huit outils : Sidechain X, Reverse FX et Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 et METER X v1.2.6.
  INSTALLATION ET SUPPRESSION
  Enregistrez les projets et fermez la STAN et METER X. Sélectionnez un produit ou Tout installer. Autorisez les droits administrateur pour les VST3. FX SHELL installe les trois effets ; REVERB X, DELAY X et COMPRESSOR X, EQ X sont indépendants. Chemin VST3 : C:\Program Files\Common Files\VST3. Relancez la recherche dans la STAN. Tout supprimer retire les produits gérés par le HUB et protège les copies VST3 externes.
+ SIDECHAIN X
+ Ducking rythmique du volume et effets sidechain.
+ REVERSE FX
+ Effets audio inversés pour les transitions.
+ STUTTER FX
+ Découpes et répétitions rythmiques.
+ REVERB X
+ Réverbération spatiale avec presets et vu-mètres stéréo.
+ DELAY X
+ Delay synchronisé au tempo avec presets et vu-mètres stéréo.
+ MISES À JOUR FX HUB
+ Consulte les versions officielles GitHub. L’installation nécessite une confirmation.
+ MISES À JOUR PLUGINS
+ Consulte le catalogue ; le remplacement automatique est désactivé.
+ SÉCURITÉ ET SHA-256
+ SHA-256 vérifie l’intégrité, pas l’absence de logiciel malveillant. L’envoi manuel à VirusTotal peut partager le fichier avec le service.
  METER X
  Mesureur audio portable indépendant, installable depuis le HUB. Le loopback WASAPI peut ne pas capturer le signal ASIO exclusif.
  COMPRESSOR X
@@ -1502,6 +1607,22 @@ public partial class MainWindow : Window
  Windows-x64-HUB für acht Werkzeuge: Sidechain X, Reverse FX und Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 und METER X v1.2.6.
  INSTALLATION UND ENTFERNUNG
  Projekte speichern und DAW sowie METER X schließen. Produkt oder Alles installieren wählen. Administratorrechte für VST3 bestätigen. FX SHELL installiert alle drei Effekte; REVERB X, DELAY X und COMPRESSOR X, EQ X sind separat. VST3-Pfad: C:\Program Files\Common Files\VST3. Plugins in der DAW erneut scannen. Alles entfernen entfernt HUB-verwaltete Produkte; externe VST3-Kopien bleiben geschützt.
+ SIDECHAIN X
+ Rhythmisches Volume-Ducking und Sidechain-Effekte.
+ REVERSE FX
+ Rückwärts-Audioeffekte für kreative Übergänge.
+ STUTTER FX
+ Rhythmische Schnitte und Wiederholungen.
+ REVERB X
+ Räumlicher Hall mit Presets und Stereo-Pegeln.
+ DELAY X
+ Tempo-synchronisiertes Delay mit Presets und Stereo-Pegeln.
+ FX HUB UPDATES
+ Prüft offizielle GitHub-Releases. Installation erfordert Bestätigung.
+ PLUGIN-UPDATES
+ Prüft den Katalog; automatischer Austausch ist deaktiviert.
+ SICHERHEIT UND SHA-256
+ SHA-256 prüft Integrität, nicht Schadsoftwarefreiheit. Manuelles Hochladen zu VirusTotal kann die Datei mit dem Dienst teilen.
  METER X
  Eigenständiges portables Audiometer, über den HUB installierbar. WASAPI-Loopback erfasst möglicherweise kein exklusives ASIO-Audio.
  COMPRESSOR X
@@ -1586,6 +1707,12 @@ public partial class MainWindow : Window
   DockPanel.SetDock(header,Dock.Top);layout.Children.Add(header);
   var guideBody=new StackPanel {Margin=new Thickness(20,18,18,20)};
   var lines=GuideTexts[Index].Split('\n');
+  var version=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.43";
+  header.Text=T("guide")+" · v"+version;
+  var indexPanel=new WrapPanel{Margin=new Thickness(0,0,0,12)};
+  guideBody.Children.Add(new TextBlock{Text=new[]{"Contents","Indice","Índice","Sommaire","Inhalt"}[Index],Foreground=(Brush)FindResource("SecondaryBrush"),FontSize=17,FontWeight=FontWeights.Bold,Margin=new Thickness(0,0,0,8)});
+  guideBody.Children.Add(indexPanel);
+  var sectionLinks=new Dictionary<string,FrameworkElement>();
   for(int i=0;i<lines.Length;i++){
    var line=lines[i].Trim();
    if(string.IsNullOrWhiteSpace(line))continue;
@@ -1605,14 +1732,27 @@ public partial class MainWindow : Window
     continue;
    }
    bool heading=i==0 || (line.Any(char.IsLetter) && line==line.ToUpperInvariant() && !line.StartsWith("https://",StringComparison.OrdinalIgnoreCase));
-   guideBody.Children.Add(new TextBlock{
+   var paragraph=new TextBlock{
     Text=line,TextWrapping=TextWrapping.Wrap,
     FontFamily=new FontFamily("Segoe UI"),FontSize=i==0?19:heading?15:14,
     FontWeight=heading?FontWeights.SemiBold:FontWeights.Normal,
     Foreground=(Brush)FindResource(heading?"SecondaryBrush":"FgBrush"),
     LineHeight=22,LineStackingStrategy=LineStackingStrategy.BlockLineHeight,
     Margin=heading?new Thickness(0,i==0?0:16,0,6):new Thickness(0,0,0,4)
-   });
+   };
+   if(heading && i>0){
+    var group=new StackPanel{Orientation=Orientation.Horizontal};
+    string iconName=line is "SIDECHAIN X" or "REVERSE FX" or "STUTTER FX"?"FX SHELL":line;
+    group.Children.Add(NeonDialog.CreateProductIcon(iconName,(Brush)FindResource("BgBrush"),(Brush)FindResource("SecondaryBrush")));
+    paragraph.Margin=new Thickness(0,0,0,0);paragraph.VerticalAlignment=VerticalAlignment.Center;group.Children.Add(paragraph);
+    var card=new Border{Child=group,Background=(Brush)FindResource("CardFillBrush"),CornerRadius=new CornerRadius(7),Padding=new Thickness(7),Margin=new Thickness(0,12,0,6)};
+    guideBody.Children.Add(card);
+    if(!sectionLinks.ContainsKey(line)){
+     sectionLinks.Add(line,card);
+     var jump=new Button{Content=line,FontSize=11,Padding=new Thickness(7,4,7,4),Margin=new Thickness(0,0,6,6),Cursor=Cursors.Hand};
+     jump.Click+=(_,_)=>card.BringIntoView();indexPanel.Children.Add(jump);
+    }
+   }else guideBody.Children.Add(paragraph);
   }
   var guideScroll=new ScrollViewer{
    VerticalScrollBarVisibility=ScrollBarVisibility.Auto,

@@ -495,7 +495,11 @@
     <StackPanel>
       <Grid><TextBlock x:Name="ScanResultsHeading" Margin="0,0,42,0" FontSize="16" FontWeight="Bold" Foreground="{DynamicResource HeadingBrush}" TextWrapping="Wrap"/><Button x:Name="CloseScanButton" Width="44" Height="44" Padding="0" Margin="0" HorizontalAlignment="Right" VerticalAlignment="Top" ToolTip="Chiudi / Close" Click="CloseScan_Click" Background="#282143" BorderBrush="#A36AFF" BorderThickness="2"><Grid Width="30" Height="30"><Path Stroke="#FFFFFF" StrokeThickness="3.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round" Stretch="Fill" Data="M 3,3 L 27,27 M 27,3 L 3,27"><Path.Effect><DropShadowEffect Color="#7DEFFF" BlurRadius="5" ShadowDepth="0" Opacity="0.9"/></Path.Effect></Path></Grid></Button></Grid>
       <TextBlock x:Name="ScanResultsDetails" Margin="0,7,0,0" FontSize="12" Foreground="{DynamicResource FgBrush}" TextWrapping="Wrap"/>
-      <TextBlock x:Name="ScanResultsPath" Margin="0,8,0,0" FontSize="11" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap"/>
+      <StackPanel x:Name="ScanVisualResults" Margin="0,8,0,0"/>
+      <Expander x:Name="ScanPathsExpander" IsExpanded="False" Margin="0,8,0,0" Foreground="{DynamicResource SecondaryBrush}">
+        <TextBlock x:Name="ScanResultsPath" Margin="10,8,0,0" FontSize="11" Foreground="{DynamicResource SecondaryBrush}" TextWrapping="Wrap"/>
+      </Expander>
+      <Button x:Name="ScanRepeatButton" Click="Scan_Click" HorizontalAlignment="Right" Margin="0,8,0,0" Padding="12,5"/>
     </StackPanel>
   </Border>
 
