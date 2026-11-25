@@ -15,6 +15,23 @@
 
 ---
 
+## Individual downloads — no FX HUB required
+
+Prefer to download just one tool? These official Windows x64 binaries are the same payloads included in FX HUB v0.8.41.
+
+| Tool | Version | Format | Download |
+|---|---|---|---|
+| **FX SHELL** — Sidechain X, Reverse FX, Stutter FX | 3.0.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.41/Payload/DJ%20RUSSO%20FX%20SHELL.vst3) |
+| **REVERB X** | 1.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.41/Payload/DJ%20RUSSO%20REVERB%20X.vst3) |
+| **DELAY X** | 1.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.41/Payload/DJ%20RUSSO%20DELAY%20X.vst3) |
+| **METER X** | 1.2.6 | Portable EXE | [Download EXE](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.41/Payload/DJ%20RUSSO%20METER%20X.exe) |
+
+**Manual installation:** close your DAW, back up any existing plugin, then copy the downloaded `.vst3` file to `C:\Program Files\Common Files\VST3` (administrator permission may be required). Rescan your plugins in your DAW. METER X is a standalone Windows executable and does not belong in the VST3 folder.
+
+FX SHELL is a single shared VST3 module containing three effects; do not split or duplicate it. These direct links are pinned to the published v0.8.41 tag, not the development branch. They are raw binaries, not separate setup installers. For guided installation, conflict checks and HUB updates, use the [FX HUB installer](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest).
+
+---
+
 ## Interface gallery
 
 Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it at full resolution.
