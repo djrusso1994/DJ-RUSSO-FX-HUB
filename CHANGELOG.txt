@@ -1,3 +1,10 @@
+v0.8.42 - COMPRESSOR X v2.2 integration (development build, pending payload upload and Windows testing)
+- Dedicated independent VST3 installation and removal with pinned SHA-256 validation and its own receipt.
+- Add COMPRESSOR X to catalog, product details, bulk operations, scan, conflict handling, diagnostics and update catalog.
+- Update five localized guides, setup version and automated build checks. Seven of fourteen tools after integration.
+- Individual verified package downloads: immutable GitHub commit, size and SHA-256, progress, no overwrite or automatic installation; FX SHELL remains a shared package.
+- Existing plugin binaries and stable release unchanged. Requires approved logo and exact binary before build.
+
 v0.8.41 - DELAY X v1.3, professional dialogs and diagnostics (released 24 November 2026)
 - Published official Windows x64 v0.8.41 installer on GitHub Releases after successful automated compilation and user functional testing.
 - Added independent DELAY X v1.3 VST3 with its original logo, individual installation and removal, pinned SHA-256 payload integrity checks and protection against conflicting existing files.

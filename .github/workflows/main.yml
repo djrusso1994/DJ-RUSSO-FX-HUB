@@ -71,7 +71,37 @@ jobs:
           $delay = "publish/Payload/DJ RUSSO DELAY X.vst3"
           if (-not (Test-Path -LiteralPath $delay -PathType Leaf)) { throw "DELAY X v1.3 payload missing; do not publish incomplete HUB." }
           if ((Get-FileHash -LiteralPath $delay -Algorithm SHA256).Hash.ToLowerInvariant() -ne "b442f60efb91dee6978af07ddb79f8f208b51107bc7775eec18d25d47f60b6d1") { throw "DELAY X payload SHA-256 mismatch; refusing release." }
-          Write-Host "METER X, FX SHELL, REVERB X and DELAY X payloads verified."
+          $compressor = "publish/Payload/DJ RUSSO COMPRESSOR X.vst3"
+          if (-not (Test-Path -LiteralPath $compressor -PathType Leaf)) { throw "COMPRESSOR X v2.2 payload missing; do not publish incomplete HUB." }
+          if ((Get-FileHash -LiteralPath $compressor -Algorithm SHA256).Hash.ToLowerInvariant() -ne "cad8e2d08a34060b1d2af958063b96836c4f3df706420048ffbc3d6cf660a504") { throw "COMPRESSOR X payload SHA-256 mismatch; refusing release." }
+          if (-not (Test-Path -LiteralPath "Assets/logo-compressor-x.png" -PathType Leaf)) { throw "COMPRESSOR X approved logo missing." }
+          $catalog = Get-Content "publish/plugin-updates.json" -Raw | ConvertFrom-Json
+          foreach ($package in $catalog.packages) {
+            $p = Join-Path "publish/Payload" $package.download.fileName
+            if (-not (Test-Path -LiteralPath $p -PathType Leaf)) { throw "Missing individual package: $p" }
+            if ((Get-Item -LiteralPath $p).Length -ne $package.download.sizeBytes) { throw "Individual package size mismatch: $p" }
+            if ((Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant() -ne $package.download.sha256) { throw "Individual package hash mismatch: $p" }
+          }
+          Write-Host "All five bundled packages and individual download metadata verified."
+
+      - name: Verify individual downloads from pinned GitHub commits
+        shell: pwsh
+        run: |
+          $catalog = Get-Content "publish/plugin-updates.json" -Raw | ConvertFrom-Json
+          foreach ($package in $catalog.packages) {
+            $d = $package.download
+            $encoded = [Uri]::EscapeDataString($d.fileName)
+            $url = "https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/$($d.commit)/Payload/$encoded"
+            $temp = Join-Path $env:RUNNER_TEMP ("plugin-check-" + [Guid]::NewGuid().ToString("N"))
+            try {
+              Invoke-WebRequest -Uri $url -OutFile $temp -MaximumRedirection 0 -TimeoutSec 90 -ErrorAction Stop
+              if ((Get-Item -LiteralPath $temp).Length -ne $d.sizeBytes) { throw "Remote package size mismatch: $($package.id)" }
+              if ((Get-FileHash -LiteralPath $temp -Algorithm SHA256).Hash.ToLowerInvariant() -ne $d.sha256) { throw "Remote package SHA-256 mismatch: $($package.id)" }
+              Write-Host "Verified remote individual package: $($package.id)"
+            } finally {
+              Remove-Item -LiteralPath $temp -ErrorAction SilentlyContinue
+            }
+          }
 
       # Early smoke check for WPF resource/XAML parse failures before packaging or releasing.
       - name: Smoke-test FX HUB WPF startup
@@ -104,13 +134,13 @@ jobs:
           if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
           & $iscc "installer\\DJ_RUSSO_FX_HUB.iss"
           if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed." }
-          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.41.exe")) { throw "Installer output missing." }
+          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.42.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: DJ_RUSSO_FX_HUB_Setup_v0.8.41
-          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.41.exe
+          name: DJ_RUSSO_FX_HUB_Setup_v0.8.42
+          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.42.exe
           if-no-files-found: error
 
       - name: Create ZIP

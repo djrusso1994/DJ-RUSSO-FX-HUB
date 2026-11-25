@@ -10,7 +10,13 @@
         "stutter-fx"
       ],
       "downloadAvailable": false,
-      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO FX SHELL.vst3",
+        "sizeBytes": 9942528,
+        "sha256": "8bd68722de231324d10aa8fd767538828dac81bebc9d3bc6bc19f95884be7de5",
+        "commit": "2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a"
+      }
     },
     {
       "id": "meter-x",
@@ -19,7 +25,13 @@
         "meter-x"
       ],
       "downloadAvailable": false,
-      "identityPolicy": "preserve-user-settings"
+      "identityPolicy": "preserve-user-settings",
+      "download": {
+        "fileName": "DJ RUSSO METER X.exe",
+        "sizeBytes": 929280,
+        "sha256": "bd2508c353a6c75de739944bc864715578cba77bbbb6e685ad19c496dc3354e9",
+        "commit": "2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a"
+      }
     },
     {
       "id": "reverb-x",
@@ -28,7 +40,13 @@
         "reverb-x"
       ],
       "downloadAvailable": false,
-      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO REVERB X.vst3",
+        "sizeBytes": 7854080,
+        "sha256": "1e74946b3ea145bc9959f3d198f581361c9597d4efbe84869d02684bdf84b017",
+        "commit": "2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a"
+      }
     },
     {
       "id": "delay-x",
@@ -37,7 +55,28 @@
         "delay-x"
       ],
       "downloadAvailable": false,
-      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO DELAY X.vst3",
+        "sizeBytes": 7218688,
+        "sha256": "b442f60efb91dee6978af07ddb79f8f208b51107bc7775eec18d25d47f60b6d1",
+        "commit": "2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a"
+      }
+    },
+    {
+      "id": "compressor-x",
+      "version": "2.2",
+      "effectIds": [
+        "compressor-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO COMPRESSOR X.vst3",
+        "sizeBytes": 10050560,
+        "sha256": "cad8e2d08a34060b1d2af958063b96836c4f3df706420048ffbc3d6cf660a504",
+        "commit": "7c15ea42c603ac397ac5e39bf8fd5a8144e0e2d8"
+      }
     }
   ]
 }
