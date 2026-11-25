@@ -14,6 +14,19 @@ namespace DJRussoFXHub;
 public partial class MainWindow : Window
 {
  internal int DialogLanguageIndex => Index;
+ private void SetNavIcon(Button button,string label,string geometry){
+  System.Windows.Automation.AutomationProperties.SetName(button,label);
+  var grid=new Grid{VerticalAlignment=VerticalAlignment.Center};
+  grid.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+  grid.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+  var glyph=new System.Windows.Shapes.Path{Data=Geometry.Parse(geometry),Width=17,Height=17,Stretch=Stretch.Uniform,StrokeThickness=1.5,StrokeLineJoin=PenLineJoin.Round,StrokeStartLineCap=PenLineCap.Round,StrokeEndLineCap=PenLineCap.Round,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(0,0,8,0)};
+  glyph.SetResourceReference(System.Windows.Shapes.Shape.StrokeProperty,"SecondaryBrush");
+  var text=new TextBlock{Text=label,TextWrapping=TextWrapping.Wrap,TextAlignment=TextAlignment.Center,FontSize=13,FontWeight=FontWeights.SemiBold,VerticalAlignment=VerticalAlignment.Center};
+  text.SetResourceReference(TextBlock.ForegroundProperty,"FgBrush");
+  grid.Children.Add(glyph);Grid.SetColumn(text,1);grid.Children.Add(text);
+  button.Content=grid;
+ }
+
 
  private record PluginInfo(string id,string name,string category,string status);
  private sealed class PluginCard { public string Id {get;set;}=""; public bool IsSelected {get;set;} public bool IsReady {get;set;} public string ActionLabel {get;set;}=""; public string RemoveLabel {get;set;}=""; public Visibility ActionVisibility => IsReady ? Visibility.Visible : Visibility.Collapsed; public string FallbackName {get;set;}=""; public int LogoHeight {get;set;}=78; public int LogoMaxWidth {get;set;}=150; public BitmapSource? Logo {get;set;} public string Category {get;set;}=""; public string Footer {get;set;}=""; public Visibility MeterVisibility {get;set;}=Visibility.Collapsed; public bool MeterReady {get;set;} public bool MeterInstallReady {get;set;} public string MeterImportLabel {get;set;}=""; public string MeterLaunchLabel {get;set;}=""; public string MeterRemoveLabel {get;set;}=""; public string BadgeSymbol {get;set;}="✕"; public System.Windows.Media.Brush BadgeBrush {get;set;}=System.Windows.Media.Brushes.IndianRed; public string BadgeTip {get;set;}=""; }
@@ -275,7 +288,7 @@ public partial class MainWindow : Window
 
  private void Refresh()
  {
-     SettingsButton.Content="⚙   "+T("settings"); GuideButton.Content="ⓘ   "+T("guide");
+     SetNavIcon(SettingsButton,T("settings"),"M10,2 V5 M10,15 V18 M2,10 H5 M15,10 H18 M4,4 L6,6 M14,14 L16,16 M4,16 L6,14 M14,6 L16,4 M10,5 A5,5 0 1 1 9.99,5 Z M10,8 A2,2 0 1 1 9.99,8 Z"); SetNavIcon(GuideButton,T("guide"),"M2,3 H7 Q10,3 10,6 Q10,3 13,3 H18 V16 H13 Q10,16 10,18 Q10,16 7,16 H2 Z M10,6 V18");
      ThemeHint.Text=T("theme");SettingsHint.Text=T("settingshint");
      SearchCaption.Text=T("searchProducts");FilterCaption.Text=T("filterProducts");
      ProductSearch.ToolTip=T("searchTip");ProductFilter.ToolTip=T("filterTip");
@@ -297,7 +310,7 @@ public partial class MainWindow : Window
      VirusTotalReportButton.Content=new[]{"Open VirusTotal upload","Apri caricamento VirusTotal","Abrir carga de VirusTotal","Ouvrir VirusTotal","VirusTotal-Upload öffnen"}[Index];
      CopyInstallerHashButton.Content=new[]{"Copy SHA-256","Copia SHA-256","Copiar SHA-256","Copier SHA-256","SHA-256 kopieren"}[Index];
      SourceText.Text=T("source");Subtitle.Text=T("subtitle");
-     UpdatesButton.Content="↻   "+T("updates"); DiagnosticsButton.Content="◈   "+T("diagnostics");BackupButton.Content="▣   "+T("backup");OpenBackupFolderButton.Content="▣   "+new[]{"OPEN BACKUPS","APRI BACKUP","ABRIR COPIAS","OUVRIR SAUVEGARDES","BACKUPS ÖFFNEN"}[Index];OpenBackupFolderButton.ToolTip=new[]{"Open the most recent backup folder","Apri la cartella dell'ultimo backup","Abrir la carpeta de la última copia","Ouvrir le dossier de la dernière sauvegarde","Letzten Backup-Ordner öffnen"}[Index];FolderButton.Content="▣   "+T("folder");ScanButton.Content="⌕   "+T("scan");
+     SetNavIcon(UpdatesButton,T("updates"),"M17,8 A7,7 0 0 0 4,6 M17,3 V8 H12 M3,12 A7,7 0 0 0 16,14 M3,17 V12 H8"); SetNavIcon(DiagnosticsButton,T("diagnostics"),"M1,10 H5 L8,3 L12,17 L15,10 H19");SetNavIcon(BackupButton,T("backup"),"M3,2 H14 L17,5 V18 H3 Z M6,2 V8 H14 V2 M6,18 V12 H14 V18");SetNavIcon(OpenBackupFolderButton,new[]{"OPEN BACKUPS","APRI BACKUP","ABRIR COPIAS","OUVRIR SAUVEGARDES","BACKUPS ÖFFNEN"}[Index],"M2,5 H7 L9,7 H18 V9 M2,5 V17 H16 L19,9 H5 L2,17");OpenBackupFolderButton.ToolTip=new[]{"Open the most recent backup folder","Apri la cartella dell'ultimo backup","Abrir la carpeta de la última copia","Ouvrir le dossier de la dernière sauvegarde","Letzten Backup-Ordner öffnen"}[Index];SetNavIcon(FolderButton,T("folder"),"M2,4 H7 L9,7 H18 V17 H2 Z M2,7 H9");SetNavIcon(ScanButton,T("scan"),"M8,2 A6,6 0 1 1 7.99,2 Z M12,12 L18,18");
      PluginUpdatesButton.Content=new[]{"PLUGIN UPDATES","AGGIORNAMENTI PLUGIN","ACTUALIZAR PLUGINS","MAJ PLUGINS","PLUGIN-UPDATES"}[Index];
       PluginUpdatesButton.ToolTip=new[]{"Check for plugin updates","Controlla aggiornamenti plugin","Buscar actualizaciones de plugins","Vérifier les mises à jour des plugins","Plugin-Updates prüfen"}[Index];
       ShellSectionTitle.Text=BulkTitleLabels[Index];ShellSectionHint.Text=BulkHintLabels[Index];
