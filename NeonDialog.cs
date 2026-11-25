@@ -375,13 +375,17 @@ internal static class NeonDialog
                     var name=line.Substring(0,split);
                     var namePanel=new StackPanel{Orientation=Orientation.Horizontal};
                     var iconFrame=new Border{Width=30,Height=30,CornerRadius=new CornerRadius(7),Background=bg,Margin=new Thickness(0,0,10,0)};
-                    string geometry=name.StartsWith("FX SHELL")?"M2,6 L10,2 L18,6 L10,10 Z M2,10 L10,14 L18,10 M2,14 L10,18 L18,14":
-                        name.StartsWith("REVERB")?"M2,10 Q6,0 10,10 T18,10":
-                        name.StartsWith("DELAY")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
-                        name.StartsWith("COMPRESSOR")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
-                        name.StartsWith("METER")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
+                    // Use one product glyph in both component and integrity rows, independent of the localized package prefix.
+                    bool Product(string id)=>name.Contains(id,StringComparison.OrdinalIgnoreCase);
+                    string geometry=Product("FX SHELL")?"M2,6 L10,2 L18,6 L10,10 Z M2,10 L10,14 L18,10 M2,14 L10,18 L18,14":
+                        Product("REVERB X")?"M2,10 Q6,0 10,10 T18,10":
+                        Product("DELAY X")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
+                        Product("COMPRESSOR X")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
+                        Product("EQ X")?"M4,2 V6 M4,10 V18 M2,6 H6 V10 H2 Z M10,2 V12 M10,16 V18 M8,12 H12 V16 H8 Z M16,2 V4 M16,8 V18 M14,4 H18 V8 H14 Z":
+                        Product("METER X")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
                         "M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z";
                     iconFrame.Child=new Path{Data=Geometry.Parse(geometry),Stroke=secondary,StrokeThickness=1.5,
+                        StrokeLineJoin=PenLineJoin.Round,StrokeStartLineCap=PenLineCap.Round,StrokeEndLineCap=PenLineCap.Round,
                         Width=17,Height=17,Stretch=Stretch.Uniform,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center};
                     namePanel.Children.Add(iconFrame);
                     var names=new StackPanel{VerticalAlignment=VerticalAlignment.Center};
