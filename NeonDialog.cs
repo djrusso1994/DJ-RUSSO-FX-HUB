@@ -37,8 +37,8 @@ internal static class NeonDialog
         bool summary=operation!=null && buttons==MessageBoxButton.OK;
         string action=removal?new[]{"Remove","Rimuovi","Eliminar","Supprimer","Entfernen"}[lang]:
             new[]{"Install","Installa","Instalar","Installer","Installieren"}[lang];
+        string product=operation!=null && caption!="DJ RUSSO FX HUB"?caption:"";
         if(operation!=null){
-            string product=caption=="DJ RUSSO FX HUB"?"":caption;
             caption=confirmation?action+(product.Length>0?" "+product:" — "+new[]{"all packages","tutti i pacchetti","todos los paquetes","tous les paquets","alle Pakete"}[lang]):
                 (removal?new[]{"Removal report","Esito rimozione","Resultado de eliminación","Résultat de suppression","Entfernungsergebnis"}[lang]:
                 new[]{"Installation report","Esito installazione","Resultado de instalación","Résultat d’installation","Installationsergebnis"}[lang])+(product.Length>0?" • "+product:"");
@@ -165,6 +165,14 @@ internal static class NeonDialog
             HorizontalAlignment = HorizontalAlignment.Center,
             VerticalAlignment = VerticalAlignment.Center
         };
+        if(confirmation && product.Length>0){
+            var productIcon=CreateProductIcon(product,panel,cyan);
+            if(productIcon.Child is Path path){
+                productIcon.Child=null;
+                path.Width=30;path.Height=30;path.StrokeThickness=1.7;
+                symbolFrame.Child=path;
+            }
+        }
         row.Children.Add(symbolFrame);
         var messageScroll = new ScrollViewer
         {
@@ -189,7 +197,31 @@ internal static class NeonDialog
             LineHeight = 24,
             Margin = new Thickness(0, 0, 16, 0)
         };
-        if(operation!=null){
+        if(confirmation && caption.Contains(" — ",StringComparison.Ordinal)){
+            var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
+            var heading=new TextBlock{Text=new[]{"Included packages","Pacchetti interessati","Paquetes incluidos","Paquets concernés","Betroffene Pakete"}[lang],Foreground=cyan,FontSize=15,FontWeight=FontWeights.SemiBold,Margin=new Thickness(0,0,0,8)};
+            content.Children.Add(heading);
+            var products=new UniformGrid{Columns=2,Margin=new Thickness(0,0,0,10)};
+            foreach(var name in new[]{"FX SHELL","REVERB X","DELAY X","COMPRESSOR X","EQ X","METER X"}){
+                var productRow=new StackPanel{Orientation=Orientation.Horizontal};
+                productRow.Children.Add(CreateProductIcon(name,bg,cyan));
+                productRow.Children.Add(new TextBlock{Text=name,Foreground=fg,FontSize=13,FontWeight=FontWeights.SemiBold,VerticalAlignment=VerticalAlignment.Center});
+                products.Children.Add(new Border{Child=productRow,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(8,5,8,5),Margin=new Thickness(0,0,6,6)});
+            }
+            content.Children.Add(products);
+            var details=removal?new[]{"Only HUB-managed packages will be removed. External VST3 files are protected. Close FL Studio and METER X.","Saranno rimossi solo i pacchetti gestiti dal HUB. I VST3 esterni sono protetti. Chiudi FL Studio e METER X.","Solo se eliminarán los paquetes gestionados por el HUB. Los VST3 externos están protegidos. Cierra FL Studio y METER X.","Seuls les paquets gérés par le HUB seront supprimés. Les VST3 externes sont protégés. Fermez FL Studio et METER X.","Nur vom HUB verwaltete Pakete werden entfernt. Externe VST3-Dateien sind geschützt. FL Studio und METER X schließen."}[lang]:
+                new[]{"VST3 installation requires administrator approval. Close FL Studio before continuing.","L'installazione dei VST3 richiede l'autorizzazione dell'amministratore. Chiudi FL Studio prima di continuare.","La instalación de VST3 requiere permisos de administrador. Cierra FL Studio antes de continuar.","L'installation des VST3 nécessite les droits administrateur. Fermez FL Studio avant de continuer.","Die VST3-Installation benötigt Administratorrechte. FL Studio vor dem Fortfahren schließen."}[lang];
+            content.Children.Add(new Border{Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(12),Child=new TextBlock{Text=details,Foreground=fg,FontSize=14,TextWrapping=TextWrapping.Wrap,LineHeight=21}});
+            messageScroll.Content=content;
+        }
+        else if(confirmation && product.Length>0){
+            var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
+            string version=product switch {"FX SHELL"=>"3.0.3","REVERB X"=>"1.3","DELAY X"=>"1.3","COMPRESSOR X"=>"2.2","EQ X"=>"1.1.1","METER X"=>"1.2.6",_=>""};
+            content.Children.Add(new TextBlock{Text=product+(version.Length>0?"  •  v"+version:""),FontSize=18,FontWeight=FontWeights.SemiBold,Foreground=cyan,Margin=new Thickness(0,0,0,10)});
+            content.Children.Add(new Border{Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(12),Child=new TextBlock{Text=message,Foreground=fg,FontSize=14,TextWrapping=TextWrapping.Wrap,LineHeight=22}});
+            messageScroll.Content=content;
+        }
+        else if(operation!=null){
             var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
             foreach(var line in (message??"").Split('\n')){
                 int separator=line.IndexOf(": ",StringComparison.Ordinal);
@@ -203,9 +235,15 @@ internal static class NeonDialog
                     grid.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
                     grid.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
                     text.Text=line.Substring(0,separator);text.FontWeight=FontWeights.SemiBold;
-                    grid.Children.Add(text);
+                    var namePanel=new Grid();
+                    namePanel.ColumnDefinitions.Add(new ColumnDefinition{Width=GridLength.Auto});
+                    namePanel.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
+                    namePanel.Children.Add(CreateProductIcon(text.Text,bg,cyan));
+                    text.VerticalAlignment=VerticalAlignment.Center;
+                    Grid.SetColumn(text,1);namePanel.Children.Add(text);
+                    grid.Children.Add(namePanel);
                     var statusText=new TextBlock{Text=(success?"✓  ":"")+status,TextWrapping=TextWrapping.Wrap,
-                        TextAlignment=TextAlignment.Right,Foreground=success?cyan:fg,FontSize=14,Margin=new Thickness(10,0,0,0)};
+                        TextAlignment=TextAlignment.Right,Foreground=success?cyan:fg,FontSize=14,VerticalAlignment=VerticalAlignment.Center,Margin=new Thickness(10,0,0,0)};
                     Grid.SetColumn(statusText,1);grid.Children.Add(statusText);item.Child=grid;
                 }else item.Child=text;
                 content.Children.Add(item);
@@ -275,6 +313,40 @@ internal static class NeonDialog
         dialog.Content = outer;
         dialog.ShowDialog();
         return result;
+    }
+
+    internal static Border CreateProductIcon(string name, Brush bg, Brush secondary)
+    {
+        var iconFrame=new Border{Width=30,Height=30,CornerRadius=new CornerRadius(7),Background=bg,Margin=new Thickness(0,0,10,0)};
+        // Use one product glyph in both component and integrity rows, independent of the localized package prefix.
+        bool Product(string id)=>name.Contains(id,StringComparison.OrdinalIgnoreCase);
+        string geometry=Product("@info")?"M10,1 A9,9 0 1 1 9.99,1 Z M10,8 V15 M10,5 V6":
+            Product("@package")?"M2,6 L10,2 L18,6 V15 L10,19 L2,15 Z M2,6 L10,10 L18,6 M10,10 V19":
+            Product("@update")?"M17,8 A7,7 0 0 0 4,6 M17,3 V8 H12 M3,12 A7,7 0 0 0 16,14 M3,17 V12 H8":
+            Product("@download")?"M10,2 V13 M6,9 L10,13 L14,9 M2,14 V18 H18 V14":
+            Product("@security")?"M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z M6,10 L9,13 L14,8":
+            Product("@monitor")?"M2,3 H18 V14 H2 Z M10,14 V18 M6,18 H14":
+            Product("@diagnostic")?"M1,10 H5 L8,3 L12,17 L15,10 H19":
+            Product("@settings")?"M10,2 V5 M10,15 V18 M2,10 H5 M15,10 H18 M4,4 L6,6 M14,14 L16,16 M4,16 L6,14 M14,6 L16,4 M10,5 A5,5 0 1 1 9.99,5 Z":
+            Product("@tools")?"M3,17 L12,8 M11,3 Q15,1 18,4 L14,8 L12,8 M3,17 L5,19":
+            Product("@support")?"M3,10 A7,7 0 0 1 17,10 M3,10 V15 H6 V10 Z M17,10 V15 H14 V10 Z M17,15 Q17,18 10,18":
+            Product("@credits")?"M10,2 A4,4 0 1 1 9.99,2 Z M3,18 Q3,10 10,10 Q17,10 17,18 Z":
+            Product("SIDECHAIN X")?"M2,10 H5 L7,16 L10,4 L13,10 H18":
+            Product("REVERSE FX")?"M15,4 L5,10 L15,16 Z M3,4 V16":
+            Product("STUTTER FX")?"M3,4 V16 M7,7 V13 M11,4 V16 M15,7 V13 M18,4 V16":
+            Product("FX SHELL")?"M2,6 L10,2 L18,6 L10,10 Z M2,10 L10,14 L18,10 M2,14 L10,18 L18,14":
+            Product("REVERB X")?"M2,10 Q6,0 10,10 T18,10":
+            Product("DELAY X")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
+            Product("COMPRESSOR X")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
+            Product("EQ X")?"M4,2 V6 M4,10 V18 M2,6 H6 V10 H2 Z M10,2 V12 M10,16 V18 M8,12 H12 V16 H8 Z M16,2 V4 M16,8 V18 M14,4 H18 V8 H14 Z":
+            Product("METER X")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
+            Product("FL Studio")?"M2,5 H7 L9,7 H18 V17 H2 Z M2,7 H9 M9,12 L11,14 L15,10":
+            Product("VST3")?"M2,4 H7 L9,7 H18 V17 H2 Z M2,7 H9":
+            "M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z";
+        iconFrame.Child=new Path{Data=Geometry.Parse(geometry),Stroke=secondary,StrokeThickness=1.5,
+            StrokeLineJoin=PenLineJoin.Round,StrokeStartLineCap=PenLineCap.Round,StrokeEndLineCap=PenLineCap.Round,
+            Width=17,Height=17,Stretch=Stretch.Uniform,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center};
+        return iconFrame;
     }
 
     // Dedicated diagnostics presentation; ordinary dialogs are unchanged.
@@ -374,15 +446,7 @@ internal static class NeonDialog
                     row.ColumnDefinitions.Add(new ColumnDefinition{Width=new GridLength(1,GridUnitType.Star)});
                     var name=line.Substring(0,split);
                     var namePanel=new StackPanel{Orientation=Orientation.Horizontal};
-                    var iconFrame=new Border{Width=30,Height=30,CornerRadius=new CornerRadius(7),Background=bg,Margin=new Thickness(0,0,10,0)};
-                    string geometry=name.StartsWith("FX SHELL")?"M2,6 L10,2 L18,6 L10,10 Z M2,10 L10,14 L18,10 M2,14 L10,18 L18,14":
-                        name.StartsWith("REVERB")?"M2,10 Q6,0 10,10 T18,10":
-                        name.StartsWith("DELAY")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
-                        name.StartsWith("COMPRESSOR")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
-                        name.StartsWith("METER")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
-                        "M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z";
-                    iconFrame.Child=new Path{Data=Geometry.Parse(geometry),Stroke=secondary,StrokeThickness=1.5,
-                        Width=17,Height=17,Stretch=Stretch.Uniform,HorizontalAlignment=HorizontalAlignment.Center,VerticalAlignment=VerticalAlignment.Center};
+                    var iconFrame=CreateProductIcon(name,bg,secondary);
                     namePanel.Children.Add(iconFrame);
                     var names=new StackPanel{VerticalAlignment=VerticalAlignment.Center};
                     int versionAt=name.LastIndexOf(" v",StringComparison.Ordinal);

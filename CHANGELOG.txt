@@ -1,3 +1,18 @@
+v0.8.43 - EQ X v1.1.1 and Neon Ghost interface polish (approved for stable release, 25 November 2026)
+- Added the user-tested EQ X independent VST3, original logo, install/remove, detection, diagnostics and SHA-256 integrity validation.
+- Added pinned individual download, update catalog entry and five-language HUB labels. Eight of fourteen tools available in this build.
+- Unified vector diagnostic icons across installed components and package integrity, including a dedicated EQ X fader glyph and theme-aware colors. Added distinct folder and verified-path glyphs for VST3 and FL Studio locations in all five HUB languages.
+- Clarified the sidebar FX HUB update label in all five languages, distinct from plugin updates.
+- Reused the exact diagnostic product icon factory in installation and removal reports; aligned names and status text without changing operations.
+- Replaced sidebar text glyphs with theme-aware vector navigation icons, preserving labels, actions and hover animation.
+- Redesigned bulk confirmation dialogs with shared package vector icons, a two-column list and localized safety notices.
+- Redesigned scan results with verified-tool count, progress bar, shared vector product cards, conflict/external statuses, collapsible paths and rescan action. Expanded the five-language user guide with all eight tool descriptions, update/security sections, section navigation and assembly version.
+- Refined single-product confirmation dialogs and guide navigation with contextual vector icons and theme-aware index buttons.
+- Added optional once-per-launch offline startup music playback at 30%, persistent setting and non-overlapping transition to chip player; original Wave Pt. II WAV included in Assets.
+- Display startup track title and highlight indexed guide destinations with precise scrolling, two subtle bounces and temporary glow.
+- Windows build succeeded; project owner approved the tested interface and authorized stable publication.
+- Existing audio binaries and identities unchanged. Automatic plugin replacement remains disabled.
+
 v0.8.42 - COMPRESSOR X v2.2 and individual downloads (released 25 November 2026)
 - Published official Windows x64 installer after successful automated compilation and user functional testing.
 - Added independent COMPRESSOR X v2.2 VST3 with its original logo, dedicated installation and removal, pinned SHA-256 integrity validation and installation receipt.

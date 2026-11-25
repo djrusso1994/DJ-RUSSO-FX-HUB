@@ -77,6 +77,21 @@
         "sha256": "cad8e2d08a34060b1d2af958063b96836c4f3df706420048ffbc3d6cf660a504",
         "commit": "7c15ea42c603ac397ac5e39bf8fd5a8144e0e2d8"
       }
+    },
+    {
+      "id": "eq-x",
+      "version": "1.1.1",
+      "effectIds": [
+        "eq-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO EQ X.vst3",
+        "sizeBytes": 12597248,
+        "sha256": "91d05696d42ecc2f3aba63c59bbb5cd9c774ff6fee276492ebe66fe2368c1758",
+        "commit": "89aecc51051d3cc9c1005e62f1fa8c34278c12da"
+      }
     }
   ]
 }
