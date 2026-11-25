@@ -120,7 +120,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.38";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.42";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  // Temporarily favor speed while Windows is actively resizing/maximizing,
  // then restore high-quality antialiasing after layout has settled.
  // This cannot replace or override the native DWM maximize transition.
@@ -340,7 +340,7 @@ public partial class MainWindow : Window
              BadgeTip=conflict?ConflictLabel:external?ExternalLabel:installed?(Index==1?"Installato e verificato":"Installed and verified"):
                  (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
              FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?103:77,LogoMaxWidth=planned?165:150,Category=T(category),
-             Footer=fx.id=="meter-x"? (VersionDisplay("meter-x")+" • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?(Index==1?"INSTALLATO":"INSTALLED"):(Index==1?"NON INSTALLATO":"NOT INSTALLED"))+"\n"+VersionDisplay(fx.id)
+             Footer=fx.id=="meter-x"? (VersionDisplay("meter-x")+" • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?new[]{"INSTALLED","INSTALLATO","INSTALADO","INSTALLÉ","INSTALLIERT"}[Index]:new[]{"NOT INSTALLED","NON INSTALLATO","NO INSTALADO","NON INSTALLÉ","NICHT INSTALLIERT"}[Index])+"\n"+VersionDisplay(fx.id)
          });
      }
      var term=ProductSearch?.Text?.Trim()??"";
@@ -455,9 +455,13 @@ public partial class MainWindow : Window
   }catch(Exception ex){detail="METER X: "+ex.Message;return false;}
  }
  private void InstallShell_Click(object sender,RoutedEventArgs e){
-  if(NeonDialog.Show(this,Index==1?
-     "Installare FX SHELL, REVERB X, DELAY X, COMPRESSOR X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.":
+  if(NeonDialog.Show(this,new[]{
      "Install available FX SHELL, REVERB X, DELAY X, COMPRESSOR X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
+     "Installare FX SHELL, REVERB X, DELAY X, COMPRESSOR X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.",
+     "¿Instalar FX SHELL, REVERB X, DELAY X, COMPRESSOR X y METER X disponibles? Los VST3 requieren permisos de administrador. Cierra FL Studio primero.",
+     "Installer FX SHELL, REVERB X, DELAY X, COMPRESSOR X et METER X disponibles ? Les VST3 nécessitent les droits administrateur. Fermez FL Studio.",
+     "Verfügbare FX SHELL, REVERB X, DELAY X, COMPRESSOR X und METER X installieren? VST3 benötigen Administratorrechte. FL Studio zuerst schließen."
+     }[Index],
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   var state=ShellInstaller.GetState();
@@ -519,9 +523,13 @@ public partial class MainWindow : Window
   }finally{Refresh();}
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
-  if(NeonDialog.Show(this,Index==1?
-     "Rimuovere FX SHELL, REVERB X, DELAY X, COMPRESSOR X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.":
+  if(NeonDialog.Show(this,new[]{
      "Remove HUB-managed FX SHELL, REVERB X, DELAY X, COMPRESSOR X and METER X? External files are untouched. Close FL Studio and METER X.",
+     "Rimuovere FX SHELL, REVERB X, DELAY X, COMPRESSOR X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.",
+     "¿Eliminar FX SHELL, REVERB X, DELAY X, COMPRESSOR X y METER X gestionados por el HUB? No se modifican archivos externos. Cierra FL Studio y METER X.",
+     "Supprimer FX SHELL, REVERB X, DELAY X, COMPRESSOR X et METER X gérés par le HUB ? Les fichiers externes restent intacts. Fermez FL Studio et METER X.",
+     "Vom HUB verwaltete FX SHELL, REVERB X, DELAY X, COMPRESSOR X und METER X entfernen? Externe Dateien bleiben unverändert. FL Studio und METER X schließen."
+     }[Index],
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
   if(ShellInstaller.GetState()==ShellInstaller.State.Managed){
@@ -947,7 +955,7 @@ public partial class MainWindow : Window
   MeterPanelLaunchButton.Visibility=meter?Visibility.Visible:Visibility.Collapsed;
   MeterPanelLaunchButton.IsEnabled=meter && installed;
   MeterPanelRemoveButton.Visibility=meter||shell||reverb||delay||compressor?Visibility.Visible:Visibility.Collapsed;
-  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?(Index==1?"● Installato":"● Installed"):meter||shell||reverb||delay||compressor?(Index==1?"○ Non installato":"○ Not installed"):(Index==1?"◌ In arrivo":"◌ Coming soon");
+  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?new[]{"● Installed","● Installato","● Instalado","● Installé","● Installiert"}[Index]:meter||shell||reverb||delay||compressor?new[]{"○ Not installed","○ Non installato","○ No instalado","○ Non installé","○ Nicht installiert"}[Index]:new[]{"◌ Coming soon","◌ In arrivo","◌ Próximamente","◌ À venir","◌ Demnächst"}[Index];
  }
  private async void CheckPluginUpdates_Click(object sender,RoutedEventArgs e){
    if(hubUpdateInProgress)return;
@@ -1279,6 +1287,8 @@ public partial class MainWindow : Window
  Save projects and close your DAW and METER X. Select a product or Install all. Approve administrator access for VST3 installation. FX SHELL installs all three effects; REVERB X, DELAY X and COMPRESSOR X are separate. VST3 location: C:\Program Files\Common Files\VST3. Rescan in your DAW. Remove all removes HUB-managed products; external VST3 copies are protected.
  METER X
  Independent portable audio meter, installable from the HUB. WASAPI loopback may not capture exclusive ASIO audio.
+ COMPRESSOR X
+ Independent VST3 compressor with 60 presets, a dynamic compression curve, Plasma Energy, lookahead and advanced stereo dynamics. Close your DAW before installing or removing it.
  COMPATIBILITY AND REQUIREMENTS
  Windows x64 and a compatible VST3 x64 host for effects. FL Studio is the primary test host; Cubase, Ableton Live and REAPER are not fully tested. FL Studio is not required for the HUB.
  DETECTION AND DIAGNOSTICS
@@ -1300,6 +1310,8 @@ public partial class MainWindow : Window
  Salva i progetti e chiudi la DAW e METER X. Seleziona un prodotto oppure Installa tutto. Autorizza l'amministratore per i VST3. FX SHELL installa tutti e tre gli effetti; REVERB X, DELAY X e COMPRESSOR X sono separati. Percorso VST3: C:\Program Files\Common Files\VST3. Ripeti la scansione nella DAW. Rimuovi tutto rimuove i prodotti gestiti dall'HUB; le copie VST3 esterne sono protette.
  METER X
  Misuratore audio portable indipendente, installabile dall'HUB. Il loopback WASAPI potrebbe non acquisire audio tramite ASIO esclusivo.
+ COMPRESSOR X
+ Compressore VST3 indipendente con 60 preset, curva dinamica, Plasma Energy, lookahead e dinamica stereo avanzata. Chiudi la DAW prima di installarlo o rimuoverlo.
  COMPATIBILITÀ E REQUISITI
  Windows x64 e host VST3 x64 compatibile per gli effetti. FL Studio è l'host principale di test; Cubase, Ableton Live e REAPER non sono stati testati completamente. FL Studio non è necessario per l'HUB.
  RILEVAMENTO E DIAGNOSTICA
@@ -1321,6 +1333,8 @@ public partial class MainWindow : Window
  Guarda los proyectos y cierra la DAW y METER X. Selecciona un producto o Instalar todo. Autoriza los permisos de administrador para VST3. FX SHELL instala los tres efectos; REVERB X, DELAY X y COMPRESSOR X son independientes. Ruta VST3: C:\Program Files\Common Files\VST3. Vuelve a escanear en la DAW. Eliminar todo elimina los productos gestionados por el HUB y protege las copias VST3 externas.
  METER X
  Medidor portátil independiente instalable desde el HUB. WASAPI loopback puede no capturar audio ASIO exclusivo.
+ COMPRESSOR X
+ Compresor VST3 independiente con 60 presets, curva dinámica, Plasma Energy, lookahead y dinámica estéreo avanzada. Cierra la DAW antes de instalarlo o eliminarlo.
  COMPATIBILIDAD Y REQUISITOS
  Windows x64 y host VST3 x64 compatible. FL Studio es el host principal de pruebas; Cubase, Ableton Live y REAPER no se han probado completamente. FL Studio no es necesario para el HUB.
  DETECCIÓN Y DIAGNÓSTICO
@@ -1342,6 +1356,8 @@ public partial class MainWindow : Window
  Enregistrez les projets et fermez la STAN et METER X. Sélectionnez un produit ou Tout installer. Autorisez les droits administrateur pour les VST3. FX SHELL installe les trois effets ; REVERB X, DELAY X et COMPRESSOR X sont indépendants. Chemin VST3 : C:\Program Files\Common Files\VST3. Relancez la recherche dans la STAN. Tout supprimer retire les produits gérés par le HUB et protège les copies VST3 externes.
  METER X
  Mesureur audio portable indépendant, installable depuis le HUB. Le loopback WASAPI peut ne pas capturer le signal ASIO exclusif.
+ COMPRESSOR X
+ Compresseur VST3 indépendant avec 60 presets, courbe dynamique, Plasma Energy, lookahead et dynamique stéréo avancée. Fermez la STAN avant de l'installer ou de le supprimer.
  COMPATIBILITÉ ET CONFIGURATION
  Windows x64 et hôte VST3 x64 compatible. FL Studio est l'hôte principal de test ; Cubase, Ableton Live et REAPER ne sont pas entièrement testés. FL Studio n'est pas requis pour le HUB.
  DÉTECTION ET DIAGNOSTIC
@@ -1363,6 +1379,8 @@ public partial class MainWindow : Window
  Projekte speichern und DAW sowie METER X schließen. Produkt oder Alles installieren wählen. Administratorrechte für VST3 bestätigen. FX SHELL installiert alle drei Effekte; REVERB X, DELAY X und COMPRESSOR X sind separat. VST3-Pfad: C:\Program Files\Common Files\VST3. Plugins in der DAW erneut scannen. Alles entfernen entfernt HUB-verwaltete Produkte; externe VST3-Kopien bleiben geschützt.
  METER X
  Eigenständiges portables Audiometer, über den HUB installierbar. WASAPI-Loopback erfasst möglicherweise kein exklusives ASIO-Audio.
+ COMPRESSOR X
+ Eigenständiger VST3-Kompressor mit 60 Presets, dynamischer Kurve, Plasma Energy, Lookahead und erweiterter Stereo-Dynamik. DAW vor der Installation oder Entfernung schließen.
  KOMPATIBILITÄT UND ANFORDERUNGEN
  Windows x64 und kompatibler VST3-x64-Host. FL Studio ist der primäre Testhost; Cubase, Ableton Live und REAPER sind nicht vollständig getestet. FL Studio ist für den HUB nicht erforderlich.
  ERKENNUNG UND DIAGNOSE
@@ -1502,7 +1520,7 @@ public partial class MainWindow : Window
   CopyInstallerHashButton.IsEnabled=false;
   SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
   try{
-   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.38";
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.42";
    using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
    response.EnsureSuccessStatusCode();
    using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());

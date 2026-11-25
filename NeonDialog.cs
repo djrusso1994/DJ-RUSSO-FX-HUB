@@ -378,6 +378,7 @@ internal static class NeonDialog
                     string geometry=name.StartsWith("FX SHELL")?"M2,6 L10,2 L18,6 L10,10 Z M2,10 L10,14 L18,10 M2,14 L10,18 L18,14":
                         name.StartsWith("REVERB")?"M2,10 Q6,0 10,10 T18,10":
                         name.StartsWith("DELAY")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
+                        name.StartsWith("COMPRESSOR")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
                         name.StartsWith("METER")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
                         "M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z";
                     iconFrame.Child=new Path{Data=Geometry.Parse(geometry),Stroke=secondary,StrokeThickness=1.5,
