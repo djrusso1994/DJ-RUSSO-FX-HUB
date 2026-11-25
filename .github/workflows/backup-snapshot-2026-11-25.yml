@@ -1,0 +1,27 @@
+name: Backup source snapshots 2026-11-25
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  source-snapshots:
+    if: github.head_ref == 'backup/snapshot-2026-11-25'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          ref: '7c15ea42c603ac397ac5e39bf8fd5a8144e0e2d8'
+      - name: Archive exact source revisions
+        run: |
+          mkdir -p snapshots
+          git archive --format=zip --prefix=DJ_RUSSO_FX_HUB_v0.8.41/ -o snapshots/FX_HUB_v0.8.41_SOURCE.zip 2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a
+          git archive --format=zip --prefix=DJ_RUSSO_FX_HUB_v0.8.42_TEST/ -o snapshots/FX_HUB_v0.8.42_TEST_SOURCE.zip 7c15ea42c603ac397ac5e39bf8fd5a8144e0e2d8
+          (cd snapshots && sha256sum *.zip > SHA256SUMS.txt)
+      - uses: actions/upload-artifact@v6
+        with:
+          name: FX_HUB_SOURCE_SNAPSHOTS_2026-11-25
+          path: snapshots/
+          if-no-files-found: error
+          compression-level: 0
