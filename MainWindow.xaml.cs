@@ -73,7 +73,7 @@ public partial class MainWindow : Window
   ["source"]=["Update source: official GitHub Releases","Fonte aggiornamenti: GitHub Releases ufficiali","Fuente de actualizaciones: versiones oficiales de GitHub","Source des mises à jour : versions officielles GitHub","Updatequelle: offizielle GitHub-Releases"],
   ["shellfound"]=["FX SHELL detected; individual effects not verified","FX SHELL rilevato; singoli effetti non verificati","FX SHELL detectado; efectos individuales sin verificar","FX SHELL détecté ; effets individuels non vérifiés","FX SHELL erkannt; einzelne Effekte nicht geprüft"],
   ["subtitle"]=["14 PLUGINS • ONE CREATIVE ECOSYSTEM","14 PLUGIN • UN UNICO ECOSISTEMA CREATIVO","14 PLUGINS • UN ECOSISTEMA CREATIVO","14 PLUGINS • UN ÉCOSYSTÈME CRÉATIF","14 PLUGINS • EIN KREATIVES ÖKOSYSTEM"],
-  ["updates"]=["CHECK UPDATES","CONTROLLA AGGIORNAMENTI","BUSCAR ACTUALIZACIONES","VÉRIFIER LES MISES À JOUR","UPDATES PRÜFEN"],
+  ["updates"]=["FX HUB UPDATES","AGGIORNAMENTI FX HUB","ACTUALIZACIONES FX HUB","MISES À JOUR FX HUB","FX HUB UPDATES"],
   ["folder"]=["OPEN VST3 FOLDER","APRI CARTELLA VST3","ABRIR CARPETA VST3","OUVRIR DOSSIER VST3","VST3-ORDNER ÖFFNEN"],
   ["scan"]=["SCAN INSTALLED SOFTWARE","RILEVA SOFTWARE INSTALLATI","BUSCAR SOFTWARE INSTALADO","DÉTECTER LES LOGICIELS INSTALLÉS","INSTALLIERTE SOFTWARE SUCHEN"],
   ["language"]=["Language","Lingua","Idioma","Langue","Sprache"],
