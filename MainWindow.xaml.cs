@@ -932,6 +932,10 @@ public partial class MainWindow : Window
   ProductPanelTitle.Text=fx.name;
   var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter","reverb-x"=>"logo-reverb-x","delay-x"=>"logo-delay-x","compressor-x"=>"logo-compressor-x",_=>fx.id});
   var comingSoon=!meter && !shell && !reverb && !delay && !compressor;
+  PluginDownloadButton.Visibility=comingSoon?Visibility.Collapsed:Visibility.Visible;
+  PluginDownloadButton.IsEnabled=!pluginDownloadInProgress && !hubUpdateInProgress;
+  PluginDownloadButton.Content=pluginDownloadInProgress?new[]{"DOWNLOADING…","DOWNLOAD IN CORSO…","DESCARGANDO…","TÉLÉCHARGEMENT…","DOWNLOAD LÄUFT…"}[Index]:new[]{"DOWNLOAD PACKAGE","SCARICA PACCHETTO","DESCARGAR PAQUETE","TÉLÉCHARGER LE PAQUET","PAKET HERUNTERLADEN"}[Index];
+  PluginDownloadButton.ToolTip=new[]{"Download verified file only; does not install or overwrite.","Scarica il file verificato, senza installare o sovrascrivere.","Descarga el archivo verificado sin instalar ni sobrescribir.","Télécharge le fichier vérifié sans installer ni écraser.","Geprüfte Datei herunterladen, ohne Installation oder Überschreiben."}[Index];
   // Use the same cached transparent-pixel crop already used in the catalog.
   // This keeps the artwork itself legible, not merely its oversized PNG canvas.
   ProductPanelLogo.Source=comingSoon?CardLogo(fx.id,productAsset,true):productAsset;
@@ -956,6 +960,42 @@ public partial class MainWindow : Window
   MeterPanelLaunchButton.IsEnabled=meter && installed;
   MeterPanelRemoveButton.Visibility=meter||shell||reverb||delay||compressor?Visibility.Visible:Visibility.Collapsed;
   MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?new[]{"● Installed","● Installato","● Instalado","● Installé","● Installiert"}[Index]:meter||shell||reverb||delay||compressor?new[]{"○ Not installed","○ Non installato","○ No instalado","○ Non installé","○ Nicht installiert"}[Index]:new[]{"◌ Coming soon","◌ In arrivo","◌ Próximamente","◌ À venir","◌ Demnächst"}[Index];
+ }
+ private bool pluginDownloadInProgress;
+ private async void PluginDownload_Click(object sender,RoutedEventArgs e){
+  if(pluginDownloadInProgress || hubUpdateInProgress)return;
+  string id=IsShellProduct(selectedProductId)?"fx-shell":selectedProductId;
+  pluginDownloadInProgress=true;
+  PluginDownloadButton.IsEnabled=false;
+  PluginDownloadProgress.Value=0;
+  PluginDownloadProgress.Visibility=Visibility.Visible;
+  PluginDownloadProgress.IsIndeterminate=true;
+  using var timeout=new System.Threading.CancellationTokenSource(TimeSpan.FromMinutes(3));
+  try{
+   var package=await PluginDownload.ResolveAsync(id,timeout.Token);
+   var dialog=new SaveFileDialog{
+    FileName=Path.GetFileNameWithoutExtension(package.FileName)+" v"+package.Version+Path.GetExtension(package.FileName),
+    DefaultExt=Path.GetExtension(package.FileName),
+    Filter=Path.GetExtension(package.FileName)==".vst3"?"VST3 (*.vst3)|*.vst3":"EXE (*.exe)|*.exe",
+    AddExtension=true, OverwritePrompt=false,
+    InitialDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Downloads"),
+    Title=new[]{"Save verified package","Salva pacchetto verificato","Guardar paquete verificado","Enregistrer le paquet vérifié","Geprüftes Paket speichern"}[Index]
+   };
+   if(dialog.ShowDialog(this)!=true)return;
+   if(!Path.GetExtension(dialog.FileName).Equals(Path.GetExtension(package.FileName),StringComparison.OrdinalIgnoreCase))
+    throw new IOException("Invalid file extension.");
+   PluginDownloadProgress.IsIndeterminate=false;
+   var progress=new Progress<int>(p=>{if(pluginDownloadInProgress){PluginDownloadProgress.Value=p;}});
+   await PluginDownload.DownloadAsync(package,dialog.FileName,progress,timeout.Token);
+   NeonDialog.Show(this,new[]{"Download verified (SHA-256). No installed files changed.","Download verificato (SHA-256). Nessun file installato modificato.","Descarga verificada (SHA-256). No se modificaron archivos instalados.","Téléchargement vérifié (SHA-256). Aucun fichier installé modifié.","Download geprüft (SHA-256). Keine installierten Dateien geändert."}[Index]+"\n\n"+dialog.FileName,"DJ RUSSO FX HUB");
+  }catch(Exception ex){
+   NeonDialog.Show(this,new[]{"Download failed: ","Download non riuscito: ","Error de descarga: ","Échec du téléchargement : ","Download fehlgeschlagen: "}[Index]+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+  }finally{
+   pluginDownloadInProgress=false;
+   PluginDownloadProgress.Visibility=Visibility.Collapsed;
+   PluginDownloadProgress.IsIndeterminate=false;
+   UpdateSelectedProductPanel();
+  }
  }
  private async void CheckPluginUpdates_Click(object sender,RoutedEventArgs e){
    if(hubUpdateInProgress)return;
@@ -1026,7 +1066,10 @@ public partial class MainWindow : Window
        new[]{"Incluse","Catalogue","Mise à jour publiée ; installation automatique non activée.","À jour. Aucun fichier modifié."},
        new[]{"Enthalten","Katalog","Update veröffentlicht; automatische Installation noch nicht aktiv.","Aktuell. Keine Dateien geändert."}
      }[Index];
-     var message=$"{displayName}\n{labels[0]}: v{installedVersion}  •  {labels[1]}: v{version}\n{(available?labels[2]:labels[3])}";
+     var newer=Version.TryParse(version,out var remoteVersion) && Version.TryParse(installedVersion,out var localVersion) && remoteVersion>localVersion;
+     var downloadable=found.TryGetProperty("download",out _);
+     var downloadNotice=new[]{"New package available: use Download package. Installation is manual.","Nuovo pacchetto disponibile: usa Scarica pacchetto. Installazione manuale.","Nuevo paquete disponible: usa Descargar paquete. Instalación manual.","Nouveau paquet disponible : utilisez Télécharger le paquet. Installation manuelle.","Neues Paket verfügbar: Paket herunterladen. Manuelle Installation."}[Index];
+     var message=$"{displayName}\n{labels[0]}: v{installedVersion}  •  {labels[1]}: v{version}\n{(newer?(downloadable?downloadNotice:labels[2]):labels[3])}";
      NeonToast.Show(this,message);
    }catch(Exception ex){
      NeonDialog.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
@@ -1294,7 +1337,7 @@ public partial class MainWindow : Window
  DETECTION AND DIAGNOSTICS
  Detection counts installed tools; diagnostics checks paths, package integrity, installation status and known VST3 filenames. Neither guarantees successful DAW loading.
  UPDATES AND SETTINGS
- Internet access is required for online update checks. Plugin checks compare bundled and catalog versions; automatic installation may not be available. Settings offer themes and five languages.
+ Internet access is required for online update checks. Plugin checks compare bundled and catalog versions; automatic installation may not be available. Settings offer themes and five languages. Download package saves an individually verified file, without installing or replacing anything. FX SHELL downloads as one shared VST3.
  TROUBLESHOOTING
  Rescan VST3, check the standard path, restart the DAW and approve administrator access. Use diagnostics before reinstalling.
  SUPPORT
@@ -1317,7 +1360,7 @@ public partial class MainWindow : Window
  RILEVAMENTO E DIAGNOSTICA
  Il rilevamento conta gli strumenti installati; la diagnostica verifica percorsi, integrità dei pacchetti, stato di installazione e nomi VST3 conosciuti. Non garantiscono il caricamento nella DAW.
  AGGIORNAMENTI E IMPOSTAZIONI
- Internet è necessario per verificare gli aggiornamenti online. Il controllo plugin confronta le versioni incluse e del catalogo; l'installazione automatica potrebbe non essere disponibile. Le impostazioni offrono temi e cinque lingue.
+ Internet è necessario per verificare gli aggiornamenti online. Il controllo plugin confronta le versioni incluse e del catalogo; l'installazione automatica potrebbe non essere disponibile. Le impostazioni offrono temi e cinque lingue. Scarica pacchetto salva il file verificato singolarmente, senza installare o sostituire nulla. FX SHELL si scarica come unico VST3.
  RISOLUZIONE DEI PROBLEMI
  Ripeti la scansione VST3, verifica il percorso standard, riavvia la DAW e autorizza l'amministratore. Usa la diagnostica prima di reinstallare.
  SUPPORTO
@@ -1340,7 +1383,7 @@ public partial class MainWindow : Window
  DETECCIÓN Y DIAGNÓSTICO
  La detección cuenta las herramientas instaladas; el diagnóstico comprueba rutas, integridad, estado y nombres VST3 conocidos. No garantizan la carga en la DAW.
  ACTUALIZACIONES Y AJUSTES
- Se necesita Internet para comprobar actualizaciones. Se comparan versiones incluidas y del catálogo; la instalación automática puede no estar disponible. Hay temas y cinco idiomas.
+ Se necesita Internet para comprobar actualizaciones. Se comparan versiones incluidas y del catálogo; la instalación automática puede no estar disponible. Hay temas y cinco idiomas. Descargar paquete guarda un archivo verificado individual sin instalarlo ni sustituir nada. FX SHELL se descarga como un VST3 compartido.
  SOLUCIÓN DE PROBLEMAS
  Repite el escaneo VST3, comprueba la ruta, reinicia la DAW y autoriza los permisos. Usa el diagnóstico antes de reinstalar.
  SOPORTE
@@ -1363,7 +1406,7 @@ public partial class MainWindow : Window
  DÉTECTION ET DIAGNOSTIC
  La détection compte les outils installés ; le diagnostic vérifie les chemins, l'intégrité, l'état et les noms VST3 connus. Ils ne garantissent pas le chargement dans la STAN.
  MISES À JOUR ET PARAMÈTRES
- Internet est requis pour vérifier les mises à jour. Les versions incluses et du catalogue sont comparées ; l'installation automatique peut être indisponible. Thèmes et cinq langues sont proposés.
+ Internet est requis pour vérifier les mises à jour. Les versions incluses et du catalogue sont comparées ; l'installation automatique peut être indisponible. Thèmes et cinq langues sont proposés. Télécharger le paquet enregistre un fichier vérifié sans installer ni remplacer quoi que ce soit. FX SHELL est un VST3 partagé.
  DÉPANNAGE
  Relancez la recherche VST3, vérifiez le chemin, redémarrez la STAN et autorisez les droits administrateur. Utilisez le diagnostic avant de réinstaller.
  ASSISTANCE
@@ -1386,7 +1429,7 @@ public partial class MainWindow : Window
  ERKENNUNG UND DIAGNOSE
  Die Erkennung zählt installierte Werkzeuge; die Diagnose prüft Pfade, Integrität, Installationsstatus und bekannte VST3-Dateinamen. Das Laden in der DAW wird nicht garantiert.
  UPDATES UND EINSTELLUNGEN
- Internet ist für Updateprüfungen erforderlich. Enthaltene Versionen werden mit dem Katalog verglichen; automatische Installation ist möglicherweise nicht verfügbar. Designs und fünf Sprachen stehen zur Verfügung.
+ Internet ist für Updateprüfungen erforderlich. Enthaltene Versionen werden mit dem Katalog verglichen; automatische Installation ist möglicherweise nicht verfügbar. Designs und fünf Sprachen stehen zur Verfügung. Paket herunterladen speichert eine geprüfte Datei ohne Installation oder Ersatz. FX SHELL ist eine gemeinsame VST3-Datei.
  FEHLERBEHEBUNG
  VST3 erneut scannen, Pfad prüfen, DAW neu starten und Administratorrechte bestätigen. Vor Neuinstallation Diagnose verwenden.
  SUPPORT

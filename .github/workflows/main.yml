@@ -75,7 +75,14 @@ jobs:
           if (-not (Test-Path -LiteralPath $compressor -PathType Leaf)) { throw "COMPRESSOR X v2.2 payload missing; do not publish incomplete HUB." }
           if ((Get-FileHash -LiteralPath $compressor -Algorithm SHA256).Hash.ToLowerInvariant() -ne "cad8e2d08a34060b1d2af958063b96836c4f3df706420048ffbc3d6cf660a504") { throw "COMPRESSOR X payload SHA-256 mismatch; refusing release." }
           if (-not (Test-Path -LiteralPath "Assets/logo-compressor-x.png" -PathType Leaf)) { throw "COMPRESSOR X approved logo missing." }
-          Write-Host "All five bundled packages verified."
+          $catalog = Get-Content "publish/plugin-updates.json" -Raw | ConvertFrom-Json
+          foreach ($package in $catalog.packages) {
+            $p = Join-Path "publish/Payload" $package.download.fileName
+            if (-not (Test-Path -LiteralPath $p -PathType Leaf)) { throw "Missing individual package: $p" }
+            if ((Get-Item -LiteralPath $p).Length -ne $package.download.sizeBytes) { throw "Individual package size mismatch: $p" }
+            if ((Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant() -ne $package.download.sha256) { throw "Individual package hash mismatch: $p" }
+          }
+          Write-Host "All five bundled packages and individual download metadata verified."
 
       # Early smoke check for WPF resource/XAML parse failures before packaging or releasing.
       - name: Smoke-test FX HUB WPF startup
