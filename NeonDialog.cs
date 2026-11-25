@@ -383,6 +383,8 @@ internal static class NeonDialog
                         Product("COMPRESSOR X")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
                         Product("EQ X")?"M4,2 V6 M4,10 V18 M2,6 H6 V10 H2 Z M10,2 V12 M10,16 V18 M8,12 H12 V16 H8 Z M16,2 V4 M16,8 V18 M14,4 H18 V8 H14 Z":
                         Product("METER X")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
+                        Product("FL Studio")?"M2,5 H7 L9,7 H18 V17 H2 Z M2,7 H9 M9,12 L11,14 L15,10":
+                        Product("VST3")?"M2,4 H7 L9,7 H18 V17 H2 Z M2,7 H9":
                         "M10,2 L17,5 V11 Q17,16 10,19 Q3,16 3,11 V5 Z";
                     iconFrame.Child=new Path{Data=Geometry.Parse(geometry),Stroke=secondary,StrokeThickness=1.5,
                         StrokeLineJoin=PenLineJoin.Round,StrokeStartLineCap=PenLineCap.Round,StrokeEndLineCap=PenLineCap.Round,
