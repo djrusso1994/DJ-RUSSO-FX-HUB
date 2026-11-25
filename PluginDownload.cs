@@ -25,6 +25,7 @@ internal static class PluginDownload
         "reverb-x" => "DJ RUSSO REVERB X.vst3",
         "delay-x" => "DJ RUSSO DELAY X.vst3",
         "compressor-x" => "DJ RUSSO COMPRESSOR X.vst3",
+        "eq-x" => "DJ RUSSO EQ X.vst3",
         _ => null
     };
     private static Package? ReadPackage(string json, string id)

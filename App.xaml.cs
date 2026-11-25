@@ -13,6 +13,8 @@ public partial class App : Application
             Environment.Exit(DelayInstaller.RunElevatedWorker(e.Args[0]));
         if (e.Args.Length == 1 && CompressorInstaller.IsWorkerArgument(e.Args[0]))
             Environment.Exit(CompressorInstaller.RunElevatedWorker(e.Args[0]));
+        if (e.Args.Length == 1 && EqInstaller.IsWorkerArgument(e.Args[0]))
+            Environment.Exit(EqInstaller.RunElevatedWorker(e.Args[0]));
         base.OnStartup(e);
     }
 }

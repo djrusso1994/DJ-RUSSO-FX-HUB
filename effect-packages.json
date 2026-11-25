@@ -30,6 +30,13 @@
       "effectIds": [
         "compressor-x"
       ]
+    },
+    {
+      "id": "eq-x",
+      "detector": "bundled-eq-sha256",
+      "effectIds": [
+        "eq-x"
+      ]
     }
   ]
 }

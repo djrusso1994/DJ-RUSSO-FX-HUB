@@ -45,7 +45,7 @@
     "id": "eq-x",
     "name": "EQ X",
     "category": "EQ",
-    "status": "Planned"
+    "status": "Ready for testing"
   },
   {
     "id": "reverb-x",
