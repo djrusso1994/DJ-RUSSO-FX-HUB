@@ -3,6 +3,7 @@ v0.8.43 - EQ X v1.1.1 Professional Edition (pending HUB validation)
 - Added pinned individual download, update catalog entry and five-language HUB labels. Eight of fourteen tools available in this build.
 - Unified vector diagnostic icons across installed components and package integrity, including a dedicated EQ X fader glyph and theme-aware colors. Added distinct folder and verified-path glyphs for VST3 and FL Studio locations in all five HUB languages.
 - Clarified the sidebar FX HUB update label in all five languages, distinct from plugin updates.
+- Reused the exact diagnostic product icon factory in installation and removal reports; aligned names and status text without changing operations.
 - Existing audio binaries and identities unchanged. Automatic plugin replacement remains disabled.
 
 v0.8.42 - COMPRESSOR X v2.2 and individual downloads (released 25 November 2026)
