@@ -1276,7 +1276,9 @@ public partial class MainWindow : Window
   if(startupFinished)return;
   string file=Path.Combine(AppContext.BaseDirectory,"Assets","startup-wave.wav");
   if(!startupMusic||!File.Exists(file)){FinishIntro();return;}
-  startupPlaying=true;startupPlayer.Volume=0.30;
+  startupPlaying=true;startupPlayer.Volume=chipMuted?0:0.30;
+  ChipTrackLabel.Text="DJ RUSSO – Wave Pt. II";
+  ChipTrackLabel.ToolTip="DJ RUSSO – Wave Pt. II";
   startupPlayer.MediaEnded+=(_,_)=>FinishIntro();
   startupPlayer.MediaFailed+=(_,_)=>FinishIntro();
   startupTimeout.Tick+=(_,_)=>FinishIntro();
@@ -1284,7 +1286,7 @@ public partial class MainWindow : Window
  }
  private void FinishIntro(bool startChip=true){
   if(startupFinished)return;
-  startupFinished=true;startupPlaying=false;startupTimeout.Stop();startupPlayer.Close();
+  startupFinished=true;startupPlaying=false;startupTimeout.Stop();startupPlayer.Close();ChipTrackLabel.ToolTip=null;
   if(startChip)PlayChip();
  }
  private void StartupMusic_Changed(object sender,RoutedEventArgs e){
@@ -1738,6 +1740,32 @@ public partial class MainWindow : Window
   guideBody.Children.Add(new TextBlock{Text=new[]{"Contents","Indice","Índice","Sommaire","Inhalt"}[Index],Foreground=(Brush)FindResource("SecondaryBrush"),FontSize=17,FontWeight=FontWeights.Bold,Margin=new Thickness(0,0,0,8)});
   guideBody.Children.Add(indexPanel);
   var sectionLinks=new Dictionary<string,FrameworkElement>();
+  ScrollViewer? guideNavigationScroll=null;
+  Border? activeGuideSection=null;
+  void NavigateGuideSection(Border target){
+   if(guideNavigationScroll is null)return;
+   var sc=guideNavigationScroll;
+   if(activeGuideSection!=null){
+    activeGuideSection.RenderTransform.BeginAnimation(TranslateTransform.YProperty,null);
+    activeGuideSection.RenderTransform=new TranslateTransform();
+    activeGuideSection.Effect=null;
+    activeGuideSection.BorderThickness=new Thickness(0);
+   }
+   activeGuideSection=target;
+   sc.UpdateLayout();
+   var y=target.TransformToAncestor(guideBody).Transform(new Point(0,0)).Y+guideBody.Margin.Top;
+   sc.ScrollToVerticalOffset(Math.Max(0,y-14));
+   var shift=new TranslateTransform();target.RenderTransform=shift;
+   target.BorderBrush=(Brush)FindResource("SecondaryBrush");target.BorderThickness=new Thickness(1);
+   target.Effect=new System.Windows.Media.Effects.DropShadowEffect{Color=Color.FromRgb(57,216,237),BlurRadius=14,ShadowDepth=0,Opacity=0.8};
+   var bounce=new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames();
+   foreach(var frame in new[]{(0,0d),(120,-6d),(240,0d),(360,-3d),(480,0d)})
+    bounce.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(frame.Item2,System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(frame.Item1))));
+   shift.BeginAnimation(TranslateTransform.YProperty,bounce);
+   var clear=new System.Windows.Threading.DispatcherTimer{Interval=TimeSpan.FromMilliseconds(1800)};
+   clear.Tick+=(_,_)=>{clear.Stop();if(ReferenceEquals(activeGuideSection,target)&&ReferenceEquals(target.RenderTransform,shift)){target.Effect=null;target.BorderThickness=new Thickness(0);activeGuideSection=null;}};
+   clear.Start();
+  }
   for(int i=0;i<lines.Length;i++){
    var line=lines[i].Trim();
    if(string.IsNullOrWhiteSpace(line))continue;
@@ -1781,15 +1809,19 @@ public partial class MainWindow : Window
      jump.Content=jumpContent;
      jump.MouseEnter+=(_,_)=>jump.Effect=new System.Windows.Media.Effects.DropShadowEffect{Color=Color.FromRgb(57,216,237),BlurRadius=9,ShadowDepth=0,Opacity=0.6};
      jump.MouseLeave+=(_,_)=>jump.Effect=null;
-     jump.Click+=(_,_)=>card.BringIntoView();indexPanel.Children.Add(jump);
+     jump.Click+=(_,_)=>NavigateGuideSection(card);indexPanel.Children.Add(jump);
     }
    }else guideBody.Children.Add(paragraph);
   }
+  var bottomSpace=new Border{Height=0,IsHitTestVisible=false};
+  guideBody.Children.Add(bottomSpace);
   var guideScroll=new ScrollViewer{
    VerticalScrollBarVisibility=ScrollBarVisibility.Auto,
    HorizontalScrollBarVisibility=ScrollBarVisibility.Disabled,
    Content=guideBody,Margin=new Thickness(0,0,5,0)
   };
+  guideNavigationScroll=guideScroll;
+  guideScroll.SizeChanged+=(_,_)=>bottomSpace.Height=Math.Max(0,guideScroll.ViewportHeight-85);
   guideScroll.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=(Style)FindResource("NeonGuideScrollBar");
   guideScroll.Resources["ScrollRailBrush"]=FindResource("ScrollRailBrush");
   guideScroll.Resources["ScrollThumbBrush"]=FindResource("ScrollThumbBrush");
