@@ -133,7 +133,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.43";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.43";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";if(doc.RootElement.TryGetProperty("startupMusic",out var sm)&&sm.ValueKind is JsonValueKind.True or JsonValueKind.False)startupMusic=sm.GetBoolean();}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;StartupMusicCheck.IsChecked=startupMusic;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  // Temporarily favor speed while Windows is actively resizing/maximizing,
  // then restore high-quality antialiasing after layout has settled.
  // This cannot replace or override the native DWM maximize transition.
@@ -289,7 +289,7 @@ public partial class MainWindow : Window
  private void Refresh()
  {
      SetNavIcon(SettingsButton,T("settings"),"M10,2 V5 M10,15 V18 M2,10 H5 M15,10 H18 M4,4 L6,6 M14,14 L16,16 M4,16 L6,14 M14,6 L16,4 M10,5 A5,5 0 1 1 9.99,5 Z M10,8 A2,2 0 1 1 9.99,8 Z"); SetNavIcon(GuideButton,T("guide"),"M2,3 H7 Q10,3 10,6 Q10,3 13,3 H18 V16 H13 Q10,16 10,18 Q10,16 7,16 H2 Z M10,6 V18");
-     ThemeHint.Text=T("theme");SettingsHint.Text=T("settingshint");
+     ThemeHint.Text=T("theme");SettingsHint.Text=T("settingshint");StartupMusicCheck.Content=new[]{"Startup music · Wave Pt. II","Musica di avvio · Wave Pt. II","Música de inicio · Wave Pt. II","Musique de démarrage · Wave Pt. II","Startmusik · Wave Pt. II"}[Index];
      SearchCaption.Text=T("searchProducts");FilterCaption.Text=T("filterProducts");
      ProductSearch.ToolTip=T("searchTip");ProductFilter.ToolTip=T("filterTip");
      // Keep filter captions synchronized with the selected UI language.
@@ -363,13 +363,13 @@ public partial class MainWindow : Window
      UpdateSelectedProductPanel();
      UpdateMeterUi();
  }
- private void SettingsLanguageBox_SelectionChanged(object sender,SelectionChangedEventArgs e){if(!ready||SettingsLanguageBox.SelectedItem is not ComboBoxItem item)return;lang=item.Tag?.ToString()??"en";ScanResultsPanel.Visibility=Visibility.Collapsed;try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme}));}catch{}Refresh();}
+ private void SettingsLanguageBox_SelectionChanged(object sender,SelectionChangedEventArgs e){if(!ready||SettingsLanguageBox.SelectedItem is not ComboBoxItem item)return;lang=item.Tag?.ToString()??"en";ScanResultsPanel.Visibility=Visibility.Collapsed;try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme,startupMusic}));}catch{}Refresh();}
 
  private void SettingsThemeBox_SelectionChanged(object sender,SelectionChangedEventArgs e){
   if(!ready)return;theme=SettingsThemeBox.SelectedIndex switch {1=>"dark",2=>"light",_=>"neon"};
   SavePrefs();ApplyTheme();Refresh();
  }
- private void SavePrefs(){try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme}));}catch{}}
+ private void SavePrefs(){try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme,startupMusic}));}catch{}}
  private void ApplyTheme(){
   var light=theme=="light"; var dark=theme=="dark";
   var bg=light?"#EDF1F8":dark?"#11141B":"#090C19";
@@ -1269,6 +1269,29 @@ public partial class MainWindow : Window
   catch{waveEnvelope=Array.Empty<double>();}
  }
  private readonly MediaPlayer chipPlayer=new();
+ private readonly MediaPlayer startupPlayer=new();
+ private bool startupMusic=true,startupPlaying=false,startupFinished=false;
+ private readonly System.Windows.Threading.DispatcherTimer startupTimeout=new(){Interval=TimeSpan.FromSeconds(15)};
+ private void StartIntro(){
+  if(startupFinished)return;
+  string file=Path.Combine(AppContext.BaseDirectory,"Assets","startup-wave.wav");
+  if(!startupMusic||!File.Exists(file)){FinishIntro();return;}
+  startupPlaying=true;startupPlayer.Volume=0.30;
+  startupPlayer.MediaEnded+=(_,_)=>FinishIntro();
+  startupPlayer.MediaFailed+=(_,_)=>FinishIntro();
+  startupTimeout.Tick+=(_,_)=>FinishIntro();
+  try{startupPlayer.Open(new Uri(file));startupPlayer.Play();startupTimeout.Start();}catch{FinishIntro();}
+ }
+ private void FinishIntro(bool startChip=true){
+  if(startupFinished)return;
+  startupFinished=true;startupPlaying=false;startupTimeout.Stop();startupPlayer.Close();
+  if(startChip)PlayChip();
+ }
+ private void StartupMusic_Changed(object sender,RoutedEventArgs e){
+  if(!ready)return;
+  startupMusic=StartupMusicCheck.IsChecked==true;SavePrefs();
+  if(!startupMusic&&startupPlaying)FinishIntro();
+ }
  private readonly System.Windows.Threading.DispatcherTimer chipTimer=new();
  private int chipIndex=0; private bool chipPaused=false; private bool chipMuted=false;
  private void SetChipPlaying(bool playing){ChipPauseIcon.Visibility=playing?Visibility.Visible:Visibility.Collapsed;ChipResumeIcon.Visibility=playing?Visibility.Collapsed:Visibility.Visible;}
@@ -1283,11 +1306,12 @@ public partial class MainWindow : Window
    chipTimer.Interval=TimeSpan.FromMinutes(5); // MediaEnded advances at actual file duration; timer is a fallback.
    chipTimer.Tick += (_,_)=>NextChip();
    chipPlayer.Volume=0.10;
-   PlayChip();
-   Closed += (_,_)=>{waveTimer.Stop();chipTimer.Stop();chipPlayer.Stop();chipPlayer.Close();};
+   chipPaused=true;SetChipPlaying(false);Loaded+=(_,_)=>StartIntro();
+   Closed += (_,_)=>{startupTimeout.Stop();startupPlayer.Close();waveTimer.Stop();chipTimer.Stop();chipPlayer.Stop();chipPlayer.Close();};
  }
  private void PlayChip()
  {
+   if(!startupFinished)FinishIntro(false);
    string file=Path.Combine(AppContext.BaseDirectory,"ChipMusic",$"ghost-chip-{chipIndex+1:00}.wav");
    if(!File.Exists(file)){ChipTrackLabel.Text="CHIP AUDIO UNAVAILABLE";return;}
    LoadWaveEnvelope();chipPlayer.Open(new Uri(file));chipPlayer.Volume=chipMuted?0:ChipVolumeSlider.Value/100.0;
@@ -1298,12 +1322,13 @@ public partial class MainWindow : Window
  private void ChipNext_Click(object sender,RoutedEventArgs e)=>NextChip();
  private void ChipPlay_Click(object sender,RoutedEventArgs e)
  {
+   if(!startupFinished){FinishIntro();return;}
    if(chipPaused){chipPlayer.Play();chipTimer.Start();SetChipPlaying(true);}
    else{chipPlayer.Pause();chipTimer.Stop();SetChipPlaying(false);}
    chipPaused=!chipPaused;
  }
  private void ChipMute_Click(object sender,RoutedEventArgs e)
- {chipMuted=!chipMuted;chipPlayer.Volume=chipMuted?0:ChipVolumeSlider.Value/100.0;ChipSoundWaves.Visibility=chipMuted?Visibility.Collapsed:Visibility.Visible;ChipMutedMark.Visibility=chipMuted?Visibility.Visible:Visibility.Collapsed;}
+ {chipMuted=!chipMuted;startupPlayer.Volume=chipMuted?0:0.30;chipPlayer.Volume=chipMuted?0:ChipVolumeSlider.Value/100.0;ChipSoundWaves.Visibility=chipMuted?Visibility.Collapsed:Visibility.Visible;ChipMutedMark.Visibility=chipMuted?Visibility.Visible:Visibility.Collapsed;}
  private void ChipVolume_Changed(object sender,RoutedPropertyChangedEventArgs<double> e)
  {if(chipPlayer!=null)chipPlayer.Volume=chipMuted?0:e.NewValue/100.0;}
  private void Scan_Click(object sender,RoutedEventArgs e)
@@ -1742,14 +1767,20 @@ public partial class MainWindow : Window
    };
    if(heading && i>0){
     var group=new StackPanel{Orientation=Orientation.Horizontal};
-    string iconName=line is "SIDECHAIN X" or "REVERSE FX" or "STUTTER FX"?"FX SHELL":line;
+    string iconName=line switch {"ABOUT"=>"@info","INFORMAZIONI"=>"@info","INFORMACIÓN"=>"@info","INFORMATIONS"=>"@info","INFORMATIONEN"=>"@info","INSTALLATION AND REMOVAL"=>"@package","INSTALLAZIONE E RIMOZIONE"=>"@package","INSTALACIÓN Y ELIMINACIÓN"=>"@package","INSTALLATION ET SUPPRESSION"=>"@package","INSTALLATION UND ENTFERNUNG"=>"@package","FX HUB UPDATES"=>"@update","AGGIORNAMENTI FX HUB"=>"@update","ACTUALIZACIONES FX HUB"=>"@update","MISES À JOUR FX HUB"=>"@update","PLUGIN UPDATES"=>"@download","AGGIORNAMENTI PLUGIN"=>"@download","ACTUALIZACIONES PLUGIN"=>"@download","MISES À JOUR PLUGINS"=>"@download","PLUGIN-UPDATES"=>"@download","SECURITY AND SHA-256"=>"@security","SICUREZZA E SHA-256"=>"@security","SEGURIDAD Y SHA-256"=>"@security","SÉCURITÉ ET SHA-256"=>"@security","SICHERHEIT UND SHA-256"=>"@security","COMPATIBILITY AND REQUIREMENTS"=>"@monitor","COMPATIBILITÀ E REQUISITI"=>"@monitor","COMPATIBILIDAD Y REQUISITOS"=>"@monitor","COMPATIBILITÉ ET CONFIGURATION"=>"@monitor","KOMPATIBILITÄT UND ANFORDERUNGEN"=>"@monitor","DETECTION AND DIAGNOSTICS"=>"@diagnostic","RILEVAMENTO E DIAGNOSTICA"=>"@diagnostic","DETECCIÓN Y DIAGNÓSTICO"=>"@diagnostic","DÉTECTION ET DIAGNOSTIC"=>"@diagnostic","ERKENNUNG UND DIAGNOSE"=>"@diagnostic","UPDATES AND SETTINGS"=>"@settings","AGGIORNAMENTI E IMPOSTAZIONI"=>"@settings","ACTUALIZACIONES Y AJUSTES"=>"@settings","MISES À JOUR ET PARAMÈTRES"=>"@settings","UPDATES UND EINSTELLUNGEN"=>"@settings","TROUBLESHOOTING"=>"@tools","RISOLUZIONE DEI PROBLEMI"=>"@tools","SOLUCIÓN DE PROBLEMAS"=>"@tools","DÉPANNAGE"=>"@tools","FEHLERBEHEBUNG"=>"@tools","SUPPORT"=>"@support","SUPPORTO"=>"@support","SOPORTE"=>"@support","ASSISTANCE"=>"@support","CREDITS"=>"@credits","CREDITI"=>"@credits","CRÉDITOS"=>"@credits","CRÉDITS"=>"@credits","MITWIRKENDE"=>"@credits",_=>line};
     group.Children.Add(NeonDialog.CreateProductIcon(iconName,(Brush)FindResource("BgBrush"),(Brush)FindResource("SecondaryBrush")));
     paragraph.Margin=new Thickness(0,0,0,0);paragraph.VerticalAlignment=VerticalAlignment.Center;group.Children.Add(paragraph);
     var card=new Border{Child=group,Background=(Brush)FindResource("CardFillBrush"),CornerRadius=new CornerRadius(7),Padding=new Thickness(7),Margin=new Thickness(0,12,0,6)};
     guideBody.Children.Add(card);
     if(!sectionLinks.ContainsKey(line)){
      sectionLinks.Add(line,card);
-     var jump=new Button{Content=line,FontSize=11,Padding=new Thickness(7,4,7,4),Margin=new Thickness(0,0,6,6),Cursor=Cursors.Hand};
+     var jump=new Button{FontSize=11,Padding=new Thickness(8,5,8,5),Margin=new Thickness(0,0,6,6),Cursor=Cursors.Hand,Style=(Style)FindResource("WindowControlButton"),Background=(Brush)FindResource("CardFillBrush"),Foreground=(Brush)FindResource("FgBrush"),BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1)};
+     var jumpContent=new StackPanel{Orientation=Orientation.Horizontal,Margin=new Thickness(7,4,7,4)};
+     jumpContent.Children.Add(NeonDialog.CreateProductIcon(iconName,(Brush)FindResource("BgBrush"),(Brush)FindResource("SecondaryBrush")));
+     jumpContent.Children.Add(new TextBlock{Text=line,FontSize=11,Foreground=(Brush)FindResource("FgBrush"),VerticalAlignment=VerticalAlignment.Center});
+     jump.Content=jumpContent;
+     jump.MouseEnter+=(_,_)=>jump.Effect=new System.Windows.Media.Effects.DropShadowEffect{Color=Color.FromRgb(57,216,237),BlurRadius=9,ShadowDepth=0,Opacity=0.6};
+     jump.MouseLeave+=(_,_)=>jump.Effect=null;
      jump.Click+=(_,_)=>card.BringIntoView();indexPanel.Children.Add(jump);
     }
    }else guideBody.Children.Add(paragraph);

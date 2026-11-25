@@ -7,6 +7,8 @@ v0.8.43 - EQ X v1.1.1 Professional Edition (pending HUB validation)
 - Replaced sidebar text glyphs with theme-aware vector navigation icons, preserving labels, actions and hover animation.
 - Redesigned bulk confirmation dialogs with shared package vector icons, a two-column list and localized safety notices.
 - Redesigned scan results with verified-tool count, progress bar, shared vector product cards, conflict/external statuses, collapsible paths and rescan action. Expanded the five-language user guide with all eight tool descriptions, update/security sections, section navigation and assembly version.
+- Refined single-product confirmation dialogs and guide navigation with contextual vector icons and theme-aware index buttons.
+- Added optional once-per-launch offline startup music playback at 30%, persistent setting and non-overlapping transition to chip player; startup-wave.wav must be supplied before release.
 - Existing audio binaries and identities unchanged. Automatic plugin replacement remains disabled.
 
 v0.8.42 - COMPRESSOR X v2.2 and individual downloads (released 25 November 2026)

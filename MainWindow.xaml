@@ -517,6 +517,7 @@
       <ComboBoxItem Content="Dark Professional" ContentTemplate="{StaticResource ThemeDarkTemplate}"/>
       <ComboBoxItem Content="Light Modern" ContentTemplate="{StaticResource ThemeLightTemplate}"/>
      </ComboBox></WrapPanel>
+    <CheckBox x:Name="StartupMusicCheck" Content="Startup music · Wave Pt. II" Checked="StartupMusic_Changed" Unchecked="StartupMusic_Changed" Foreground="{DynamicResource FgBrush}" Margin="0,12,0,0"/>
     <Border Margin="0,12,0,0" Padding="12" CornerRadius="8" Background="{DynamicResource SidebarBrush}" BorderBrush="{DynamicResource CardStrokeBrush}" BorderThickness="1">
      <StackPanel>
       <TextBlock x:Name="SecurityHeading" Text="Security &amp; authenticity" FontWeight="SemiBold" FontSize="14" Foreground="{DynamicResource SecondaryBrush}"/>
