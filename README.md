@@ -26,6 +26,8 @@ Prefer to download just one tool? These official Windows x64 binaries are the sa
 | **DELAY X** | 1.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.41/Payload/DJ%20RUSSO%20DELAY%20X.vst3) |
 | **METER X** | 1.2.6 | Portable EXE | [Download EXE](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.41/Payload/DJ%20RUSSO%20METER%20X.exe) |
 
+**Preview — COMPRESSOR X v2.2 (VST3, Windows x64):** [Download standalone VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/bf13d6e121d734750614b4d9a731b2eb3c128e49/Payload/DJ%20RUSSO%20COMPRESSOR%20X.vst3). This independent plugin is available for testing; its integration in FX HUB v0.8.42 has passed the automated Windows build but is not yet part of the stable HUB release.
+
 **Manual installation:** close your DAW, back up any existing plugin, then copy the downloaded `.vst3` file to `C:\Program Files\Common Files\VST3` (administrator permission may be required). Rescan your plugins in your DAW. METER X is a standalone Windows executable and does not belong in the VST3 folder.
 
 FX SHELL is a single shared VST3 module containing three effects; do not split or duplicate it. These direct links are pinned to the published v0.8.41 tag, not the development branch. They are raw binaries, not separate setup installers. For guided installation, conflict checks and HUB updates, use the [FX HUB installer](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest).
