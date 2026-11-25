@@ -38,6 +38,15 @@
       ],
       "downloadAvailable": false,
       "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
+    },
+    {
+      "id": "compressor-x",
+      "version": "2.2",
+      "effectIds": [
+        "compressor-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state"
     }
   ]
 }

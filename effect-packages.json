@@ -23,6 +23,13 @@
       "effectIds": [
         "delay-x"
       ]
+    },
+    {
+      "id": "compressor-x",
+      "detector": "bundled-compressor-sha256",
+      "effectIds": [
+        "compressor-x"
+      ]
     }
   ]
 }

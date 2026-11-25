@@ -27,6 +27,10 @@ Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it 
 |:---:|:---:|
 | [![DJ RUSSO METER X](screenshots/03-meter-x.png)](screenshots/03-meter-x.png) | [![DJ RUSSO FX HUB — Dark Professional](screenshots/04-dark-professional.png)](screenshots/04-dark-professional.png) |
 
+## v0.8.42 development build (pending Windows testing)
+
+COMPRESSOR X v2.2 is being integrated as an independent VST3. The test build will manage seven of fourteen planned tools, with pinned SHA-256 integrity, safe conflict handling, installation/removal, detection and diagnostics. The public stable release remains v0.8.41 until testing and approval.
+
 ## What's new in v0.8.41
 
 - **DELAY X v1.3 released:** independent Neon Ghost VST3 effect with its original logo, SHA-256 integrity verification and safe installation/removal.
