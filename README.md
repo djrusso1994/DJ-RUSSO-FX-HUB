@@ -36,7 +36,7 @@ FX SHELL is a single shared VST3 module containing three effects; do not split o
 
 ## Interface gallery
 
-Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it at full resolution.
+Explore the **DJ RUSSO FX HUB** interface. These screenshots illustrate earlier builds; v0.8.43 includes the additional refinements described below. Click any screenshot to view it at full resolution.
 
 | **Main Dashboard** | **Installed Plugins** |
 |:---:|:---:|
@@ -54,13 +54,21 @@ Explore the real **DJ RUSSO FX HUB** interface. Click any screenshot to view it 
 - **8 of 14 audio tools available:** individual and bulk installation/removal, conflict protection, detection and diagnostics.
 - **Individual downloads:** download the original plugin files without installing FX HUB.
 - **Five interface languages:** English, Italian, Spanish, French and German.
-- **Validation:** EQ X VST3 tested by the project owner; HUB integration requires Windows validation. Existing plugin binaries and DSP are unchanged.
+- **Unified vector interface:** contextual icons across navigation, diagnostics, package integrity, installation/removal confirmations and reports, detection and the guide.
+- **Software detection dashboard:** verified tool counts, progress bar, package cards, conflict/external installation indicators, expandable paths and rescan action.
+- **Interactive user guide:** themed index, precise section navigation and a brief double-bounce highlight with neon glow.
+- **Original startup music:** DJ RUSSO – Wave Pt. II, with the track title, optional playback at 30% volume, preserved fades and transition to the chip player without overlap.
+- **Validation:** Windows build passed and the project owner approved the tested interface. Existing plugin binaries and DSP are unchanged.
 
 [**Download FX HUB — latest published installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 ![Suite development: 8 of 14 tools](Assets/suite-progress.svg)
 
-## Previous release: v0.8.41
+## Previous release: v0.8.42
+
+COMPRESSOR X v2.2 and verified individual downloads for seven available audio tools. See [v0.8.42 release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.42) and the cumulative [changelog](CHANGELOG.txt).
+
+## Earlier release: v0.8.41
 
 - **DELAY X v1.3 released:** independent Neon Ghost VST3 effect with its original logo, SHA-256 integrity verification and safe installation/removal.
 - **Expanded audio-tool catalog:** six of fourteen planned effects/tools are now available: Sidechain X, Reverse FX, Stutter FX, METER X, REVERB X and DELAY X.
@@ -126,7 +134,8 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 - Choose interface language and one of three visual themes: Neon Ghost, Dark Professional or Light Modern.
 - Check GitHub Releases for newer versions, including preview releases.
 - Open diagnostics, backup tools and the VST3 directory.
-- Neon Ghost visual design and mini chip player.
+- Neon Ghost visual design, optional original startup music (Wave Pt. II) and mini chip player.
+- Interactive five-language guide and contextual vector icons.
 
 ## Download and install
 
@@ -143,7 +152,7 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 - Windows x64; developed with WPF and .NET 8.
 - FL Studio is the primary testing DAW; other VST3 hosts are not yet fully validated.
 - FX SHELL contains three effects in **one shared VST3 file**. Do not manually split or duplicate it.
-- REVERB X v1.3, DELAY X v1.3 COMPRESSOR X v2.2 and EQ X v1.1.1 install as **independent VST3 effects**, separately from FX SHELL.
+- REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2 and EQ X v1.1.1 install as **independent VST3 effects**, separately from FX SHELL.
 - If a different or modified VST3 is detected at the destination, the HUB blocks automatic replacement and offers a **Resolve Conflict** explanation. Close your DAW and back up existing files before making manual changes.
 - Installation may require Windows administrator permission.
 - Always back up important projects and plugins before testing.
