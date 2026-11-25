@@ -86,8 +86,10 @@ internal static class PluginDownload
         string dir = Path.GetDirectoryName(path) ?? throw new IOException("Invalid destination.");
         string installed = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles), "VST3");
         string app = Path.TrimEndingDirectorySeparator(Path.GetFullPath(AppContext.BaseDirectory));
+        string meter = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "DJRusso", "FXHub", "MeterX");
         if (dir.Equals(installed, StringComparison.OrdinalIgnoreCase) || dir.StartsWith(installed + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
-            dir.Equals(app, StringComparison.OrdinalIgnoreCase) || dir.StartsWith(app + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+            dir.Equals(app, StringComparison.OrdinalIgnoreCase) || dir.StartsWith(app + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) ||
+            dir.Equals(meter, StringComparison.OrdinalIgnoreCase) || dir.StartsWith(meter + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
             throw new IOException("Choose a separate download folder, not the installation directory.");
         string temp = Path.Combine(dir, ".djrusso-download-" + Guid.NewGuid().ToString("N") + ".tmp");
         try

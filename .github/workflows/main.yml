@@ -84,6 +84,25 @@ jobs:
           }
           Write-Host "All five bundled packages and individual download metadata verified."
 
+      - name: Verify individual downloads from pinned GitHub commits
+        shell: pwsh
+        run: |
+          $catalog = Get-Content "publish/plugin-updates.json" -Raw | ConvertFrom-Json
+          foreach ($package in $catalog.packages) {
+            $d = $package.download
+            $encoded = [Uri]::EscapeDataString($d.fileName)
+            $url = "https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/$($d.commit)/Payload/$encoded"
+            $temp = Join-Path $env:RUNNER_TEMP ("plugin-check-" + [Guid]::NewGuid().ToString("N"))
+            try {
+              Invoke-WebRequest -Uri $url -OutFile $temp -MaximumRedirection 0 -TimeoutSec 90 -ErrorAction Stop
+              if ((Get-Item -LiteralPath $temp).Length -ne $d.sizeBytes) { throw "Remote package size mismatch: $($package.id)" }
+              if ((Get-FileHash -LiteralPath $temp -Algorithm SHA256).Hash.ToLowerInvariant() -ne $d.sha256) { throw "Remote package SHA-256 mismatch: $($package.id)" }
+              Write-Host "Verified remote individual package: $($package.id)"
+            } finally {
+              Remove-Item -LiteralPath $temp -ErrorAction SilentlyContinue
+            }
+          }
+
       # Early smoke check for WPF resource/XAML parse failures before packaging or releasing.
       - name: Smoke-test FX HUB WPF startup
         shell: pwsh

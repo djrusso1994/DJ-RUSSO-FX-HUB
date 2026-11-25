@@ -974,12 +974,12 @@ public partial class MainWindow : Window
   try{
    var package=await PluginDownload.ResolveAsync(id,timeout.Token);
    var dialog=new SaveFileDialog{
-    FileName=Path.GetFileNameWithoutExtension(package.FileName)+" v"+package.Version+Path.GetExtension(package.FileName),
+    FileName=package.FileName,
     DefaultExt=Path.GetExtension(package.FileName),
     Filter=Path.GetExtension(package.FileName)==".vst3"?"VST3 (*.vst3)|*.vst3":"EXE (*.exe)|*.exe",
     AddExtension=true, OverwritePrompt=false,
     InitialDirectory=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),"Downloads"),
-    Title=new[]{"Save verified package","Salva pacchetto verificato","Guardar paquete verificado","Enregistrer le paquet vérifié","Geprüftes Paket speichern"}[Index]
+    Title=new[]{"Save verified package","Salva pacchetto verificato","Guardar paquete verificado","Enregistrer le paquet vérifié","Geprüftes Paket speichern"}[Index]+" — v"+package.Version
    };
    if(dialog.ShowDialog(this)!=true)return;
    if(!Path.GetExtension(dialog.FileName).Equals(Path.GetExtension(package.FileName),StringComparison.OrdinalIgnoreCase))
