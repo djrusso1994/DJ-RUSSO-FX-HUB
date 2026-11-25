@@ -1140,6 +1140,7 @@ public partial class MainWindow : Window
   if(result==0){try{CompressorInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"COMPRESSOR X");}}
   else NeonDialog.Show(this,"COMPRESSOR X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","COMPRESSOR X");
   Refresh();
+ }
  private void InstallSelectedEq(){
   if(EqInstaller.GetState()!=EqInstaller.State.Missing || !EqInstaller.HasExpectedPayload())return;
   if(NeonDialog.Show(this,new[]{"Install EQ X v1.1.1? Close FL Studio.","Installare EQ X v1.1.1? Chiudi FL Studio.","¿Instalar EQ X v1.1.1? Cierra FL Studio.","Installer EQ X v1.1.1 ? Fermez FL Studio.","EQ X v1.1.1 installieren? FL Studio schließen."}[Index],"EQ X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
@@ -1192,6 +1193,7 @@ public partial class MainWindow : Window
   if(result==0){try{CompressorInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"COMPRESSOR X");}}
   else NeonDialog.Show(this,"COMPRESSOR X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","COMPRESSOR X");
   Refresh();
+ }
  private void RemoveSelectedEq(){
   if(EqInstaller.GetState()!=EqInstaller.State.Managed)return;
   if(NeonDialog.Show(this,new[]{"Remove HUB-managed EQ X? Close FL Studio.","Rimuovere EQ X installato dall’HUB? Chiudi FL Studio.","¿Eliminar EQ X gestionado por el HUB? Cierra FL Studio.","Supprimer EQ X géré par le HUB ? Fermez FL Studio.","Vom HUB verwaltetes EQ X entfernen? FL Studio schließen."}[Index],"EQ X",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
