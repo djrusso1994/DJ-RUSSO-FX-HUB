@@ -5,6 +5,7 @@ v0.8.43 - EQ X v1.1.1 Professional Edition (pending HUB validation)
 - Clarified the sidebar FX HUB update label in all five languages, distinct from plugin updates.
 - Reused the exact diagnostic product icon factory in installation and removal reports; aligned names and status text without changing operations.
 - Replaced sidebar text glyphs with theme-aware vector navigation icons, preserving labels, actions and hover animation.
+- Redesigned bulk confirmation dialogs with shared package vector icons, a two-column list and localized safety notices.
 - Existing audio binaries and identities unchanged. Automatic plugin replacement remains disabled.
 
 v0.8.42 - COMPRESSOR X v2.2 and individual downloads (released 25 November 2026)

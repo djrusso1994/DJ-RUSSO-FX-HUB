@@ -189,7 +189,24 @@ internal static class NeonDialog
             LineHeight = 24,
             Margin = new Thickness(0, 0, 16, 0)
         };
-        if(operation!=null){
+        if(confirmation && caption.Contains(" — ",StringComparison.Ordinal)){
+            var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
+            var heading=new TextBlock{Text=new[]{"Included packages","Pacchetti interessati","Paquetes incluidos","Paquets concernés","Betroffene Pakete"}[lang],Foreground=cyan,FontSize=15,FontWeight=FontWeights.SemiBold,Margin=new Thickness(0,0,0,8)};
+            content.Children.Add(heading);
+            var products=new UniformGrid{Columns=2,Margin=new Thickness(0,0,0,10)};
+            foreach(var name in new[]{"FX SHELL","REVERB X","DELAY X","COMPRESSOR X","EQ X","METER X"}){
+                var productRow=new StackPanel{Orientation=Orientation.Horizontal};
+                productRow.Children.Add(CreateProductIcon(name,bg,cyan));
+                productRow.Children.Add(new TextBlock{Text=name,Foreground=fg,FontSize=13,FontWeight=FontWeights.SemiBold,VerticalAlignment=VerticalAlignment.Center});
+                products.Children.Add(new Border{Child=productRow,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(8,5,8,5),Margin=new Thickness(0,0,6,6)});
+            }
+            content.Children.Add(products);
+            var details=removal?new[]{"Only HUB-managed packages will be removed. External VST3 files are protected. Close FL Studio and METER X.","Saranno rimossi solo i pacchetti gestiti dal HUB. I VST3 esterni sono protetti. Chiudi FL Studio e METER X.","Solo se eliminarán los paquetes gestionados por el HUB. Los VST3 externos están protegidos. Cierra FL Studio y METER X.","Seuls les paquets gérés par le HUB seront supprimés. Les VST3 externes sont protégés. Fermez FL Studio et METER X.","Nur vom HUB verwaltete Pakete werden entfernt. Externe VST3-Dateien sind geschützt. FL Studio und METER X schließen."}[lang]:
+                new[]{"VST3 installation requires administrator approval. Close FL Studio before continuing.","L'installazione dei VST3 richiede l'autorizzazione dell'amministratore. Chiudi FL Studio prima di continuare.","La instalación de VST3 requiere permisos de administrador. Cierra FL Studio antes de continuar.","L'installation des VST3 nécessite les droits administrateur. Fermez FL Studio avant de continuer.","Die VST3-Installation benötigt Administratorrechte. FL Studio vor dem Fortfahren schließen."}[lang];
+            content.Children.Add(new Border{Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(12),Child=new TextBlock{Text=details,Foreground=fg,FontSize=14,TextWrapping=TextWrapping.Wrap,LineHeight=21}});
+            messageScroll.Content=content;
+        }
+        else if(operation!=null){
             var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
             foreach(var line in (message??"").Split('\n')){
                 int separator=line.IndexOf(": ",StringComparison.Ordinal);
