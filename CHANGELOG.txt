@@ -1,6 +1,7 @@
 v0.8.43 - EQ X v1.1.1 Professional Edition (pending HUB validation)
 - Added the user-tested EQ X independent VST3, original logo, install/remove, detection, diagnostics and SHA-256 integrity validation.
 - Added pinned individual download, update catalog entry and five-language HUB labels. Eight of fourteen tools available in this build.
+- Unified vector diagnostic icons across installed components and package integrity, including a dedicated EQ X fader glyph and theme-aware colors.
 - Existing audio binaries and identities unchanged. Automatic plugin replacement remains disabled.
 
 v0.8.42 - COMPRESSOR X v2.2 and individual downloads (released 25 November 2026)
