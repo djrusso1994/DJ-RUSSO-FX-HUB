@@ -1,9 +1,12 @@
-v0.8.42 - COMPRESSOR X v2.2 integration (development build, pending payload upload and Windows testing)
-- Dedicated independent VST3 installation and removal with pinned SHA-256 validation and its own receipt.
-- Add COMPRESSOR X to catalog, product details, bulk operations, scan, conflict handling, diagnostics and update catalog.
-- Update five localized guides, setup version and automated build checks. Seven of fourteen tools after integration.
-- Individual verified package downloads: immutable GitHub commit, size and SHA-256, progress, no overwrite or automatic installation; FX SHELL remains a shared package.
-- Existing plugin binaries and stable release unchanged. Requires approved logo and exact binary before build.
+v0.8.42 - COMPRESSOR X v2.2 and individual downloads (released 25 November 2026)
+- Published official Windows x64 installer after successful automated compilation and user functional testing.
+- Added independent COMPRESSOR X v2.2 VST3 with its original logo, dedicated installation and removal, pinned SHA-256 integrity validation and installation receipt.
+- Integrated COMPRESSOR X into the catalog, product details, install-all/remove-all operations, detection, conflict handling, diagnostics and plugin-update catalog.
+- Updated localized guides and operation confirmations in English, Italian, Spanish, French and German.
+- Added individual package downloads with pinned GitHub source commits, file-size and SHA-256 verification, progress feedback and protection against overwriting existing files. No automatic installation.
+- Added public individual download links to the GitHub README for FX SHELL, METER X, REVERB X, DELAY X and COMPRESSOR X; FX SHELL remains a single shared VST3 containing three effects.
+- Updated README release information and vector version badge to v0.8.42; added Neon Ghost vector suite progress graphic (7 of 14 tools, 50%).
+- Preserved previous plugin binaries, VST3 identities, audio DSP and previous releases.
 
 v0.8.41 - DELAY X v1.3, professional dialogs and diagnostics (released 24 November 2026)
 - Published official Windows x64 v0.8.41 installer on GitHub Releases after successful automated compilation and user functional testing.
