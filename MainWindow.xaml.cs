@@ -88,7 +88,7 @@ public partial class MainWindow : Window
   ["subtitle"]=["14 PLUGINS • ONE CREATIVE ECOSYSTEM","14 PLUGIN • UN UNICO ECOSISTEMA CREATIVO","14 PLUGINS • UN ECOSISTEMA CREATIVO","14 PLUGINS • UN ÉCOSYSTÈME CRÉATIF","14 PLUGINS • EIN KREATIVES ÖKOSYSTEM"],
   ["updates"]=["FX HUB UPDATES","AGGIORNAMENTI FX HUB","ACTUALIZACIONES FX HUB","MISES À JOUR FX HUB","FX HUB UPDATES"],
   ["folder"]=["OPEN VST3 FOLDER","APRI CARTELLA VST3","ABRIR CARPETA VST3","OUVRIR DOSSIER VST3","VST3-ORDNER ÖFFNEN"],
-  ["scan"]=["SCAN INSTALLED SOFTWARE","RILEVA SOFTWARE INSTALLATI","BUSCAR SOFTWARE INSTALADO","DÉTECTER LES LOGICIELS INSTALLÉS","INSTALLIERTE SOFTWARE SUCHEN"],
+  ["scan"]=["DETECT INSTALLED VSTs","RILEVA VST INSTALLATI","DETECTAR VST INSTALADOS","DÉTECTER LES VST INSTALLÉS","INSTALLIERTE VST ERKENNEN"],
   ["language"]=["Language","Lingua","Idioma","Langue","Sprache"],
   ["ready"]=["Ready • Local FX SHELL install available; GitHub release check enabled.","Pronto • Installazione locale FX SHELL disponibile; controllo aggiornamenti GitHub attivo.","Listo • Instalación local de FX SHELL disponible; comprobación de versiones de GitHub activa.","Prêt • Installation locale de FX SHELL disponible ; vérification des versions GitHub active.","Bereit • Lokale FX SHELL-Installation verfügbar; GitHub-Versionsprüfung aktiv."],
   ["planned"]=["COMING SOON","IN ARRIVO","PRÓXIMAMENTE","PROCHAINEMENT","DEMNÄCHST"],
@@ -133,7 +133,7 @@ public partial class MainWindow : Window
  private string ManagedPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","managed.json");
  private string VstDir=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");
  private string PrefPath=>Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"DJRusso","FXHub","settings.json");
- public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.43";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";if(doc.RootElement.TryGetProperty("startupMusic",out var sm)&&sm.ValueKind is JsonValueKind.True or JsonValueKind.False)startupMusic=sm.GetBoolean();}catch{} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;StartupMusicCheck.IsChecked=startupMusic;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
+ public MainWindow(){searchDebounce.Tick+=ApplySearchDebounce;Closed+=(_,_)=>searchDebounce.Stop();InitializeComponent();InitializeResizeRendering();HeaderLogo.Source=CardLogo("header-hub",Asset("hub"),true)??HeaderLogo.Source;ConfigureMaximizedWorkArea();var assemblyVersion=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.44";HubVersionText.Text="v"+assemblyVersion;Title="DJ RUSSO FX HUB — v"+assemblyVersion;try {var doc=JsonDocument.Parse(File.ReadAllText(PrefPath));lang=doc.RootElement.GetProperty("language").GetString()??"en"; if(doc.RootElement.TryGetProperty("theme",out var th))theme=th.GetString()??"neon";if(doc.RootElement.TryGetProperty("startupMusic",out var sm)&&sm.ValueKind is JsonValueKind.True or JsonValueKind.False)startupMusic=sm.GetBoolean();}catch{} if(!File.Exists(PrefPath)){try{var initial=File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"initial-language.txt")).Trim();if(initial is "en" or "it" or "es" or "fr" or "de"){lang=initial;SavePrefs();}}catch{}} var index=lang switch {"it"=>1,"es"=>2,"fr"=>3,"de"=>4,_=>0};SettingsLanguageBox.SelectedIndex=index;SettingsThemeBox.SelectedIndex=theme=="dark"?1:theme=="light"?2:0;StartupMusicCheck.IsChecked=startupMusic;LoadPlugins();LoadManifest();ready=true;ApplyTheme();Refresh();InitChipPlayer();Loaded+=async (_,_)=>await CheckHubReleaseAsync(false);}
  // Temporarily favor speed while Windows is actively resizing/maximizing,
  // then restore high-quality antialiasing after layout has settled.
  // This cannot replace or override the native DWM maximize transition.
@@ -292,6 +292,27 @@ public partial class MainWindow : Window
      ThemeHint.Text=T("theme");SettingsHint.Text=T("settingshint");StartupMusicCheck.Content=new[]{"Startup music · Wave Pt. II","Musica di avvio · Wave Pt. II","Música de inicio · Wave Pt. II","Musique de démarrage · Wave Pt. II","Startmusik · Wave Pt. II"}[Index];
      SearchCaption.Text=T("searchProducts");FilterCaption.Text=T("filterProducts");
      ProductSearch.ToolTip=T("searchTip");ProductFilter.ToolTip=T("filterTip");
+     Language=System.Windows.Markup.XmlLanguage.GetLanguage(lang switch {"it"=>"it-IT","es"=>"es-ES","fr"=>"fr-FR","de"=>"de-DE",_=>"en-US"});
+     var searchMenu=new ContextMenu();
+     void SearchAction(string[] labels,System.Windows.Input.RoutedUICommand command){searchMenu.Items.Add(new MenuItem{Header=labels[Index],Command=command,CommandTarget=ProductSearch});}
+     SearchAction(new[]{"Undo","Annulla","Deshacer","Annuler","Rückgängig"},System.Windows.Input.ApplicationCommands.Undo);
+     SearchAction(new[]{"Redo","Ripristina","Rehacer","Rétablir","Wiederholen"},System.Windows.Input.ApplicationCommands.Redo);
+     searchMenu.Items.Add(new Separator());
+     SearchAction(new[]{"Cut","Taglia","Cortar","Couper","Ausschneiden"},System.Windows.Input.ApplicationCommands.Cut);
+     SearchAction(new[]{"Copy","Copia","Copiar","Copier","Kopieren"},System.Windows.Input.ApplicationCommands.Copy);
+     SearchAction(new[]{"Paste","Incolla","Pegar","Coller","Einfügen"},System.Windows.Input.ApplicationCommands.Paste);
+     SearchAction(new[]{"Delete","Elimina","Eliminar","Supprimer","Löschen"},System.Windows.Input.ApplicationCommands.Delete);
+     SearchAction(new[]{"Select all","Seleziona tutto","Seleccionar todo","Tout sélectionner","Alles auswählen"},System.Windows.Input.ApplicationCommands.SelectAll);
+     ProductSearch.ContextMenu=searchMenu;
+     MinimizeWindowButton.ToolTip=new[]{"Minimize","Riduci a icona","Minimizar","Réduire","Minimieren"}[Index];
+     MaximizeWindowButton.ToolTip=new[]{"Maximize / Restore","Ingrandisci / Ripristina","Maximizar / Restaurar","Agrandir / Restaurer","Maximieren / Wiederherstellen"}[Index];
+     CloseWindowButton.ToolTip=new[]{"Close","Chiudi","Cerrar","Fermer","Schließen"}[Index];
+     CloseScanButton.ToolTip=CloseWindowButton.ToolTip;
+     CloseSettingsButton.ToolTip=CloseWindowButton.ToolTip;
+     SettingsPanelHeading.Text=T("settings");
+     ChipPlayButton.ToolTip=new[]{"Play / Pause","Riproduci / Pausa","Reproducir / Pausa","Lecture / Pause","Wiedergabe / Pause"}[Index];
+     ChipNextButton.ToolTip=new[]{"Next track","Traccia successiva","Siguiente pista","Piste suivante","Nächster Titel"}[Index];
+     ChipMuteButton.ToolTip=new[]{"Mute","Silenzia","Silenciar","Muet","Stummschalten"}[Index];
      // Keep filter captions synchronized with the selected UI language.
      string[][] filterLabels = {
          new[] { "All products", "Installed", "Available", "Coming soon" },
@@ -329,8 +350,8 @@ public partial class MainWindow : Window
      // Explain disabled actions in the selected language.
      ShellInstallButton.ToolTip=BulkHintLabels[Index];
      ShellRemoveButton.ToolTip=BulkHintLabels[Index];
-     ShellInstallButton.IsEnabled=(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()) || (ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()) || (DelayInstaller.GetState()==DelayInstaller.State.Missing && DelayInstaller.HasExpectedPayload()) || (CompressorInstaller.GetState()==CompressorInstaller.State.Missing && CompressorInstaller.HasExpectedPayload()) || (EqInstaller.GetState()==EqInstaller.State.Missing && EqInstaller.HasExpectedPayload()) || (!File.Exists(MeterExePath) && File.Exists(BundledMeterPath));
-     ShellRemoveButton.IsEnabled=shellState==ShellInstaller.State.Managed || ReverbInstaller.GetState()==ReverbInstaller.State.Managed || DelayInstaller.GetState()==DelayInstaller.State.Managed || CompressorInstaller.GetState()==CompressorInstaller.State.Managed || EqInstaller.GetState()==EqInstaller.State.Managed || File.Exists(MeterExePath);
+     ShellInstallButton.IsEnabled=(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()) || (ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()) || (DelayInstaller.GetState()==DelayInstaller.State.Missing && DelayInstaller.HasExpectedPayload()) || (CompressorInstaller.GetState()==CompressorInstaller.State.Missing && CompressorInstaller.HasExpectedPayload()) || (EqInstaller.GetState()==EqInstaller.State.Missing && EqInstaller.HasExpectedPayload()) || (DriveInstaller.GetState()==DriveInstaller.State.Missing && DriveInstaller.HasExpectedPayload()) || (!File.Exists(MeterExePath) && File.Exists(BundledMeterPath));
+     ShellRemoveButton.IsEnabled=shellState==ShellInstaller.State.Managed || ReverbInstaller.GetState()==ReverbInstaller.State.Managed || DelayInstaller.GetState()==DelayInstaller.State.Managed || CompressorInstaller.GetState()==CompressorInstaller.State.Managed || EqInstaller.GetState()==EqInstaller.State.Managed || DriveInstaller.GetState()==DriveInstaller.State.Managed || File.Exists(MeterExePath);
      // Selected-product controls are updated after the card list is rebuilt.
      bool shellVerified=shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
      var verifiedIds=new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -344,14 +365,14 @@ public partial class MainWindow : Window
          bool planned=fx.status=="Planned" && fx.id!="meter-x";
          var logo=fx.id switch {"sidechain-x"=>Asset("sidechain"),"reverse-fx"=>Asset(theme=="light"?"reverse_light":"reverse"),"stutter-fx"=>Asset("stutter"),"meter-x"=>Asset("meter-x"),"reverb-x"=>Asset("logo-reverb-x"),"delay-x"=>Asset("logo-delay-x"),"compressor-x"=>Asset("logo-compressor-x"),"eq-x"=>Asset("eq-x"),_=>Asset(fx.id)};
          var category=fx.category switch {"Dynamics"=>"dynamics","Creative FX"=>"creative","Analysis"=>"analysis","Mastering"=>"mastering","Vocal"=>"vocal","EQ"=>"eq","Spatial"=>"spatial","Saturation"=>"saturation","AI Offline"=>"ai",_=>"creative"};
-         bool installed=fx.id=="meter-x" ? File.Exists(MeterExePath) : fx.id=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : fx.id=="delay-x" ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : fx.id=="compressor-x" ? CompressorInstaller.GetState() is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary :fx.id=="eq-x" ? EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary : (!planned && verifiedIds.Contains(fx.id));
+         bool installed=fx.id=="meter-x" ? File.Exists(MeterExePath) : fx.id=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : fx.id=="delay-x" ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : fx.id=="compressor-x" ? CompressorInstaller.GetState() is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary :fx.id=="eq-x" ? EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary :fx.id=="drive-x" ? DriveInstaller.GetState() is DriveInstaller.State.Managed or DriveInstaller.State.ExternalSameBinary : (!planned && verifiedIds.Contains(fx.id));
          bool conflict=VstConflict(fx.id),external=VstExternal(fx.id);
          cards.Add(new PluginCard {
              Id=fx.id,IsSelected=fx.id==selectedProductId,IsReady=false,
              BadgeSymbol=conflict?"!":installed?"✓":planned?"…":"✕",
              BadgeBrush=conflict?System.Windows.Media.Brushes.Orange:installed?System.Windows.Media.Brushes.LimeGreen:planned?System.Windows.Media.Brushes.MediumPurple:System.Windows.Media.Brushes.IndianRed,
-             BadgeTip=conflict?ConflictLabel:external?ExternalLabel:installed?(Index==1?"Installato e verificato":"Installed and verified"):
-                 (planned?(Index==1?"Non ancora rilasciato":"Not released yet"):(Index==1?"Non installato":"Not installed")),
+             BadgeTip=conflict?ConflictLabel:external?ExternalLabel:installed?(new[]{"Installed and verified","Installato e verificato","Instalado y verificado","Installé et vérifié","Installiert und geprüft"}[Index]):
+                 (planned?(new[]{"Not released yet","Non ancora rilasciato","Aún no publicado","Pas encore publié","Noch nicht veröffentlicht"}[Index]):(new[]{"Not installed","Non installato","No instalado","Non installé","Nicht installiert"}[Index])),
              FallbackName="",MeterVisibility=fx.id=="meter-x"?Visibility.Visible:Visibility.Collapsed,MeterReady=fx.id=="meter-x" && File.Exists(MeterExePath),MeterInstallReady=fx.id=="meter-x" && !File.Exists(MeterExePath) && File.Exists(BundledMeterPath),MeterImportLabel=MeterInstallLabels[Index],MeterLaunchLabel=MeterLaunchLabels[Index],MeterRemoveLabel=MeterRemoveLabels[Index],Logo=CardLogo(fx.id,logo,planned),LogoHeight=planned?103:77,LogoMaxWidth=planned?165:150,Category=T(category),
              Footer=fx.id=="meter-x"? (VersionDisplay("meter-x")+" • " + (installed?MeterText("installed"):MeterText("missing"))) : planned?T("planned"):(conflict?ConflictLabel.ToUpperInvariant():external?ExternalLabel.ToUpperInvariant():installed?new[]{"INSTALLED","INSTALLATO","INSTALADO","INSTALLÉ","INSTALLIERT"}[Index]:new[]{"NOT INSTALLED","NON INSTALLATO","NO INSTALADO","NON INSTALLÉ","NICHT INSTALLIERT"}[Index])+"\n"+VersionDisplay(fx.id)
          });
@@ -363,7 +384,7 @@ public partial class MainWindow : Window
      UpdateSelectedProductPanel();
      UpdateMeterUi();
  }
- private void SettingsLanguageBox_SelectionChanged(object sender,SelectionChangedEventArgs e){if(!ready||SettingsLanguageBox.SelectedItem is not ComboBoxItem item)return;lang=item.Tag?.ToString()??"en";ScanResultsPanel.Visibility=Visibility.Collapsed;try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme,startupMusic}));}catch{}Refresh();}
+ private void SettingsLanguageBox_SelectionChanged(object sender,SelectionChangedEventArgs e){if(!ready||SettingsLanguageBox.SelectedItem is not ComboBoxItem item)return;lang=item.Tag?.ToString()??"en";try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme,startupMusic}));}catch{}Refresh();}
 
  private void SettingsThemeBox_SelectionChanged(object sender,SelectionChangedEventArgs e){
   if(!ready)return;theme=SettingsThemeBox.SelectedIndex switch {1=>"dark",2=>"light",_=>"neon"};
@@ -454,7 +475,7 @@ public partial class MainWindow : Window
  private static readonly string[] BulkInstallLabels={"INSTALL ALL","INSTALLA TUTTO","INSTALAR TODO","TOUT INSTALLER","ALLES INSTALLIEREN"};
  private static readonly string[] BulkRemoveLabels={"REMOVE ALL","RIMUOVI TUTTO","ELIMINAR TODO","TOUT SUPPRIMER","ALLES ENTFERNEN"};
  private static readonly string[] BulkTitleLabels={"AVAILABLE SOFTWARE","SOFTWARE DISPONIBILI","SOFTWARE DISPONIBLE","LOGICIELS DISPONIBLES","VERFÜGBARE SOFTWARE"};
- private static readonly string[] BulkHintLabels={"Install bundled FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X and METER X.","Installa FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X e METER X inclusi.","Instala FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X y METER X incluidos.","Installez FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X et METER X inclus.","FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X und METER X installieren."};
+ private static readonly string[] BulkHintLabels={"Install bundled FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X and METER X.","Installa FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X e METER X inclusi.","Instala FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X y METER X incluidos.","Installez FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X et METER X inclus.","FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X und METER X installieren."};
  private static readonly string[] MeterInstallLabels={"INSTALL","INSTALLA","INSTALAR","INSTALLER","INSTALLIEREN"};
  private string BundledMeterPath=>Path.Combine(AppContext.BaseDirectory,"Payload","DJ RUSSO METER X.exe");
  private bool InstallMeterFile(out string detail){
@@ -469,11 +490,11 @@ public partial class MainWindow : Window
  }
  private void InstallShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,new[]{
-     "Install available FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
-     "Installare FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.",
-     "¿Instalar FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X y METER X disponibles? Los VST3 requieren permisos de administrador. Cierra FL Studio primero.",
-     "Installer FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X et METER X disponibles ? Les VST3 nécessitent les droits administrateur. Fermez FL Studio.",
-     "Verfügbare FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X und METER X installieren? VST3 benötigen Administratorrechte. FL Studio zuerst schließen."
+     "Install available FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X and METER X? VST3 installation requires administrator approval. Close FL Studio first.",
+     "Installare FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X e METER X disponibili? I VST3 richiedono autorizzazione amministratore. Chiudi prima FL Studio.",
+     "¿Instalar FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X y METER X disponibles? Los VST3 requieren permisos de administrador. Cierra FL Studio primero.",
+     "Installer FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X et METER X disponibles ? Les VST3 nécessitent les droits administrateur. Fermez FL Studio.",
+     "Verfügbare FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X und METER X installieren? VST3 benötigen Administratorrechte. FL Studio zuerst schließen."
      }[Index],
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
@@ -484,7 +505,7 @@ public partial class MainWindow : Window
     var result=RunElevated(ShellInstaller.InstallArgument);
     if(result==0){
      try{ShellInstaller.SaveReceipt();messages.Add("FX SHELL: "+BulkStatus("installed"));}
-     catch(Exception ex){messages.Add("FX SHELL: receipt / registrazione: "+ex.Message);}
+     catch(Exception ex){messages.Add("FX SHELL: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
     }else messages.Add("FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")");
    }
   }else if(state==ShellInstaller.State.Managed || state==ShellInstaller.State.ExternalSameBinary)
@@ -497,7 +518,7 @@ public partial class MainWindow : Window
     var reverbResult=RunElevated(ReverbInstaller.InstallArgument);
     if(reverbResult==0){
      try{ReverbInstaller.SaveReceipt();messages.Add("REVERB X: "+BulkStatus("installed"));}
-     catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
+     catch(Exception ex){messages.Add("REVERB X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
     }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
    }
   }else if(reverbState is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary)
@@ -510,7 +531,7 @@ public partial class MainWindow : Window
     var delayResult=RunElevated(DelayInstaller.InstallArgument);
     if(delayResult==0){
      try{DelayInstaller.SaveReceipt();messages.Add("DELAY X: "+BulkStatus("installed"));}
-     catch(Exception ex){messages.Add("DELAY X: receipt / registrazione: "+ex.Message);}
+     catch(Exception ex){messages.Add("DELAY X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
     }else messages.Add("DELAY X: "+T(delayResult==9?"cancelled":"ioError")+" ("+delayResult+")");
    }
   }else if(delayState is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary)
@@ -523,7 +544,7 @@ public partial class MainWindow : Window
     var compressorResult=RunElevated(CompressorInstaller.InstallArgument);
     if(compressorResult==0){
      try{CompressorInstaller.SaveReceipt();messages.Add("COMPRESSOR X: "+BulkStatus("installed"));}
-     catch(Exception ex){messages.Add("COMPRESSOR X: receipt / registrazione: "+ex.Message);}
+     catch(Exception ex){messages.Add("COMPRESSOR X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
     }else messages.Add("COMPRESSOR X: "+T(compressorResult==9?"cancelled":"ioError")+" ("+compressorResult+")");
    }
   }else if(compressorState is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary)
@@ -536,12 +557,25 @@ public partial class MainWindow : Window
     var eqResult=RunElevated(EqInstaller.InstallArgument);
     if(eqResult==0){
      try{EqInstaller.SaveReceipt();messages.Add("EQ X: "+BulkStatus("installed"));}
-     catch(Exception ex){messages.Add("EQ X: receipt / registrazione: "+ex.Message);}
+     catch(Exception ex){messages.Add("EQ X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
     }else messages.Add("EQ X: "+T(eqResult==9?"cancelled":"ioError")+" ("+eqResult+")");
    }
   }else if(eqState is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary)
    messages.Add("EQ X: "+BulkStatus("already"));
   else messages.Add("EQ X: "+BulkStatus("conflict"));
+  var driveState=DriveInstaller.GetState();
+  if(driveState==DriveInstaller.State.Missing){
+   if(!DriveInstaller.HasExpectedPayload())messages.Add("DRIVE X: "+T("payloadBad"));
+   else{
+    var driveResult=RunElevated(DriveInstaller.InstallArgument);
+    if(driveResult==0){
+     try{DriveInstaller.SaveReceipt();messages.Add("DRIVE X: "+BulkStatus("installed"));}
+     catch(Exception ex){messages.Add("DRIVE X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
+    }else messages.Add("DRIVE X: "+T(driveResult==9?"cancelled":"ioError")+" ("+driveResult+")");
+   }
+  }else if(driveState is DriveInstaller.State.Managed or DriveInstaller.State.ExternalSameBinary)
+   messages.Add("DRIVE X: "+BulkStatus("already"));
+  else messages.Add("DRIVE X: "+BulkStatus("conflict"));
   InstallMeterFile(out var meterDetail);messages.Add(meterDetail);
   // Present the completed operation before rebuilding the product cards.
   try{
@@ -550,11 +584,11 @@ public partial class MainWindow : Window
  }
  private void RemoveShell_Click(object sender,RoutedEventArgs e){
   if(NeonDialog.Show(this,new[]{
-     "Remove HUB-managed FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X and METER X? External files are untouched. Close FL Studio and METER X.",
-     "Rimuovere FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.",
-     "¿Eliminar FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X y METER X gestionados por el HUB? No se modifican archivos externos. Cierra FL Studio y METER X.",
-     "Supprimer FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X et METER X gérés par le HUB ? Les fichiers externes restent intacts. Fermez FL Studio et METER X.",
-     "Vom HUB verwaltete FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X und METER X entfernen? Externe Dateien bleiben unverändert. FL Studio und METER X schließen."
+     "Remove HUB-managed FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X and METER X? External files are untouched. Close FL Studio and METER X.",
+     "Rimuovere FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X e METER X gestiti dall'HUB? I file esterni non saranno toccati. Chiudi FL Studio e METER X.",
+     "¿Eliminar FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X y METER X gestionados por el HUB? No se modifican archivos externos. Cierra FL Studio y METER X.",
+     "Supprimer FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X et METER X gérés par le HUB ? Les fichiers externes restent intacts. Fermez FL Studio et METER X.",
+     "Vom HUB verwaltete FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X und METER X entfernen? Externe Dateien bleiben unverändert. FL Studio und METER X schließen."
      }[Index],
      "DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   var messages=new List<string>();
@@ -562,37 +596,44 @@ public partial class MainWindow : Window
    var result=RunElevated(ShellInstaller.RemoveArgument);
    if(result==0){
     try{ShellInstaller.DeleteReceipt();messages.Add("FX SHELL: "+BulkStatus("removed"));}
-    catch(Exception ex){messages.Add("FX SHELL: receipt / registrazione: "+ex.Message);}
+    catch(Exception ex){messages.Add("FX SHELL: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
    }else messages.Add("FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")");
   }else messages.Add("FX SHELL: "+BulkStatus("notManaged"));
   if(ReverbInstaller.GetState()==ReverbInstaller.State.Managed){
    var reverbResult=RunElevated(ReverbInstaller.RemoveArgument);
    if(reverbResult==0){
     try{ReverbInstaller.DeleteReceipt();messages.Add("REVERB X: "+BulkStatus("removed"));}
-    catch(Exception ex){messages.Add("REVERB X: receipt / registrazione: "+ex.Message);}
+    catch(Exception ex){messages.Add("REVERB X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
    }else messages.Add("REVERB X: "+T(reverbResult==9?"cancelled":"ioError")+" ("+reverbResult+")");
   }else messages.Add("REVERB X: "+BulkStatus("notManaged"));
   if(DelayInstaller.GetState()==DelayInstaller.State.Managed){
    var delayResult=RunElevated(DelayInstaller.RemoveArgument);
    if(delayResult==0){
     try{DelayInstaller.DeleteReceipt();messages.Add("DELAY X: "+BulkStatus("removed"));}
-    catch(Exception ex){messages.Add("DELAY X: receipt / registrazione: "+ex.Message);}
+    catch(Exception ex){messages.Add("DELAY X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
    }else messages.Add("DELAY X: "+T(delayResult==9?"cancelled":"ioError")+" ("+delayResult+")");
   }else messages.Add("DELAY X: "+BulkStatus("notManaged"));
   if(CompressorInstaller.GetState()==CompressorInstaller.State.Managed){
    var compressorResult=RunElevated(CompressorInstaller.RemoveArgument);
    if(compressorResult==0){
     try{CompressorInstaller.DeleteReceipt();messages.Add("COMPRESSOR X: "+BulkStatus("removed"));}
-    catch(Exception ex){messages.Add("COMPRESSOR X: receipt / registrazione: "+ex.Message);}
+    catch(Exception ex){messages.Add("COMPRESSOR X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
    }else messages.Add("COMPRESSOR X: "+T(compressorResult==9?"cancelled":"ioError")+" ("+compressorResult+")");
   }else messages.Add("COMPRESSOR X: "+BulkStatus("notManaged"));
   if(EqInstaller.GetState()==EqInstaller.State.Managed){
    var eqResult=RunElevated(EqInstaller.RemoveArgument);
    if(eqResult==0){
     try{EqInstaller.DeleteReceipt();messages.Add("EQ X: "+BulkStatus("removed"));}
-    catch(Exception ex){messages.Add("EQ X: receipt / registrazione: "+ex.Message);}
+    catch(Exception ex){messages.Add("EQ X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
    }else messages.Add("EQ X: "+T(eqResult==9?"cancelled":"ioError")+" ("+eqResult+")");
   }else messages.Add("EQ X: "+BulkStatus("notManaged"));
+  if(DriveInstaller.GetState()==DriveInstaller.State.Managed){
+   var driveResult=RunElevated(DriveInstaller.RemoveArgument);
+   if(driveResult==0){
+    try{DriveInstaller.DeleteReceipt();messages.Add("DRIVE X: "+BulkStatus("removed"));}
+    catch(Exception ex){messages.Add("DRIVE X: "+new[]{"Receipt error","Errore registrazione","Error de registro","Erreur d’enregistrement","Registrierungsfehler"}[Index]+": "+ex.Message);}
+   }else messages.Add("DRIVE X: "+T(driveResult==9?"cancelled":"ioError")+" ("+driveResult+")");
+  }else messages.Add("DRIVE X: "+BulkStatus("notManaged"));
   if(File.Exists(MeterExePath)){
    try{File.Delete(MeterExePath);messages.Add("METER X: "+BulkStatus("removed"));}
    catch(Exception ex){messages.Add("METER X: "+ex.Message);}
@@ -638,7 +679,7 @@ public partial class MainWindow : Window
     }
    }catch{}
    var picker=new Microsoft.Win32.OpenFolderDialog{
-    Title=Index==1?"Scegli la cartella in cui creare il backup":"Choose where to save the backup",
+    Title=new[]{"Choose where to save the backup","Scegli la cartella in cui creare il backup","Elige dónde guardar la copia de seguridad","Choisissez où enregistrer la sauvegarde","Speicherort für die Sicherung wählen"}[Index],
     InitialDirectory=Directory.Exists(destination)?destination:Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
     Multiselect=false
    };
@@ -656,7 +697,7 @@ public partial class MainWindow : Window
     }
    File.WriteAllText(Path.Combine(dir,"README.txt"),"DJ RUSSO FX HUB local snapshot. Do not copy files to protected VST3 locations manually. FX SHELL binary is not included; installer receipt is informational only.");
    try{Directory.CreateDirectory(preferenceDirectory);File.WriteAllText(lastDestinationFile,selected);File.WriteAllText(Path.Combine(preferenceDirectory,"last-backup-created.txt"),dir);}catch{}
-   NeonDialog.Show(this,(Index==1?"Backup creato:\n":"Backup created:\n")+dir,"FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
+   NeonDialog.Show(this,(new[]{"Backup created:\n","Backup creato:\n","Copia de seguridad creada:\n","Sauvegarde créée :\n","Sicherung erstellt:\n"}[Index])+dir,"FX HUB",MessageBoxButton.OK,MessageBoxImage.Information);
   }catch(Exception ex){NeonDialog.Show(this,ex.Message,"Backup",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void OpenBackupFolder_Click(object sender,RoutedEventArgs e){
@@ -689,6 +730,7 @@ public partial class MainWindow : Window
   if(id=="delay-x")return DelayInstaller.VersionLabel;
   if(id=="compressor-x")return CompressorInstaller.VersionLabel;
   if(id=="eq-x")return EqInstaller.VersionLabel;
+  if(id=="drive-x")return DriveInstaller.VersionLabel;
   if(id!="meter-x")return ShellInstaller.VersionLabel;
   try{
    using var catalog=JsonDocument.Parse(File.ReadAllText(Path.Combine(AppContext.BaseDirectory,"plugin-updates.json")));
@@ -756,10 +798,20 @@ public partial class MainWindow : Window
    _=>T("diagShellUnknown")
   };
   var eqPackageStatus=EqInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
+  var driveState=DriveInstaller.GetState();
+  var localizedDriveState=driveState switch{
+   DriveInstaller.State.Missing=>T("diagShellMissing"),
+   DriveInstaller.State.Managed=>T("diagShellManaged"),
+   DriveInstaller.State.ExternalSameBinary=>T("diagShellExternal"),
+   DriveInstaller.State.Conflict=>T("diagShellConflict"),
+   DriveInstaller.State.ModifiedManaged=>T("diagShellModified"),
+   _=>T("diagShellUnknown")
+  };
+  var drivePackageStatus=DriveInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var packageStatus=ShellInstaller.HasExpectedPayload()?T("diagPackageValid"):T("diagPackageInvalid");
   var flStatus=flPaths.Any(Directory.Exists)?T("diagFlFound"):T("diagFlMissing");
   // Read-only detection of known standalone file names. Presence does not prove VST3 identity.
-  var knownVst3Names=new[]{"DJ RUSSO SIDECHAIN X.vst3","DJ RUSSO REVERSE FX.vst3","DJ RUSSO STUTTER FX.vst3","DJ RUSSO VOCAL FX.vst3","DJ RUSSO REVERB X.vst3","DJ RUSSO DELAY X.vst3","DJ RUSSO COMPRESSOR X.vst3","DJ RUSSO EQ X.vst3"};
+  var knownVst3Names=new[]{"DJ RUSSO SIDECHAIN X.vst3","DJ RUSSO REVERSE FX.vst3","DJ RUSSO STUTTER FX.vst3","DJ RUSSO VOCAL FX.vst3","DJ RUSSO REVERB X.vst3","DJ RUSSO DELAY X.vst3","DJ RUSSO COMPRESSOR X.vst3","DJ RUSSO EQ X.vst3","DJ RUSSO DRIVE X.vst3"};
   var foundStandalone=knownVst3Names.Where(name=>{
     var path=Path.Combine(vst,name);
     return File.Exists(path)||Directory.Exists(path);
@@ -777,9 +829,10 @@ public partial class MainWindow : Window
   var delayHeading=new[]{"DELAY X package","Pacchetto DELAY X","Paquete DELAY X","Paquet DELAY X","DELAY X-Paket"}[Index];
   var compressorHeading=new[]{"COMPRESSOR X package","Pacchetto COMPRESSOR X","Paquete COMPRESSOR X","Paquet COMPRESSOR X","COMPRESSOR X-Paket"}[Index];
   var eqHeading=new[]{"EQ X package","Pacchetto EQ X","Paquete EQ X","Paquet EQ X","EQ X-Paket"}[Index];
+  var driveHeading=new[]{"DRIVE X package","Pacchetto DRIVE X","Paquete DRIVE X","Paquet DRIVE X","DRIVE X-Paket"}[Index];
   var installedHeading=new[]{"Installed components","Componenti installati","Componentes instalados","Composants installés","Installierte Komponenten"}[Index];
   var packageGroup=new[]{"Package integrity","Integrità dei pacchetti","Integridad de paquetes","Intégrité des paquets","Paketintegrität"}[Index];
-  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL {VersionDisplay("fx-shell")}: {Readable(localizedShellState)}\nREVERB X {VersionDisplay("reverb-x")}: {Readable(localizedReverbState)}\nDELAY X {VersionDisplay("delay-x")}: {Readable(localizedDelayState)}\nCOMPRESSOR X {VersionDisplay("compressor-x")}: {Readable(localizedCompressorState)}\nEQ X {VersionDisplay("eq-x")}: {Readable(localizedEqState)}\nMETER X {VersionDisplay("meter-x")}: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n{compressorHeading}: {Readable(compressorPackageStatus)}\n{eqHeading}: {Readable(eqPackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
+  var report=$"{T("diagVstFolder")}: {Readable(vstStatus)}\n{vst}\n\n{installedHeading}\nFX SHELL {VersionDisplay("fx-shell")}: {Readable(localizedShellState)}\nREVERB X {VersionDisplay("reverb-x")}: {Readable(localizedReverbState)}\nDELAY X {VersionDisplay("delay-x")}: {Readable(localizedDelayState)}\nCOMPRESSOR X {VersionDisplay("compressor-x")}: {Readable(localizedCompressorState)}\nEQ X {VersionDisplay("eq-x")}: {Readable(localizedEqState)}\nDRIVE X {VersionDisplay("drive-x")}: {Readable(localizedDriveState)}\nMETER X {VersionDisplay("meter-x")}: {Readable(meterStatus)}\n\n{packageGroup}\n{packageHeading}: {Readable(packageStatus)}\n{reverbHeading}: {Readable(reverbPackageStatus)}\n{delayHeading}: {Readable(delayPackageStatus)}\n{compressorHeading}: {Readable(compressorPackageStatus)}\n{eqHeading}: {Readable(eqPackageStatus)}\n{driveHeading}: {Readable(drivePackageStatus)}\n\n{T("diagFlLocations")}: {Readable(flStatus)}\n\n{detectionHeading}: {detectionList}\n\n{T("diagReadOnly")}";
   NeonDialog.ShowDiagnostics(this,report,"DJ RUSSO • "+T("diagTitle"),
    new[]{"diagVstFound","diagMeterFound","diagShellManaged","diagShellExternal","diagPackageValid","diagFlFound"}.Select(k=>Readable(T(k))).ToArray(),
    new[]{"diagShellMissing","diagMeterMissing","diagShellUnknown"}.Select(k=>Readable(T(k))).ToArray(),
@@ -789,7 +842,7 @@ public partial class MainWindow : Window
  private static readonly System.Net.Http.HttpClient UpdateClient = CreateUpdateClient();
  private static System.Net.Http.HttpClient CreateUpdateClient(){
    var c=new System.Net.Http.HttpClient{Timeout=TimeSpan.FromMinutes(5)};
-   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.43");
+   c.DefaultRequestHeaders.UserAgent.ParseAdd("DJRussoFXHub/0.8.44");
    c.DefaultRequestHeaders.Accept.ParseAdd("application/vnd.github+json");
    return c;
  }
@@ -813,7 +866,7 @@ public partial class MainWindow : Window
        if(!Version.TryParse(tagName.TrimStart('v','V'),out var parsed))continue;
        if(newest==null || parsed>newest){newest=parsed;root=release;}
      }
-     if(newest==null){if(interactive)NeonDialog.Show(this,Index==1?"Nessuna versione pubblicata su GitHub.":"No GitHub releases are available.","DJ RUSSO FX HUB");return;}
+     if(newest==null){if(interactive)NeonDialog.Show(this,new[]{"No GitHub releases are available.","Nessuna versione pubblicata su GitHub.","No hay versiones publicadas en GitHub.","Aucune version publiée sur GitHub.","Keine GitHub-Releases verfügbar."}[Index],"DJ RUSSO FX HUB");return;}
      var tag=root.GetProperty("tag_name").GetString()??"";
      var page=root.GetProperty("html_url").GetString()??releasesUrl;
      if(!page.StartsWith(releasesUrl,StringComparison.OrdinalIgnoreCase))page=releasesUrl;
@@ -852,12 +905,12 @@ public partial class MainWindow : Window
         !Uri.TryCreate(assetUrl,UriKind.Absolute,out var assetUri) ||
         assetUri.Scheme!="https" || assetUri.Host!="github.com" ||
         !assetUri.AbsolutePath.StartsWith("/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/",StringComparison.OrdinalIgnoreCase)){
-       var prompt=Index==1?$"È disponibile la v{available}. Per sicurezza questa Release richiede il download manuale da GitHub. Aprire la pagina?":$"Version {available} is available. This release requires manual download for security. Open GitHub?";
+       var prompt=new[]{$"Version {available} is available. This release requires manual download for security. Open GitHub?",$"È disponibile la v{available}. Per sicurezza questa Release richiede il download manuale da GitHub. Aprire la pagina?",$"Versión {available} disponible. Por seguridad, descarga manualmente desde GitHub. ¿Abrir la página?",$"Version {available} disponible. Pour la sécurité, téléchargement manuel depuis GitHub. Ouvrir la page ?",$"Version {available} verfügbar. Aus Sicherheitsgründen manuell von GitHub herunterladen. Seite öffnen?"}[Index];
        if(NeonDialog.Show(this,prompt,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Information)==MessageBoxResult.Yes)
          Process.Start(new ProcessStartInfo(page){UseShellExecute=true});
        return;
      }
-     var confirm=Index==1?$"DJ RUSSO FX HUB v{available} disponibile.\nScaricare l'installer ufficiale, verificare SHA-256 e avviare l'aggiornamento?\nWindows potrebbe chiedere autorizzazione amministratore.":$"DJ RUSSO FX HUB v{available} available.\nDownload and verify the official installer, then launch the update?\nWindows may request administrator permission.";
+     var confirm=new[]{$"DJ RUSSO FX HUB v{available} available.\nDownload and verify the official installer, then launch the update?\nWindows may request administrator permission.",$"DJ RUSSO FX HUB v{available} disponibile.\nScaricare l'installer ufficiale, verificare SHA-256 e avviare l'aggiornamento?\nWindows potrebbe chiedere autorizzazione amministratore.",$"DJ RUSSO FX HUB v{available} disponible.\n¿Descargar y verificar el instalador oficial e iniciar la actualización?\nWindows puede solicitar permisos de administrador.",$"DJ RUSSO FX HUB v{available} disponible.\nTélécharger et vérifier l’installateur officiel, puis lancer la mise à jour ?\nWindows peut demander les droits administrateur.",$"DJ RUSSO FX HUB v{available} verfügbar.\nOffizielles Installationsprogramm herunterladen, prüfen und Update starten?\nWindows kann Administratorrechte anfordern."}[Index];
      if(NeonDialog.Show(this,confirm,"DJ RUSSO FX HUB",MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return;
      hubUpdateInProgress=true;
      UpdatesButton.IsEnabled=false;
@@ -870,7 +923,7 @@ public partial class MainWindow : Window
        ()=>downloadCancel.Cancel(),()=>downloadCancel.IsCancellationRequested);
      progressWindow.Show();
      try{
-       StatusText.Text=Index==1?"Download aggiornamento in corso...":"Downloading update...";
+       StatusText.Text=new[]{"Downloading update...","Download aggiornamento in corso...","Descargando actualización...","Téléchargement de la mise à jour...","Update wird heruntergeladen..."}[Index];
        using(var download=await UpdateClient.GetAsync(assetUri,System.Net.Http.HttpCompletionOption.ResponseHeadersRead,downloadCancel.Token)){
          download.EnsureSuccessStatusCode();
          var total=download.Content.Headers.ContentLength;
@@ -893,18 +946,18 @@ public partial class MainWindow : Window
            if(total.HasValue && total.Value>0){
              var percent=Math.Min(100,received*100.0/total.Value);
              progressBar.Value=percent;
-             progressStatus.Text=(Index==1?"Download installer":"Downloading installer")+" • "+percent.ToString("F0")+"%";
+             progressStatus.Text=(new[]{"Downloading installer","Download installer","Descargando instalador","Téléchargement de l’installateur","Installationsprogramm wird heruntergeladen"}[Index])+" • "+percent.ToString("F0")+"%";
              progressDetails.Text=$"{mb:F1} / {total.Value/1048576.0:F1} MB   •   {speed:F1} MB/s";
            }else{
-             progressStatus.Text=Index==1?"Download installer...":"Downloading installer...";
+             progressStatus.Text=new[]{"Downloading installer...","Download installer...","Descargando instalador...","Téléchargement de l’installateur...","Installationsprogramm wird heruntergeladen..."}[Index];
              progressDetails.Text=$"{mb:F1} MB   •   {speed:F1} MB/s";
            }
          }
        }
        cancelButton.IsEnabled=false;
        progressBar.IsIndeterminate=true;
-       progressStatus.Text=Index==1?"Verifica sicurezza SHA-256...":"Verifying SHA-256...";
-       progressDetails.Text=Index==1?"Download completato. Verifica dell'installer.":"Download complete. Verifying installer.";
+       progressStatus.Text=new[]{"Verifying SHA-256...","Verifica sicurezza SHA-256...","Verificando SHA-256...","Vérification SHA-256...","SHA-256 wird geprüft..."}[Index];
+       progressDetails.Text=new[]{"Download complete. Verifying installer.","Download completato. Verifica dell'installer.","Descarga completa. Verificando instalador.","Téléchargement terminé. Vérification de l’installateur.","Download abgeschlossen. Installationsprogramm wird geprüft."}[Index];
        await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
        string actual;
        using(var input=File.OpenRead(partial)){
@@ -914,16 +967,16 @@ public partial class MainWindow : Window
        if(!string.Equals(actual,sha256,StringComparison.OrdinalIgnoreCase))
          throw new InvalidDataException("Installer SHA-256 verification failed.");
        File.Move(partial,installer,true);
-       progressStatus.Text=Index==1?"Avvio installazione...":"Launching installer...";
+       progressStatus.Text=new[]{"Launching installer...","Avvio installazione...","Iniciando instalación...","Lancement de l’installation...","Installation wird gestartet..."}[Index];
        await System.Windows.Threading.Dispatcher.Yield(System.Windows.Threading.DispatcherPriority.Background);
        Process.Start(new ProcessStartInfo(installer){UseShellExecute=true,WorkingDirectory=updateDir});
        Application.Current.Shutdown();
      }catch(OperationCanceledException){
        try{if(File.Exists(partial))File.Delete(partial);}catch{}
-       StatusText.Text=Index==1?"Download annullato":"Download cancelled";
+       StatusText.Text=new[]{"Download cancelled","Download annullato","Descarga cancelada","Téléchargement annulé","Download abgebrochen"}[Index];
      }catch(Exception ex){
        try{if(File.Exists(partial))File.Delete(partial);}catch{}
-       NeonDialog.Show(this,(Index==1?"Aggiornamento non completato: ":"Update not completed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+       NeonDialog.Show(this,(new[]{"Update not completed: ","Aggiornamento non completato: ","Actualización incompleta: ","Mise à jour incomplète : ","Update nicht abgeschlossen: "}[Index])+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
      }finally{
        // Allow programmatic closure after cancellation, error, or successful installation.
        cancelButton.IsEnabled=false;
@@ -932,7 +985,7 @@ public partial class MainWindow : Window
        UpdatesButton.IsEnabled=true;
        StatusText.Text=T("ready");
      }
-   }catch(Exception ex){if(interactive)NeonDialog.Show(this,(Index==1?"Impossibile controllare GitHub: ":"Could not check GitHub: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
+   }catch(Exception ex){if(interactive)NeonDialog.Show(this,(new[]{"Could not check GitHub: ","Impossibile controllare GitHub: ","No se pudo consultar GitHub: ","Impossible de vérifier GitHub : ","GitHub konnte nicht geprüft werden: "}[Index])+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
  private void OpenFolder_Click(object sender,RoutedEventArgs e){var path=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonProgramFiles),"VST3");if(Directory.Exists(path))Process.Start(new ProcessStartInfo{FileName=path,UseShellExecute=true});else NeonDialog.Show(T("missingfolder")+path);}
 
@@ -951,8 +1004,8 @@ public partial class MainWindow : Window
    Refresh();
   }
  }
- private bool VstConflict(string id)=>id=="reverb-x"?ReverbInstaller.GetState() is ReverbInstaller.State.Conflict or ReverbInstaller.State.ModifiedManaged:id=="delay-x"?DelayInstaller.GetState() is DelayInstaller.State.Conflict or DelayInstaller.State.ModifiedManaged:id=="compressor-x"?CompressorInstaller.GetState() is CompressorInstaller.State.Conflict or CompressorInstaller.State.ModifiedManaged:id=="eq-x"?EqInstaller.GetState() is EqInstaller.State.Conflict or EqInstaller.State.ModifiedManaged:IsShellProduct(id) && ShellInstaller.GetState() is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged;
- private bool VstExternal(string id)=>id=="reverb-x"?ReverbInstaller.GetState()==ReverbInstaller.State.ExternalSameBinary:id=="delay-x"?DelayInstaller.GetState()==DelayInstaller.State.ExternalSameBinary:id=="compressor-x"?CompressorInstaller.GetState()==CompressorInstaller.State.ExternalSameBinary:id=="eq-x"?EqInstaller.GetState()==EqInstaller.State.ExternalSameBinary:IsShellProduct(id) && ShellInstaller.GetState()==ShellInstaller.State.ExternalSameBinary;
+ private bool VstConflict(string id)=>id=="reverb-x"?ReverbInstaller.GetState() is ReverbInstaller.State.Conflict or ReverbInstaller.State.ModifiedManaged:id=="delay-x"?DelayInstaller.GetState() is DelayInstaller.State.Conflict or DelayInstaller.State.ModifiedManaged:id=="compressor-x"?CompressorInstaller.GetState() is CompressorInstaller.State.Conflict or CompressorInstaller.State.ModifiedManaged:id=="eq-x"?EqInstaller.GetState() is EqInstaller.State.Conflict or EqInstaller.State.ModifiedManaged:id=="drive-x"?DriveInstaller.GetState() is DriveInstaller.State.Conflict or DriveInstaller.State.ModifiedManaged:IsShellProduct(id) && ShellInstaller.GetState() is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged;
+ private bool VstExternal(string id)=>id=="reverb-x"?ReverbInstaller.GetState()==ReverbInstaller.State.ExternalSameBinary:id=="delay-x"?DelayInstaller.GetState()==DelayInstaller.State.ExternalSameBinary:id=="compressor-x"?CompressorInstaller.GetState()==CompressorInstaller.State.ExternalSameBinary:id=="eq-x"?EqInstaller.GetState()==EqInstaller.State.ExternalSameBinary:id=="drive-x"?DriveInstaller.GetState()==DriveInstaller.State.ExternalSameBinary:IsShellProduct(id) && ShellInstaller.GetState()==ShellInstaller.State.ExternalSameBinary;
  private string ConflictLabel=>new[]{"VST3 conflict","Conflitto VST3","Conflicto VST3","Conflit VST3","VST3-Konflikt"}[Index];
  private string ExternalLabel=>new[]{"Installed externally","Installato esternamente","Instalado externamente","Installé séparément","Extern installiert"}[Index];
  private void ResolveVstConflict(){
@@ -971,12 +1024,12 @@ public partial class MainWindow : Window
   var fx=plugins.FirstOrDefault(p=>p.id==selectedProductId);
   if(fx==null){selectedProductId="meter-x";fx=plugins.FirstOrDefault(p=>p.id=="meter-x");}
   if(fx==null)return;
-  bool meter=fx.id=="meter-x",shell=IsShellProduct(fx.id),reverb=fx.id=="reverb-x",delay=fx.id=="delay-x",compressor=fx.id=="compressor-x",equalizer=fx.id=="eq-x";
+  bool meter=fx.id=="meter-x",shell=IsShellProduct(fx.id),reverb=fx.id=="reverb-x",delay=fx.id=="delay-x",compressor=fx.id=="compressor-x",equalizer=fx.id=="eq-x",drive=fx.id=="drive-x";
   var shellState=ShellInstaller.GetState();
-  bool installed=meter?File.Exists(MeterExePath):reverb ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : delay ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : compressor ? CompressorInstaller.GetState() is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary :equalizer ? EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary : shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
+  bool installed=meter?File.Exists(MeterExePath):reverb ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : delay ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : compressor ? CompressorInstaller.GetState() is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary :equalizer ? EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary :drive ? DriveInstaller.GetState() is DriveInstaller.State.Managed or DriveInstaller.State.ExternalSameBinary : shell && shellState is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary;
   ProductPanelTitle.Text=fx.name;
   var productAsset=Asset(fx.id switch{"sidechain-x"=>"sidechain","reverse-fx"=>theme=="light"?"reverse_light":"reverse","stutter-fx"=>"stutter","reverb-x"=>"logo-reverb-x","delay-x"=>"logo-delay-x","compressor-x"=>"logo-compressor-x",_=>fx.id});
-  var comingSoon=!meter && !shell && !reverb && !delay && !compressor && !equalizer;
+  var comingSoon=!meter && !shell && !reverb && !delay && !compressor && !equalizer && !drive;
   PluginDownloadButton.Visibility=comingSoon?Visibility.Collapsed:Visibility.Visible;
   PluginDownloadButton.IsEnabled=!pluginDownloadInProgress && !hubUpdateInProgress;
   PluginDownloadButton.Content=pluginDownloadInProgress?new[]{"DOWNLOADING…","DOWNLOAD IN CORSO…","DESCARGANDO…","TÉLÉCHARGEMENT…","DOWNLOAD LÄUFT…"}[Index]:new[]{"DOWNLOAD PACKAGE","SCARICA PACCHETTO","DESCARGAR PAQUETE","TÉLÉCHARGER LE PAQUET","PAKET HERUNTERLADEN"}[Index];
@@ -987,24 +1040,24 @@ public partial class MainWindow : Window
   ProductPanelLogo.Height=comingSoon?216:132;
   ProductPanelLogo.Width=comingSoon?240:double.NaN;
   ProductPanelLogo.Stretch=Stretch.Uniform;
-  ProductPanelVersion.Text=meter?VersionDisplay("meter-x")+" • NEON GHOST":shell?VersionDisplay("fx-shell"):reverb?VersionDisplay("reverb-x")+" • NEON GHOST":delay?VersionDisplay("delay-x")+" • NEON GHOST":compressor?VersionDisplay("compressor-x")+" • NEON GHOST":equalizer?VersionDisplay("eq-x")+" • NEON GHOST":"COMING SOON / IN ARRIVO";
+  ProductPanelVersion.Text=meter?VersionDisplay("meter-x")+" • NEON GHOST":shell?VersionDisplay("fx-shell"):reverb?VersionDisplay("reverb-x")+" • NEON GHOST":delay?VersionDisplay("delay-x")+" • NEON GHOST":compressor?VersionDisplay("compressor-x")+" • NEON GHOST":equalizer?VersionDisplay("eq-x")+" • NEON GHOST":drive?VersionDisplay("drive-x")+" • NEON GHOST":new[]{"COMING SOON","IN ARRIVO","PRÓXIMAMENTE","À VENIR","DEMNÄCHST"}[Index];
   ProductPanelDescription.Text=meter?
     "Spectrum · Waveform · Spectrogram · Loudness · Peak/RMS · Vectorscope · Frequency Bands · Correlation":
-    shell?(Index==1?"Questo effetto è incluso nel pacchetto FX SHELL VST3. L'installazione riguarda tutti e tre gli effetti.":"This effect is part of the FX SHELL VST3 package. Installing it installs all three effects."):
-    reverb?(Index==1?"Riverbero Neon Ghost v1.3 con preset, meter stereo e automazioni FL Studio.":"Neon Ghost reverb v1.3 with presets, stereo meters and FL Studio automation."):delay?new[]{"Neon Ghost delay v1.3 with tempo sync, presets, stereo meters and FL Studio automation.","Delay Neon Ghost v1.3 con sincronizzazione BPM, preset, meter stereo e automazioni FL Studio.","Delay Neon Ghost v1.3 con sincronización BPM, presets, medidores estéreo y automatización en FL Studio.","Delay Neon Ghost v1.3 avec synchronisation BPM, presets, vu-mètres stéréo et automation FL Studio.","Neon Ghost Delay v1.3 mit BPM-Synchronisation, Presets, Stereo-Pegeln und FL-Studio-Automation."}[Index]:compressor?new[]{"Neon Ghost compressor v2.2 with 60 presets, dynamic curve, Plasma Energy and advanced dynamics.","Compressore Neon Ghost v2.2 con 60 preset, curva dinamica, Plasma Energy e dinamica avanzata.","Compresor Neon Ghost v2.2 con 60 presets, curva dinámica, Plasma Energy y dinámica avanzada.","Compresseur Neon Ghost v2.2 avec 60 presets, courbe dynamique, Plasma Energy et dynamique avancée.","Neon Ghost Kompressor v2.2 mit 60 Presets, dynamischer Kurve, Plasma Energy und erweiterter Dynamik."}[Index]:equalizer?new[]{"Neon Ghost 16-band dynamic EQ with 48 presets, band solo and auto gain.","EQ dinamico Neon Ghost a 16 bande, 48 preset, solo banda e auto gain.","EQ dinámico Neon Ghost de 16 bandas, 48 presets, solo de banda y ganancia automática.","EQ dynamique Neon Ghost à 16 bandes, 48 presets, solo de bande et gain automatique.","Dynamischer Neon Ghost EQ mit 16 Bändern, 48 Presets, Band-Solo und Auto-Gain."}[Index]:(Index==1?"Plugin in sviluppo. Nessun file installabile incluso.":"Plugin in development. No installable package bundled.");
-  MeterPanelInstallButton.Content=meter?(Index==1?"INSTALLA METER X":"INSTALL METER X"):shell?(Index==1?"INSTALLA FX SHELL":"INSTALL FX SHELL"):reverb?(Index==1?"INSTALLA REVERB X":"INSTALL REVERB X"):delay?new[]{"INSTALL DELAY X","INSTALLA DELAY X","INSTALAR DELAY X","INSTALLER DELAY X","DELAY X INSTALLIEREN"}[Index]:compressor?new[]{"INSTALL COMPRESSOR X","INSTALLA COMPRESSOR X","INSTALAR COMPRESSOR X","INSTALLER COMPRESSOR X","COMPRESSOR X INSTALLIEREN"}[Index]:equalizer?new[]{"INSTALL EQ X","INSTALLA EQ X","INSTALAR EQ X","INSTALLER EQ X","EQ X INSTALLIEREN"}[Index]:(Index==1?"IN ARRIVO":"COMING SOON");
-  MeterPanelRemoveButton.Content=meter?(Index==1?"RIMUOVI METER X":"REMOVE METER X"):reverb?(Index==1?"RIMUOVI REVERB X":"REMOVE REVERB X"):delay?new[]{"REMOVE DELAY X","RIMUOVI DELAY X","ELIMINAR DELAY X","SUPPRIMER DELAY X","DELAY X ENTFERNEN"}[Index]:compressor?new[]{"REMOVE COMPRESSOR X","RIMUOVI COMPRESSOR X","ELIMINAR COMPRESSOR X","SUPPRIMER COMPRESSOR X","COMPRESSOR X ENTFERNEN"}[Index]:equalizer?new[]{"REMOVE EQ X","RIMUOVI EQ X","ELIMINAR EQ X","SUPPRIMER EQ X","EQ X ENTFERNEN"}[Index]:(Index==1?"RIMUOVI FX SHELL":"REMOVE FX SHELL");
-  MeterPanelLaunchButton.Content=Index==1?"▶  AVVIA":"▶  LAUNCH";
-  MeterPanelInstallButton.IsEnabled=meter?(!installed && File.Exists(BundledMeterPath)):shell?(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()):reverb?(ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()):delay?(DelayInstaller.GetState()==DelayInstaller.State.Missing && DelayInstaller.HasExpectedPayload()):compressor?(CompressorInstaller.GetState()==CompressorInstaller.State.Missing && CompressorInstaller.HasExpectedPayload()):equalizer?(EqInstaller.GetState()==EqInstaller.State.Missing && EqInstaller.HasExpectedPayload()):false;
+    shell?(new[]{"This effect is part of the FX SHELL VST3 package. Installing it installs all three effects.","Questo effetto è incluso nel pacchetto FX SHELL VST3. L'installazione riguarda tutti e tre gli effetti.","Este efecto pertenece al paquete FX SHELL VST3. Se instalan los tres efectos.","Cet effet fait partie du paquet FX SHELL VST3. Les trois effets sont installés ensemble.","Dieser Effekt gehört zum FX SHELL VST3-Paket. Alle drei Effekte werden installiert."}[Index]):
+    reverb?(new[]{"Neon Ghost reverb v1.3 with presets, stereo meters and FL Studio automation.","Riverbero Neon Ghost v1.3 con preset, meter stereo e automazioni FL Studio.","Reverberación Neon Ghost v1.3 con presets, medidores estéreo y automatización en FL Studio.","Réverbération Neon Ghost v1.3 avec presets, vu-mètres stéréo et automation FL Studio.","Neon Ghost Hall v1.3 mit Presets, Stereo-Pegeln und FL-Studio-Automation."}[Index]):delay?new[]{"Neon Ghost delay v1.3 with tempo sync, presets, stereo meters and FL Studio automation.","Delay Neon Ghost v1.3 con sincronizzazione BPM, preset, meter stereo e automazioni FL Studio.","Delay Neon Ghost v1.3 con sincronización BPM, presets, medidores estéreo y automatización en FL Studio.","Delay Neon Ghost v1.3 avec synchronisation BPM, presets, vu-mètres stéréo et automation FL Studio.","Neon Ghost Delay v1.3 mit BPM-Synchronisation, Presets, Stereo-Pegeln und FL-Studio-Automation."}[Index]:compressor?new[]{"Neon Ghost compressor v2.2 with 60 presets, dynamic curve, Plasma Energy and advanced dynamics.","Compressore Neon Ghost v2.2 con 60 preset, curva dinamica, Plasma Energy e dinamica avanzata.","Compresor Neon Ghost v2.2 con 60 presets, curva dinámica, Plasma Energy y dinámica avanzada.","Compresseur Neon Ghost v2.2 avec 60 presets, courbe dynamique, Plasma Energy et dynamique avancée.","Neon Ghost Kompressor v2.2 mit 60 Presets, dynamischer Kurve, Plasma Energy und erweiterter Dynamik."}[Index]:equalizer?new[]{"Neon Ghost 16-band dynamic EQ with 48 presets, band solo and auto gain.","EQ dinamico Neon Ghost a 16 bande, 48 preset, solo banda e auto gain.","EQ dinámico Neon Ghost de 16 bandas, 48 presets, solo de banda y ganancia automática.","EQ dynamique Neon Ghost à 16 bandes, 48 presets, solo de bande et gain automatique.","Dynamischer Neon Ghost EQ mit 16 Bändern, 48 Presets, Band-Solo und Auto-Gain."}[Index]:drive?new[]{"Neon Ghost saturation with six algorithms, 48 presets and live spectrum.","Saturazione Neon Ghost con sei algoritmi, 48 preset e spettro in tempo reale.","Saturación Neon Ghost con seis algoritmos, 48 presets y espectro en tiempo real.","Saturation Neon Ghost avec six algorithmes, 48 presets et spectre en temps réel.","Neon Ghost Sättigung mit sechs Algorithmen, 48 Presets und Live-Spektrum."}[Index]:(new[]{"Plugin in development. No installable package bundled.","Plugin in sviluppo. Nessun file installabile incluso.","Plugin en desarrollo. No incluye paquete instalable.","Plugin en développement. Aucun paquet installable inclus.","Plugin in Entwicklung. Kein installierbares Paket enthalten."}[Index]);
+  MeterPanelInstallButton.Content=meter?(new[]{"INSTALL METER X","INSTALLA METER X","INSTALAR METER X","INSTALLER METER X","METER X INSTALLIEREN"}[Index]):shell?(new[]{"INSTALL FX SHELL","INSTALLA FX SHELL","INSTALAR FX SHELL","INSTALLER FX SHELL","FX SHELL INSTALLIEREN"}[Index]):reverb?(new[]{"INSTALL REVERB X","INSTALLA REVERB X","INSTALAR REVERB X","INSTALLER REVERB X","REVERB X INSTALLIEREN"}[Index]):delay?new[]{"INSTALL DELAY X","INSTALLA DELAY X","INSTALAR DELAY X","INSTALLER DELAY X","DELAY X INSTALLIEREN"}[Index]:compressor?new[]{"INSTALL COMPRESSOR X","INSTALLA COMPRESSOR X","INSTALAR COMPRESSOR X","INSTALLER COMPRESSOR X","COMPRESSOR X INSTALLIEREN"}[Index]:equalizer?new[]{"INSTALL EQ X","INSTALLA EQ X","INSTALAR EQ X","INSTALLER EQ X","EQ X INSTALLIEREN"}[Index]:drive?new[]{"INSTALL DRIVE X","INSTALLA DRIVE X","INSTALAR DRIVE X","INSTALLER DRIVE X","DRIVE X INSTALLIEREN"}[Index]:(new[]{"COMING SOON","IN ARRIVO","PRÓXIMAMENTE","À VENIR","DEMNÄCHST"}[Index]);
+  MeterPanelRemoveButton.Content=meter?(new[]{"REMOVE METER X","RIMUOVI METER X","ELIMINAR METER X","SUPPRIMER METER X","METER X ENTFERNEN"}[Index]):reverb?(new[]{"REMOVE REVERB X","RIMUOVI REVERB X","ELIMINAR REVERB X","SUPPRIMER REVERB X","REVERB X ENTFERNEN"}[Index]):delay?new[]{"REMOVE DELAY X","RIMUOVI DELAY X","ELIMINAR DELAY X","SUPPRIMER DELAY X","DELAY X ENTFERNEN"}[Index]:compressor?new[]{"REMOVE COMPRESSOR X","RIMUOVI COMPRESSOR X","ELIMINAR COMPRESSOR X","SUPPRIMER COMPRESSOR X","COMPRESSOR X ENTFERNEN"}[Index]:equalizer?new[]{"REMOVE EQ X","RIMUOVI EQ X","ELIMINAR EQ X","SUPPRIMER EQ X","EQ X ENTFERNEN"}[Index]:drive?new[]{"REMOVE DRIVE X","RIMUOVI DRIVE X","ELIMINAR DRIVE X","SUPPRIMER DRIVE X","DRIVE X ENTFERNEN"}[Index]:(new[]{"REMOVE FX SHELL","RIMUOVI FX SHELL","ELIMINAR FX SHELL","SUPPRIMER FX SHELL","FX SHELL ENTFERNEN"}[Index]);
+  MeterPanelLaunchButton.Content=new[]{"▶  LAUNCH","▶  AVVIA","▶  INICIAR","▶  LANCER","▶  STARTEN"}[Index];
+  MeterPanelInstallButton.IsEnabled=meter?(!installed && File.Exists(BundledMeterPath)):shell?(shellState==ShellInstaller.State.Missing && ShellInstaller.HasExpectedPayload()):reverb?(ReverbInstaller.GetState()==ReverbInstaller.State.Missing && ReverbInstaller.HasExpectedPayload()):delay?(DelayInstaller.GetState()==DelayInstaller.State.Missing && DelayInstaller.HasExpectedPayload()):compressor?(CompressorInstaller.GetState()==CompressorInstaller.State.Missing && CompressorInstaller.HasExpectedPayload()):equalizer?(EqInstaller.GetState()==EqInstaller.State.Missing && EqInstaller.HasExpectedPayload()):drive?(DriveInstaller.GetState()==DriveInstaller.State.Missing && DriveInstaller.HasExpectedPayload()):false;
   if(VstConflict(fx.id)){
    MeterPanelInstallButton.Content=new[]{"RESOLVE CONFLICT","RISOLVI CONFLITTO","RESOLVER CONFLICTO","RÉSOUDRE LE CONFLIT","KONFLIKT LÖSEN"}[Index];
    MeterPanelInstallButton.IsEnabled=true;
   }
-  MeterPanelRemoveButton.IsEnabled=meter?installed:reverb?ReverbInstaller.GetState()==ReverbInstaller.State.Managed:delay?DelayInstaller.GetState()==DelayInstaller.State.Managed:compressor?CompressorInstaller.GetState()==CompressorInstaller.State.Managed:equalizer?EqInstaller.GetState()==EqInstaller.State.Managed:shell && shellState==ShellInstaller.State.Managed;
+  MeterPanelRemoveButton.IsEnabled=meter?installed:reverb?ReverbInstaller.GetState()==ReverbInstaller.State.Managed:delay?DelayInstaller.GetState()==DelayInstaller.State.Managed:compressor?CompressorInstaller.GetState()==CompressorInstaller.State.Managed:equalizer?EqInstaller.GetState()==EqInstaller.State.Managed:drive?DriveInstaller.GetState()==DriveInstaller.State.Managed:shell && shellState==ShellInstaller.State.Managed;
   MeterPanelLaunchButton.Visibility=meter?Visibility.Visible:Visibility.Collapsed;
   MeterPanelLaunchButton.IsEnabled=meter && installed;
-  MeterPanelRemoveButton.Visibility=meter||shell||reverb||delay||compressor||equalizer?Visibility.Visible:Visibility.Collapsed;
-  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?new[]{"● Installed","● Installato","● Instalado","● Installé","● Installiert"}[Index]:meter||shell||reverb||delay||compressor||equalizer?new[]{"○ Not installed","○ Non installato","○ No instalado","○ Non installé","○ Nicht installiert"}[Index]:new[]{"◌ Coming soon","◌ In arrivo","◌ Próximamente","◌ À venir","◌ Demnächst"}[Index];
+  MeterPanelRemoveButton.Visibility=meter||shell||reverb||delay||compressor||equalizer||drive?Visibility.Visible:Visibility.Collapsed;
+  MeterPanelState.Text=VstConflict(fx.id)?"⚠ "+ConflictLabel:VstExternal(fx.id)?"● "+ExternalLabel:installed?new[]{"● Installed","● Installato","● Instalado","● Installé","● Installiert"}[Index]:meter||shell||reverb||delay||compressor||equalizer||drive?new[]{"○ Not installed","○ Non installato","○ No instalado","○ Non installé","○ Nicht installiert"}[Index]:new[]{"◌ Coming soon","◌ In arrivo","◌ Próximamente","◌ À venir","◌ Demnächst"}[Index];
  }
  private bool pluginDownloadInProgress;
  private async void PluginDownload_Click(object sender,RoutedEventArgs e){
@@ -1050,9 +1103,9 @@ public partial class MainWindow : Window
      var packageId=IsShellProduct(id)?"fx-shell":id;
      var installed=packageId=="fx-shell"
        ? ShellInstaller.GetState() is ShellInstaller.State.Managed or ShellInstaller.State.ExternalSameBinary
-       : packageId=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : packageId=="delay-x" ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : packageId=="compressor-x" ? CompressorInstaller.GetState() is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary :packageId=="eq-x" ? EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary : packageId=="meter-x" && File.Exists(MeterExePath);
+       : packageId=="reverb-x" ? ReverbInstaller.GetState() is ReverbInstaller.State.Managed or ReverbInstaller.State.ExternalSameBinary : packageId=="delay-x" ? DelayInstaller.GetState() is DelayInstaller.State.Managed or DelayInstaller.State.ExternalSameBinary : packageId=="compressor-x" ? CompressorInstaller.GetState() is CompressorInstaller.State.Managed or CompressorInstaller.State.ExternalSameBinary :packageId=="eq-x" ? EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary :packageId=="drive-x" ? DriveInstaller.GetState() is DriveInstaller.State.Managed or DriveInstaller.State.ExternalSameBinary : packageId=="meter-x" && File.Exists(MeterExePath);
      if(!installed){
-       NeonToast.Show(this,Index==1?"Questo plugin non risulta installato.":"This plugin is not installed.",warning:true);
+       NeonToast.Show(this,new[]{"This plugin is not installed.","Questo plugin non risulta installato.","Este plugin no está instalado.","Ce plugin n’est pas installé.","Dieses Plugin ist nicht installiert."}[Index],warning:true);
        return;
      }
      using var response=await UpdateClient.GetAsync("https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/main/plugin-updates.json");
@@ -1103,7 +1156,7 @@ public partial class MainWindow : Window
      var version=found.GetProperty("version").GetString()??"";
      var available=found.GetProperty("downloadAvailable").GetBoolean();
      var installedVersion=BundledVersion(packageId);
-     var displayName=packageId switch {"fx-shell"=>"FX SHELL","meter-x"=>"METER X","reverb-x"=>"REVERB X","delay-x"=>"DELAY X","compressor-x"=>"COMPRESSOR X","eq-x"=>"EQ X",_=>packageId.ToUpperInvariant()};
+     var displayName=packageId switch {"fx-shell"=>"FX SHELL","meter-x"=>"METER X","reverb-x"=>"REVERB X","delay-x"=>"DELAY X","compressor-x"=>"COMPRESSOR X","eq-x"=>"EQ X","drive-x"=>"DRIVE X",_=>packageId.ToUpperInvariant()};
      var labels=new[]{
        new[]{"Bundled","Catalog","Update published; automatic installation is not yet enabled.","Up to date. No files changed."},
        new[]{"Inclusa","Catalogo","Aggiornamento pubblicato; installazione automatica non ancora attiva.","Già aggiornato. Nessun file modificato."},
@@ -1117,11 +1170,11 @@ public partial class MainWindow : Window
      var message=$"{displayName}\n{labels[0]}: v{installedVersion}  •  {labels[1]}: v{version}\n{(newer?(downloadable?downloadNotice:labels[2]):labels[3])}";
      NeonToast.Show(this,message);
    }catch(Exception ex){
-     NeonDialog.Show(this,(Index==1?"Controllo aggiornamenti plugin non riuscito: ":"Plugin update check failed: ")+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
+     NeonDialog.Show(this,(new[]{"Plugin update check failed: ","Controllo aggiornamenti plugin non riuscito: ","Error al buscar actualizaciones: ","Échec de la recherche de mises à jour : ","Plugin-Update-Prüfung fehlgeschlagen: "}[Index])+ex.Message,"DJ RUSSO FX HUB",MessageBoxButton.OK,MessageBoxImage.Warning);
    }finally{PluginUpdatesButton.IsEnabled=true;}
  }
  private void SelectedProductInstall_Click(object sender,RoutedEventArgs e){
-  ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();DelayInstaller.InvalidateStateCache();CompressorInstaller.InvalidateStateCache();EqInstaller.InvalidateStateCache();
+  ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();DelayInstaller.InvalidateStateCache();CompressorInstaller.InvalidateStateCache();EqInstaller.InvalidateStateCache();DriveInstaller.InvalidateStateCache();
   if(VstConflict(selectedProductId)){ResolveVstConflict();Refresh();return;}
   if(selectedProductId=="meter-x"){MeterImport_Click(sender,e);return;}
   if(IsShellProduct(selectedProductId)){InstallSelectedShell();return;}
@@ -1129,10 +1182,11 @@ public partial class MainWindow : Window
   if(selectedProductId=="delay-x"){InstallSelectedDelay();return;}
   if(selectedProductId=="compressor-x"){InstallSelectedCompressor();return;}
   if(selectedProductId=="eq-x"){InstallSelectedEq();return;}
+  if(selectedProductId=="drive-x"){InstallSelectedDrive();return;}
  }
  private void InstallSelectedReverb(){
   if(ReverbInstaller.GetState()!=ReverbInstaller.State.Missing || !ReverbInstaller.HasExpectedPayload())return;
-  if(NeonDialog.Show(this,Index==1?"Installare REVERB X v1.3? Chiudi FL Studio.":"Install REVERB X v1.3? Close FL Studio.","REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,new[]{"Install REVERB X v1.3? Close FL Studio.","Installare REVERB X v1.3? Chiudi FL Studio.","¿Instalar REVERB X v1.3? Cierra FL Studio.","Installer REVERB X v1.3 ? Fermez FL Studio.","REVERB X v1.3 installieren? FL Studio schließen."}[Index],"REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ReverbInstaller.InstallArgument);
   if(result==0){try{ReverbInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"REVERB X");}}
   else NeonDialog.Show(this,"REVERB X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","REVERB X");
@@ -1162,9 +1216,17 @@ public partial class MainWindow : Window
   else NeonDialog.Show(this,"EQ X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","EQ X");
   Refresh();
  }
+ private void InstallSelectedDrive(){
+  if(DriveInstaller.GetState()!=DriveInstaller.State.Missing || !DriveInstaller.HasExpectedPayload())return;
+  if(NeonDialog.Show(this,new[]{"Install DRIVE X v1.3.3? Close FL Studio.","Installare DRIVE X v1.3.3? Chiudi FL Studio.","¿Instalar DRIVE X v1.3.3? Cierra FL Studio.","Installer DRIVE X v1.3.3 ? Fermez FL Studio.","DRIVE X v1.3.3 installieren? FL Studio schließen."}[Index],"DRIVE X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
+  int result=RunElevated(DriveInstaller.InstallArgument);
+  if(result==0){try{DriveInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"DRIVE X");}}
+  else NeonDialog.Show(this,"DRIVE X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","DRIVE X");
+  Refresh();
+ }
  private void InstallSelectedShell(){
   if(ShellInstaller.GetState()!=ShellInstaller.State.Missing || !ShellInstaller.HasExpectedPayload())return;
-  if(NeonDialog.Show(this,Index==1?"Installare FX SHELL con Sidechain X, Reverse FX e Stutter FX? Chiudi FL Studio.":"Install FX SHELL including Sidechain X, Reverse FX and Stutter FX? Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,new[]{"Install FX SHELL including Sidechain X, Reverse FX and Stutter FX? Close FL Studio.","Installare FX SHELL con Sidechain X, Reverse FX e Stutter FX? Chiudi FL Studio.","¿Instalar FX SHELL con Sidechain X, Reverse FX y Stutter FX? Cierra FL Studio.","Installer FX SHELL avec Sidechain X, Reverse FX et Stutter FX ? Fermez FL Studio.","FX SHELL mit Sidechain X, Reverse FX und Stutter FX installieren? FL Studio schließen."}[Index],"FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"install")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.InstallArgument);
   if(result==0){try{ShellInstaller.SaveReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"FX SHELL");}}
   else NeonDialog.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
@@ -1176,8 +1238,9 @@ public partial class MainWindow : Window
   if(selectedProductId=="delay-x"){RemoveSelectedDelay();return;}
   if(selectedProductId=="compressor-x"){RemoveSelectedCompressor();return;}
   if(selectedProductId=="eq-x"){RemoveSelectedEq();return;}
+  if(selectedProductId=="drive-x"){RemoveSelectedDrive();return;}
   if(!IsShellProduct(selectedProductId) || ShellInstaller.GetState()!=ShellInstaller.State.Managed)return;
-  if(NeonDialog.Show(this,Index==1?"Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.":"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,new[]{"Remove FX SHELL? This removes Sidechain X, Reverse FX and Stutter FX. Close FL Studio.","Rimuovere FX SHELL? Verranno rimossi Sidechain X, Reverse FX e Stutter FX. Chiudi FL Studio.","¿Eliminar FX SHELL? Se eliminan los tres efectos. Cierra FL Studio.","Supprimer FX SHELL ? Les trois effets seront supprimés. Fermez FL Studio.","FX SHELL entfernen? Alle drei Effekte werden entfernt. FL Studio schließen."}[Index],"FX SHELL",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ShellInstaller.RemoveArgument);
   if(result==0){try{ShellInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"FX SHELL");}}
   else NeonDialog.Show(this,"FX SHELL: "+T(result==9?"cancelled":"ioError")+" ("+result+")","FX SHELL");
@@ -1185,7 +1248,7 @@ public partial class MainWindow : Window
  }
  private void RemoveSelectedReverb(){
   if(ReverbInstaller.GetState()!=ReverbInstaller.State.Managed)return;
-  if(NeonDialog.Show(this,Index==1?"Rimuovere REVERB X installato dall\'HUB? Chiudi FL Studio.":"Remove HUB-managed REVERB X? Close FL Studio.","REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
+  if(NeonDialog.Show(this,new[]{"Remove HUB-managed REVERB X? Close FL Studio.","Rimuovere REVERB X installato dall\'HUB? Chiudi FL Studio.","¿Eliminar REVERB X gestionado por el HUB? Cierra FL Studio.","Supprimer REVERB X géré par le HUB ? Fermez FL Studio.","HUB-verwaltetes REVERB X entfernen? FL Studio schließen."}[Index],"REVERB X",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
   int result=RunElevated(ReverbInstaller.RemoveArgument);
   if(result==0){try{ReverbInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"REVERB X");}}
   else NeonDialog.Show(this,"REVERB X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","REVERB X");
@@ -1215,12 +1278,20 @@ public partial class MainWindow : Window
   else NeonDialog.Show(this,"EQ X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","EQ X");
   Refresh();
  }
+ private void RemoveSelectedDrive(){
+  if(DriveInstaller.GetState()!=DriveInstaller.State.Managed)return;
+  if(NeonDialog.Show(this,new[]{"Remove HUB-managed DRIVE X? Close FL Studio.","Rimuovere DRIVE X installato dall’HUB? Chiudi FL Studio.","¿Eliminar DRIVE X gestionado por el HUB? Cierra FL Studio.","Supprimer DRIVE X géré par le HUB ? Fermez FL Studio.","Vom HUB verwaltetes DRIVE X entfernen? FL Studio schließen."}[Index],"DRIVE X",MessageBoxButton.YesNo,MessageBoxImage.Warning,operation:"remove")!=MessageBoxResult.Yes)return;
+  int result=RunElevated(DriveInstaller.RemoveArgument);
+  if(result==0){try{DriveInstaller.DeleteReceipt();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"DRIVE X");}}
+  else NeonDialog.Show(this,"DRIVE X: "+T(result==9?"cancelled":"ioError")+" ("+result+")","DRIVE X");
+  Refresh();
+ }
  private void SelectedProductLaunch_Click(object sender,RoutedEventArgs e){
   if(selectedProductId=="meter-x")MeterLaunch_Click(sender,e);
  }
  private void UpdateMeterUi(){ /* METER X controls live inside its existing card. */ }
  private void MeterImport_Click(object sender,RoutedEventArgs e){
-  if(File.Exists(MeterExePath)){NeonToast.Show(this,Index==1?"METER X è già installato.":"METER X is already installed.");return;}
+  if(File.Exists(MeterExePath)){NeonToast.Show(this,new[]{"METER X is already installed.","METER X è già installato.","METER X ya está instalado.","METER X est déjà installé.","METER X ist bereits installiert."}[Index]);return;}
   InstallMeterFile(out var detail);
   Refresh();
   NeonDialog.Show(this,detail,"METER X",MessageBoxButton.OK,MessageBoxImage.Information,operation:"install",successfulStatuses:new[]{BulkStatus("installed"),BulkStatus("already")});
@@ -1231,12 +1302,13 @@ public partial class MainWindow : Window
  }
  private void MeterRemove_Click(object sender,RoutedEventArgs e){
   if(!File.Exists(MeterExePath))return;
-  var msg=Index==1?"Rimuovere solo la copia di METER X importata nell'HUB?":"Remove only the HUB-imported METER X copy?";
+  var msg=new[]{"Remove only the HUB-imported METER X copy?","Rimuovere solo la copia di METER X importata nell'HUB?","¿Eliminar solo la copia de METER X importada por el HUB?","Supprimer uniquement la copie de METER X importée par le HUB ?","Nur die vom HUB importierte METER X-Kopie entfernen?"}[Index];
   if(NeonDialog.Show(this,msg,"METER X",MessageBoxButton.YesNo,MessageBoxImage.Question,operation:"remove")!=MessageBoxResult.Yes)return;
   try{File.Delete(MeterExePath);Refresh();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
 
- private void CloseScan_Click(object sender,RoutedEventArgs e) => ScanResultsPanel.Visibility=Visibility.Collapsed;
+ private void CloseScan_Click(object sender,RoutedEventArgs e) => SetAuxiliaryPanel(AuxiliaryPanel.None);
+ private void CloseSettings_Click(object sender,RoutedEventArgs e) => SetAuxiliaryPanel(AuxiliaryPanel.None);
  private static readonly string[] ChipNames = { "Neon Wobble", "Ghoststep Rising", "Arcade Drop", "Future Skyline", "Midnight Trance", "Laser Bounce", "Pixel Rush", "Melodic Echo", "Bass Reactor", "Neon Horizon", "Glitch Runner", "Cyber Dreams", "Violet Drop", "Electric City", "Chiptune Anthem", "Retro Rave", "Wobble Reactor", "Starlight Bass", "Digital Hearts", "Ghostly Arps", "Nightdrive X", "Crystal Drop", "Voltage Rush", "Final Level" , "Neon Ghost Theme", "Cyber City", "Pixel Adventure", "Midnight Drive", "Arcade Rush", "Digital Dreams", "Space Explorer", "Bass Pulse", "Crystal Melody", "Retro Racer", "Future World", "DJ Russo Intro", "Moonlit Circuit", "Prism Runner", "Quantum Sunset", "Electric Aurora"};
  private readonly System.Windows.Threading.DispatcherTimer waveTimer=new(){Interval=TimeSpan.FromMilliseconds(50)};
  private readonly List<System.Windows.Shapes.Rectangle> waveBars=new();
@@ -1335,9 +1407,10 @@ public partial class MainWindow : Window
  {if(chipPlayer!=null)chipPlayer.Volume=chipMuted?0:e.NewValue/100.0;}
  private void Scan_Click(object sender,RoutedEventArgs e)
  {
-     // Keep the scan report visible in the main window instead of relying on a transient dialog.
-     ScanResultsPanel.Visibility=Visibility.Visible;
-     ScanResultsHeading.Text=Index==1?"Rilevamento VST3 e METER X in corso…":"Detecting VST3 and METER X…";
+     // Sidebar click toggles the view; the repeat button always rescans.
+     if(ReferenceEquals(sender,ScanButton) && auxiliaryPanel==AuxiliaryPanel.Scan){SetAuxiliaryPanel(AuxiliaryPanel.None);return;}
+     SetAuxiliaryPanel(AuxiliaryPanel.Scan);
+     ScanResultsHeading.Text=new[]{"Detecting VST3 and METER X…","Rilevamento VST3 e METER X in corso…","Detectando VST3 y METER X…","Détection des VST3 et de METER X…","VST3 und METER X werden erkannt…"}[Index];
      ScanResultsDetails.Text="";
      ScanResultsDetails.Visibility=Visibility.Collapsed;
      ScanVisualResults.Children.Clear();
@@ -1345,7 +1418,7 @@ public partial class MainWindow : Window
      ScanPathsExpander.Header=new[]{"Installation paths","Percorsi di installazione","Rutas de instalación","Chemins d’installation","Installationspfade"}[Index];
      ScanRepeatButton.Content=new[]{"Scan again","Ripeti rilevamento","Repetir detección","Relancer la détection","Erneut erkennen"}[Index];
      ScanResultsPath.Text="";
-     ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();DelayInstaller.InvalidateStateCache();CompressorInstaller.InvalidateStateCache();EqInstaller.InvalidateStateCache();
+     ShellInstaller.InvalidateStateCache();ReverbInstaller.InvalidateStateCache();DelayInstaller.InvalidateStateCache();CompressorInstaller.InvalidateStateCache();EqInstaller.InvalidateStateCache();DriveInstaller.InvalidateStateCache();
      try
      {
          var state=ShellInstaller.GetState();
@@ -1365,17 +1438,19 @@ public partial class MainWindow : Window
              found.Add("compressor-x");
          if(released.Contains("eq-x") && EqInstaller.GetState() is EqInstaller.State.Managed or EqInstaller.State.ExternalSameBinary)
              found.Add("eq-x");
+         if(released.Contains("drive-x") && DriveInstaller.GetState() is DriveInstaller.State.Managed or DriveInstaller.State.ExternalSameBinary)
+             found.Add("drive-x");
          // METER X is a standalone EXE, not a VST3. Count it separately and
          // report its own installation state without implying a DAW scan.
          bool meterInstalled=File.Exists(MeterExePath);
-         int count=found.Count+(meterInstalled?1:0);
-         int total=released.Count+(plugins.Any(p=>p.id=="meter-x")?1:0);
+         int count=found.Count;
+         int total=released.Count;
          string headline=Index switch {
-             1=>$"SOFTWARE RILEVATI: {count} / {total}",
-             2=>$"SOFTWARE DETECTADO: {count} / {total}",
-             3=>$"LOGICIELS DÉTECTÉS : {count} / {total}",
-             4=>$"ERKANNTE SOFTWARE: {count} / {total}",
-             _=>$"SOFTWARE DETECTED: {count} / {total}"
+             1=>$"VST RILEVATI: {count} / {total}",
+             2=>$"VST DETECTADOS: {count} / {total}",
+             3=>$"VST DÉTECTÉS : {count} / {total}",
+             4=>$"ERKANNTE VST: {count} / {total}",
+             _=>$"VST DETECTED: {count} / {total}"
          };
          var names=plugins.Where(p=>found.Contains(p.id) && IsShellProduct(p.id)).Select(p=>p.name).ToArray();
          string vstDetail=names.Length>0
@@ -1385,8 +1460,8 @@ public partial class MainWindow : Window
              ? (Index==1?"METER X: INSTALLATO (EXE trovato).":Index==2?"METER X: INSTALADO (EXE encontrado).":Index==3?"METER X : INSTALLÉ (EXE trouvé).":Index==4?"METER X: INSTALLIERT (EXE gefunden).":"METER X: INSTALLED (EXE found).")
              : (Index==1?"METER X: NON INSTALLATO.":Index==2?"METER X: NO INSTALADO.":Index==3?"METER X : NON INSTALLÉ.":Index==4?"METER X: NICHT INSTALLIERT.":"METER X: NOT INSTALLED.");
          string reverbDetail=found.Contains("reverb-x")
-             ? (Index==1?"REVERB X: INSTALLATO (VST3 verificato).":"REVERB X: INSTALLED (verified VST3).")
-             : (Index==1?"REVERB X: NON INSTALLATO.":"REVERB X: NOT INSTALLED.");
+             ? (new[]{"REVERB X: INSTALLED (verified VST3).","REVERB X: INSTALLATO (VST3 verificato).","REVERB X: INSTALADO (VST3 verificado).","REVERB X : INSTALLÉ (VST3 vérifié).","REVERB X: INSTALLIERT (VST3 geprüft)."}[Index])
+             : (new[]{"REVERB X: NOT INSTALLED.","REVERB X: NON INSTALLATO.","REVERB X: NO INSTALADO.","REVERB X : NON INSTALLÉ.","REVERB X: NICHT INSTALLIERT."}[Index]);
          string delayDetail=found.Contains("delay-x")
              ? (new[]{"DELAY X: INSTALLED (verified VST3).","DELAY X: INSTALLATO (VST3 verificato).","DELAY X: INSTALADO (VST3 verificado).","DELAY X : INSTALLÉ (VST3 vérifié).","DELAY X: INSTALLIERT (VST3 geprüft)."}[Index])
              : (new[]{"DELAY X: NOT INSTALLED.","DELAY X: NON INSTALLATO.","DELAY X: NO INSTALADO.","DELAY X : NON INSTALLÉ.","DELAY X: NICHT INSTALLIERT."}[Index]);
@@ -1396,20 +1471,25 @@ public partial class MainWindow : Window
          string eqDetail=found.Contains("eq-x")
              ? (new[]{"EQ X: INSTALLED (verified VST3).","EQ X: INSTALLATO (VST3 verificato).","EQ X: INSTALADO (VST3 verificado).","EQ X : INSTALLÉ (VST3 vérifié).","EQ X: INSTALLIERT (VST3 geprüft)."}[Index])
              : (new[]{"EQ X: NOT INSTALLED.","EQ X: NON INSTALLATO.","EQ X: NO INSTALADO.","EQ X : NON INSTALLÉ.","EQ X: NICHT INSTALLIERT."}[Index]);
-         string detail=vstDetail+"\n"+reverbDetail+"\n"+delayDetail+"\n"+compressorDetail+"\n"+eqDetail+"\n"+meterDetail;
+         string driveDetail=found.Contains("drive-x")
+             ? (new[]{"DRIVE X: INSTALLED (verified VST3).","DRIVE X: INSTALLATO (VST3 verificato).","DRIVE X: INSTALADO (VST3 verificado).","DRIVE X : INSTALLÉ (VST3 vérifié).","DRIVE X: INSTALLIERT (VST3 geprüft)."}[Index])
+             : (new[]{"DRIVE X: NOT INSTALLED.","DRIVE X: NON INSTALLATO.","DRIVE X: NO INSTALADO.","DRIVE X : NON INSTALLÉ.","DRIVE X: NICHT INSTALLIERT."}[Index]);
+         string detail=vstDetail+"\n"+reverbDetail+"\n"+delayDetail+"\n"+compressorDetail+"\n"+eqDetail+"\n"+driveDetail+"\n"+meterDetail;
          if(VstConflict("delay-x"))detail+="\nDELAY X: "+ConflictLabel;
          else if(VstExternal("delay-x"))detail+="\nDELAY X: "+ExternalLabel;
          if(VstConflict("compressor-x"))detail+="\nCOMPRESSOR X: "+ConflictLabel;
          else if(VstExternal("compressor-x"))detail+="\nCOMPRESSOR X: "+ExternalLabel;
          if(VstConflict("eq-x"))detail+="\nEQ X: "+ConflictLabel;
          else if(VstExternal("eq-x"))detail+="\nEQ X: "+ExternalLabel;
+         if(VstConflict("drive-x"))detail+="\nDRIVE X: "+ConflictLabel;
+         else if(VstExternal("drive-x"))detail+="\nDRIVE X: "+ExternalLabel;
          if(state==ShellInstaller.State.Conflict || state==ShellInstaller.State.ModifiedManaged)
              detail+="\n"+T(state==ShellInstaller.State.ModifiedManaged?"shellModified":"shellOther");
          Refresh();
          ScanResultsHeading.Text=headline;
          ScanResultsDetails.Text=detail;
          RenderScanResults(count,total,found,meterInstalled,state);
-         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+CompressorInstaller.InstalledPath+"\n"+EqInstaller.InstalledPath+"\n"+MeterExePath;
+         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+CompressorInstaller.InstalledPath+"\n"+EqInstaller.InstalledPath+"\n"+DriveInstaller.InstalledPath+"\n"+MeterExePath;
          ShellSectionStatus.Text=headline;
          StatusText.Text=headline;
          ScanResultsPanel.BorderBrush=(System.Windows.Media.Brush)FindResource("AccentBrush");
@@ -1417,11 +1497,11 @@ public partial class MainWindow : Window
      }
      catch(Exception ex)
      {
-         ScanResultsHeading.Text=Index==1?"ERRORE DURANTE LA SCANSIONE":"SCAN ERROR";
+         ScanResultsHeading.Text=new[]{"SCAN ERROR","ERRORE DURANTE LA SCANSIONE","ERROR DE ESCANEO","ERREUR D’ANALYSE","SCANFEHLER"}[Index];
          ScanVisualResults.Children.Clear();
          ScanResultsDetails.Visibility=Visibility.Visible;
          ScanResultsDetails.Text=ex.Message;
-         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+CompressorInstaller.InstalledPath+"\n"+EqInstaller.InstalledPath+"\n"+MeterExePath;
+         ScanResultsPath.Text=ShellInstaller.InstalledPath+"\n"+ReverbInstaller.InstalledPath+"\n"+DelayInstaller.InstalledPath+"\n"+CompressorInstaller.InstalledPath+"\n"+EqInstaller.InstalledPath+"\n"+DriveInstaller.InstalledPath+"\n"+MeterExePath;
          NeonDialog.Show(this,ex.ToString(),"DJ RUSSO FX HUB — SCAN ERROR",MessageBoxButton.OK,MessageBoxImage.Error);
      }
  }
@@ -1439,7 +1519,7 @@ public partial class MainWindow : Window
    var stack=new StackPanel();stack.Children.Add(new TextBlock{Text=value,FontSize=24,FontWeight=FontWeights.Bold,Foreground=cyan});stack.Children.Add(new TextBlock{Text=label,Foreground=fg,TextWrapping=TextWrapping.Wrap});
    metrics.Children.Add(new Border{Child=stack,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(10),Margin=new Thickness(3)});
   }
-  Metric(count+" / "+total,new[]{"Detected","Rilevati","Detectados","Détectés","Erkannt"}[Index]);
+  Metric(count+" / "+total,new[]{"VST effects detected","Effetti VST rilevati","Efectos VST detectados","Effets VST détectés","Erkannte VST-Effekte"}[Index]);
   Metric((total-count).ToString(),new[]{"Not verified","Non verificati","No verificados","Non vérifiés","Nicht verifiziert"}[Index]);
   ScanVisualResults.Children.Add(metrics);
   ScanVisualResults.Children.Add(new ProgressBar{Minimum=0,Maximum=Math.Max(1,total),Value=count,Height=7,Foreground=cyan,Background=surface,Margin=new Thickness(3,0,3,8)});
@@ -1454,8 +1534,11 @@ public partial class MainWindow : Window
    Grid.SetColumn(stack,1);grid.Children.Add(stack);rows.Children.Add(new Border{Child=grid,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(7),Margin=new Thickness(3)});
   }
   Product("fx-shell","FX SHELL",found.Any(IsShellProduct),shellState is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged,shellState==ShellInstaller.State.ExternalSameBinary," · "+new[]{"3 effects","3 effetti","3 efectos","3 effets","3 Effekte"}[Index]);
-  foreach(var p in new[]{("reverb-x","REVERB X"),("delay-x","DELAY X"),("compressor-x","COMPRESSOR X"),("eq-x","EQ X")})Product(p.Item1,p.Item2,found.Contains(p.Item1),VstConflict(p.Item1),VstExternal(p.Item1));
-  Product("meter-x","METER X",meterInstalled,false,false);
+  foreach(var p in new[]{("reverb-x","REVERB X"),("delay-x","DELAY X"),("compressor-x","COMPRESSOR X"),("eq-x","EQ X"),("drive-x","DRIVE X")})Product(p.Item1,p.Item2,found.Contains(p.Item1),VstConflict(p.Item1),VstExternal(p.Item1));
+  ScanVisualResults.Children.Add(rows);
+  ScanVisualResults.Children.Add(new TextBlock{Text=new[]{"Standalone application","Applicazione standalone","Aplicación independiente","Application autonome","Eigenständige Anwendung"}[Index],Foreground=cyan,FontWeight=FontWeights.SemiBold,Margin=new Thickness(3,8,3,3)});
+  rows=new System.Windows.Controls.Primitives.UniformGrid{Columns=1};
+  Product("meter-x","METER X",meterInstalled,false,false," · EXE");
   ScanVisualResults.Children.Add(rows);
  }
 
@@ -1463,7 +1546,7 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — USER GUIDE
  ABOUT
- Windows x64 hub for eight audio tools: Sidechain X, Reverse FX and Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 and METER X v1.2.6.
+ Windows x64 hub for nine audio tools: Sidechain X, Reverse FX and Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1, DRIVE X v1.3.3 and METER X v1.2.6.
  INSTALLATION AND REMOVAL
  Save projects and close your DAW and METER X. Select a product or Install all. Approve administrator access for VST3 installation. FX SHELL installs all three effects; REVERB X, DELAY X and COMPRESSOR X, EQ X are separate. VST3 location: C:\Program Files\Common Files\VST3. Rescan in your DAW. Remove all removes HUB-managed products; external VST3 copies are protected.
  SIDECHAIN X
@@ -1489,6 +1572,9 @@ public partial class MainWindow : Window
 
  EQ X
  Independent 16-band dynamic EQ with 48 presets, band solo and auto gain.
+
+ DRIVE X
+ Independent saturation VST3 with six algorithms, 48 presets, harmonic preview and live spectrum.
  COMPATIBILITY AND REQUIREMENTS
  Windows x64 and a compatible VST3 x64 host for effects. FL Studio is the primary test host; Cubase, Ableton Live and REAPER are not fully tested. FL Studio is not required for the HUB.
  DETECTION AND DIAGNOSTICS
@@ -1505,7 +1591,7 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — GUIDA UTENTE
  INFORMAZIONI
- HUB Windows x64 per otto strumenti: Sidechain X, Reverse FX e Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 e METER X v1.2.6.
+ HUB Windows x64 per nove strumenti: Sidechain X, Reverse FX e Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1, DRIVE X v1.3.3 e METER X v1.2.6.
  INSTALLAZIONE E RIMOZIONE
  Salva i progetti e chiudi la DAW e METER X. Seleziona un prodotto oppure Installa tutto. Autorizza l'amministratore per i VST3. FX SHELL installa tutti e tre gli effetti; REVERB X, DELAY X e COMPRESSOR X, EQ X sono separati. Percorso VST3: C:\Program Files\Common Files\VST3. Ripeti la scansione nella DAW. Rimuovi tutto rimuove i prodotti gestiti dall'HUB; le copie VST3 esterne sono protette.
  SIDECHAIN X
@@ -1531,6 +1617,9 @@ public partial class MainWindow : Window
 
  EQ X
  EQ dinamico indipendente a 16 bande con 48 preset, solo banda e auto gain.
+
+ DRIVE X
+ VST3 di saturazione indipendente con sei algoritmi, 48 preset, anteprima armonica e spettro in tempo reale.
  COMPATIBILITÀ E REQUISITI
  Windows x64 e host VST3 x64 compatibile per gli effetti. FL Studio è l'host principale di test; Cubase, Ableton Live e REAPER non sono stati testati completamente. FL Studio non è necessario per l'HUB.
  RILEVAMENTO E DIAGNOSTICA
@@ -1547,7 +1636,7 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — GUÍA DEL USUARIO
  INFORMACIÓN
- HUB Windows x64 para ocho herramientas: Sidechain X, Reverse FX y Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 y METER X v1.2.6.
+ HUB Windows x64 para nueve herramientas: Sidechain X, Reverse FX y Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1, DRIVE X v1.3.3 y METER X v1.2.6.
  INSTALACIÓN Y ELIMINACIÓN
  Guarda los proyectos y cierra la DAW y METER X. Selecciona un producto o Instalar todo. Autoriza los permisos de administrador para VST3. FX SHELL instala los tres efectos; REVERB X, DELAY X y COMPRESSOR X, EQ X son independientes. Ruta VST3: C:\Program Files\Common Files\VST3. Vuelve a escanear en la DAW. Eliminar todo elimina los productos gestionados por el HUB y protege las copias VST3 externas.
  SIDECHAIN X
@@ -1573,6 +1662,9 @@ public partial class MainWindow : Window
 
  EQ X
  EQ dinámico independiente de 16 bandas con 48 presets, solo de banda y ganancia automática.
+
+ DRIVE X
+ VST3 de saturación independiente con seis algoritmos, 48 presets, vista armónica y espectro en tiempo real.
  COMPATIBILIDAD Y REQUISITOS
  Windows x64 y host VST3 x64 compatible. FL Studio es el host principal de pruebas; Cubase, Ableton Live y REAPER no se han probado completamente. FL Studio no es necesario para el HUB.
  DETECCIÓN Y DIAGNÓSTICO
@@ -1589,7 +1681,7 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — GUIDE UTILISATEUR
  INFORMATIONS
- HUB Windows x64 pour huit outils : Sidechain X, Reverse FX et Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 et METER X v1.2.6.
+ HUB Windows x64 pour neuf outils : Sidechain X, Reverse FX et Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1, DRIVE X v1.3.3 et METER X v1.2.6.
  INSTALLATION ET SUPPRESSION
  Enregistrez les projets et fermez la STAN et METER X. Sélectionnez un produit ou Tout installer. Autorisez les droits administrateur pour les VST3. FX SHELL installe les trois effets ; REVERB X, DELAY X et COMPRESSOR X, EQ X sont indépendants. Chemin VST3 : C:\Program Files\Common Files\VST3. Relancez la recherche dans la STAN. Tout supprimer retire les produits gérés par le HUB et protège les copies VST3 externes.
  SIDECHAIN X
@@ -1615,6 +1707,9 @@ public partial class MainWindow : Window
 
  EQ X
  EQ dynamique indépendant à 16 bandes avec 48 presets, solo de bande et gain automatique.
+
+ DRIVE X
+ VST3 de saturation indépendant avec six algorithmes, 48 presets, aperçu harmonique et spectre en temps réel.
  COMPATIBILITÉ ET CONFIGURATION
  Windows x64 et hôte VST3 x64 compatible. FL Studio est l'hôte principal de test ; Cubase, Ableton Live et REAPER ne sont pas entièrement testés. FL Studio n'est pas requis pour le HUB.
  DÉTECTION ET DIAGNOSTIC
@@ -1631,7 +1726,7 @@ public partial class MainWindow : Window
  """
  DJ RUSSO FX HUB — BENUTZERHANDBUCH
  INFORMATIONEN
- Windows-x64-HUB für acht Werkzeuge: Sidechain X, Reverse FX und Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 und METER X v1.2.6.
+ Windows-x64-HUB für neun Werkzeuge: Sidechain X, Reverse FX und Stutter FX (FX SHELL v3.0.3), REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1, DRIVE X v1.3.3 und METER X v1.2.6.
  INSTALLATION UND ENTFERNUNG
  Projekte speichern und DAW sowie METER X schließen. Produkt oder Alles installieren wählen. Administratorrechte für VST3 bestätigen. FX SHELL installiert alle drei Effekte; REVERB X, DELAY X und COMPRESSOR X, EQ X sind separat. VST3-Pfad: C:\Program Files\Common Files\VST3. Plugins in der DAW erneut scannen. Alles entfernen entfernt HUB-verwaltete Produkte; externe VST3-Kopien bleiben geschützt.
  SIDECHAIN X
@@ -1657,6 +1752,9 @@ public partial class MainWindow : Window
 
  EQ X
  Eigenständiger dynamischer 16-Band-EQ mit 48 Presets, Band-Solo und Auto-Gain.
+
+ DRIVE X
+ Eigenständiger Sättigungs-VST3 mit sechs Algorithmen, 48 Presets, harmonischer Vorschau und Live-Spektrum.
  KOMPATIBILITÄT UND ANFORDERUNGEN
  Windows x64 und kompatibler VST3-x64-Host. FL Studio ist der primäre Testhost; Cubase, Ableton Live und REAPER sind nicht vollständig getestet. FL Studio ist für den HUB nicht erforderlich.
  ERKENNUNG UND DIAGNOSE
@@ -1734,7 +1832,7 @@ public partial class MainWindow : Window
   DockPanel.SetDock(header,Dock.Top);layout.Children.Add(header);
   var guideBody=new StackPanel {Margin=new Thickness(20,18,18,20)};
   var lines=GuideTexts[Index].Split('\n');
-  var version=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.43";
+  var version=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.44";
   header.Text=T("guide")+" · v"+version;
   var indexPanel=new WrapPanel{Margin=new Thickness(0,0,0,12)};
   guideBody.Children.Add(new TextBlock{Text=new[]{"Contents","Indice","Índice","Sommaire","Inhalt"}[Index],Foreground=(Brush)FindResource("SecondaryBrush"),FontSize=17,FontWeight=FontWeights.Bold,Margin=new Thickness(0,0,0,8)});
@@ -1849,9 +1947,9 @@ public partial class MainWindow : Window
   VirusTotalReportButton.IsEnabled=false;
   verifiedInstallerSha256=null;
   CopyInstallerHashButton.IsEnabled=false;
-  SecurityStatus.Text=Index==1?"Recupero impronta SHA-256 ufficiale...":"Retrieving official SHA-256 digest...";
+  SecurityStatus.Text=new[]{"Retrieving official SHA-256 digest...","Recupero impronta SHA-256 ufficiale...","Obteniendo SHA-256 oficial...","Récupération du SHA-256 officiel...","Offizielle SHA-256-Prüfsumme wird abgerufen..."}[Index];
   try{
-   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.43";
+   var current=typeof(MainWindow).Assembly.GetName().Version?.ToString(3)??"0.8.44";
    using var response=await UpdateClient.GetAsync("https://api.github.com/repos/djrusso1994/DJ-RUSSO-FX-HUB/releases/tags/v"+current);
    response.EnsureSuccessStatusCode();
    using var document=JsonDocument.Parse(await response.Content.ReadAsStringAsync());
@@ -1866,15 +1964,15 @@ public partial class MainWindow : Window
     break;
    }
    if(digest==null || digest.Length!=64 || !digest.All(Uri.IsHexDigit)){
-    SecurityStatus.Text=Index==1?"Impronta SHA-256 non disponibile nei metadati GitHub per questa versione. Nessuna scansione eseguita.":"SHA-256 digest is not available in GitHub metadata for this version. No scan performed.";
+    SecurityStatus.Text=new[]{"SHA-256 digest is not available in GitHub metadata for this version. No scan performed.","Impronta SHA-256 non disponibile nei metadati GitHub per questa versione. Nessuna scansione eseguita.","SHA-256 no disponible en los metadatos de GitHub. No se realizó ningún análisis.","SHA-256 indisponible dans les métadonnées GitHub. Aucune analyse effectuée.","SHA-256 in GitHub-Metadaten nicht verfügbar. Kein Scan durchgeführt."}[Index];
     return;
    }
    verifiedInstallerSha256=digest;
    CopyInstallerHashButton.IsEnabled=true;
-   SecurityStatus.Text="SHA-256: "+digest+" — "+(Index==1?"VirusTotal: carica manualmente l’installer per analizzarlo. Nessun file viene inviato automaticamente.":"VirusTotal: manually upload the installer to scan it. No file is uploaded automatically.");
+   SecurityStatus.Text="SHA-256: "+digest+" — "+(new[]{"VirusTotal: manually upload the installer to scan it. No file is uploaded automatically.","VirusTotal: carica manualmente l’installer per analizzarlo. Nessun file viene inviato automaticamente.","VirusTotal: sube manualmente el instalador para analizarlo. No se envían archivos automáticamente.","VirusTotal : téléversez manuellement l’installateur pour l’analyser. Aucun fichier envoyé automatiquement.","VirusTotal: Installationsprogramm manuell zur Prüfung hochladen. Keine automatische Übertragung."}[Index]);
    Process.Start(new ProcessStartInfo("https://www.virustotal.com/gui/home/upload"){UseShellExecute=true});
   }catch(Exception ex){
-   SecurityStatus.Text=(Index==1?"Impossibile aprire il rapporto: ":"Unable to open report: ")+ex.Message;
+   SecurityStatus.Text=(new[]{"Unable to open report: ","Impossibile aprire il rapporto: ","No se pudo abrir el informe: ","Impossible d’ouvrir le rapport : ","Bericht konnte nicht geöffnet werden: "}[Index])+ex.Message;
   }finally{VirusTotalReportButton.IsEnabled=true;}
  }
  private (Window window,TextBlock status,System.Windows.Controls.ProgressBar bar,TextBlock details,Button cancel) CreateUpdateProgressDialog(Action onCancel,Func<bool> isCancelled){
@@ -1903,8 +2001,8 @@ public partial class MainWindow : Window
      progressTitleBar.MouseLeftButtonDown+=(_,e)=>{if(e.ClickCount==1)try{progressWindow.DragMove();}catch(InvalidOperationException){}};
      progressStack.Children.Add(progressTitleBar);
      var progressLayout=new StackPanel{Margin=new Thickness(24,18,24,24)};
-     var progressHeading=new TextBlock{Text=Index==1?"AGGIORNAMENTO IN CORSO":"UPDATING DJ RUSSO FX HUB",FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
-     var progressStatus=new TextBlock{Text=Index==1?"Connessione a GitHub...":"Connecting to GitHub...",Margin=new Thickness(0,17,0,9),FontSize=13};
+     var progressHeading=new TextBlock{Text=new[]{"UPDATING DJ RUSSO FX HUB","AGGIORNAMENTO IN CORSO","ACTUALIZANDO DJ RUSSO FX HUB","MISE À JOUR DE DJ RUSSO FX HUB","DJ RUSSO FX HUB WIRD AKTUALISIERT"}[Index],FontSize=19,FontWeight=FontWeights.Bold,Foreground=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(103,231,242))};
+     var progressStatus=new TextBlock{Text=new[]{"Connecting to GitHub...","Connessione a GitHub...","Conectando con GitHub...","Connexion à GitHub...","Verbindung mit GitHub..."}[Index],Margin=new Thickness(0,17,0,9),FontSize=13};
      var progressBrush=new System.Windows.Media.LinearGradientBrush{
        StartPoint=new Point(0,0.5),EndPoint=new Point(1,0.5),
        GradientStops=new System.Windows.Media.GradientStopCollection{
@@ -1930,7 +2028,7 @@ public partial class MainWindow : Window
      progressLayout.Children.Add(progressStatus);
      progressLayout.Children.Add(progressBar);
      progressLayout.Children.Add(progressDetails);
-     var cancelButton=new Button{Content=Index==1?"ANNULLA":"CANCEL",MinWidth=124,MinHeight=40,Padding=new Thickness(14,8,14,8),HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,18,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
+     var cancelButton=new Button{Content=new[]{"CANCEL","ANNULLA","CANCELAR","ANNULER","ABBRECHEN"}[Index],MinWidth=124,MinHeight=40,Padding=new Thickness(14,8,14,8),HorizontalAlignment=HorizontalAlignment.Right,Margin=new Thickness(0,18,0,0),Foreground=System.Windows.Media.Brushes.White,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(35,30,67)),BorderBrush=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(169,91,246)),BorderThickness=new Thickness(1.5),FontWeight=FontWeights.SemiBold,Cursor=System.Windows.Input.Cursors.Hand};
      // Explicit template prevents the default Windows button theme from hiding the label.
      var cancelBorderFactory=new FrameworkElementFactory(typeof(Border));
      cancelBorderFactory.SetValue(Border.BackgroundProperty,new System.Windows.TemplateBindingExtension(Button.BackgroundProperty));
@@ -1955,12 +2053,20 @@ public partial class MainWindow : Window
      progressWindow.Closing+=(_,e)=>{if(!!isCancelled() && cancelButton.IsEnabled){e.Cancel=true;onCancel();cancelButton.IsEnabled=false;}};
      return (progressWindow,progressStatus,progressBar,progressDetails,cancelButton);
  }
- // The button and settings panel always share the same current-view state.
+ // Single view state: at most one auxiliary panel and one selected navigation button.
+ private enum AuxiliaryPanel { None, Settings, Scan }
+ private AuxiliaryPanel auxiliaryPanel=AuxiliaryPanel.None;
+ private void SetAuxiliaryPanel(AuxiliaryPanel panel)
+ {
+  auxiliaryPanel=panel;
+  SettingsPanel.Visibility=panel==AuxiliaryPanel.Settings?Visibility.Visible:Visibility.Collapsed;
+  ScanResultsPanel.Visibility=panel==AuxiliaryPanel.Scan?Visibility.Visible:Visibility.Collapsed;
+  SettingsButton.Tag=panel==AuxiliaryPanel.Settings?"Selected":null;
+  ScanButton.Tag=panel==AuxiliaryPanel.Scan?"Selected":null;
+ }
  private void Settings_Click(object sender,RoutedEventArgs e)
  {
-  bool open = SettingsPanel.Visibility != Visibility.Visible;
-  SettingsPanel.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
-  SettingsButton.Tag = open ? "Selected" : null;
+  SetAuxiliaryPanel(auxiliaryPanel==AuxiliaryPanel.Settings?AuxiliaryPanel.None:AuxiliaryPanel.Settings);
  }
 
 }
