@@ -7,10 +7,9 @@
 
 **Manage DJ RUSSO audio tools in one place.**
 
-[**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
+[**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Release notes**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.44) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
 ![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.44](docs/badges/v0.8.44/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
-
 
 **Latest stable release: v0.8.44 · 9/14 audio tools available (64.3%)**
 
@@ -27,6 +26,28 @@
 <p align="center"><em>FX HUB showcase · Real interface screenshots · Neon Ghost</em></p>
 
 ---
+
+## Overview
+
+DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updating DJ RUSSO audio tools from a single interface. It brings eight VST effects and the standalone METER X audio analyzer together in the Neon Ghost environment.
+
+## Download and install
+
+[**Download FX HUB v0.8.44 — Windows x64 installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/v0.8.44/DJ_RUSSO_FX_HUB_Setup_v0.8.44.exe) · [Latest stable release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+
+1. Download and run the official Setup EXE. Choose English, Italian, Spanish, French or German.
+2. Launch FX HUB. Close your DAW before installing or removing VST effects.
+3. Select a tool or use **Install all**. Approve administrator access when requested.
+4. Rescan your VST3 plugins in your DAW. Launch METER X directly from the HUB.
+
+## What's new in v0.8.44 — current stable release
+
+- **DRIVE X v1.3.3:** independent saturation VST3, six algorithms, 48 presets, harmonic preview and live spectrum.
+- **Nine of fourteen tools:** individual verified downloads, safe installation/removal, bulk actions and diagnostics.
+- **Five installer languages:** English (default), Italian, Spanish, French and German; first launch uses the chosen language, existing preferences are preserved.
+- **Refined navigation:** Settings and VST detection are mutually exclusive, with persistent selected buttons and separate METER X standalone status.
+- **Localization and interface polish:** updated controls, context menus, notifications and diagnostics across all five HUB languages.
+- Existing audio binaries are preserved. Windows build passed and the tested interface was approved.
 
 ## Individual downloads — no FX HUB required
 
@@ -74,46 +95,6 @@ These real interface captures depict HUB v0.8.43.
 
 METER X is a portable standalone application; Sidechain X, Reverse FX and Stutter FX share one FX SHELL VST3 module.
 
-## What's new in v0.8.44 — current stable release
-
-- **DRIVE X v1.3.3:** independent saturation VST3, six algorithms, 48 presets, harmonic preview and live spectrum.
-- **Nine of fourteen tools:** individual verified downloads, safe installation/removal, bulk actions and diagnostics.
-- **Five installer languages:** English (default), Italian, Spanish, French and German; first launch uses the chosen language, existing preferences are preserved.
-- **Refined navigation:** Settings and VST detection are mutually exclusive, with persistent selected buttons and separate METER X standalone status.
-- Existing audio binaries and the refreshed FX HUB showcase are preserved.
-
-## Previous release: v0.8.43
-
-- **EQ X v1.1.1:** independent dynamic EQ VST3, 16 bands, 48 factory presets, original logo and verified distribution.
-
-- **COMPRESSOR X v2.2:** independent VST3 with original logo, integrated catalog and SHA-256 package verification.
-- **8 of 14 audio tools available:** individual and bulk installation/removal, conflict protection, detection and diagnostics.
-- **Individual downloads:** download the original plugin files without installing FX HUB.
-- **Five interface languages:** English, Italian, Spanish, French and German.
-- **Unified vector interface:** contextual icons across navigation, diagnostics, package integrity, installation/removal confirmations and reports, detection and the guide.
-- **Software detection dashboard:** verified tool counts, progress bar, package cards, conflict/external installation indicators, expandable paths and rescan action.
-- **Interactive user guide:** themed index, precise section navigation and a brief double-bounce highlight with neon glow.
-- **Original startup music:** DJ RUSSO – Wave Pt. II, with the track title, optional playback at 30% volume, preserved fades and transition to the chip player without overlap.
-- **Validation:** Windows build passed and the project owner approved the tested interface. Existing plugin binaries and DSP are unchanged.
-
-[**Download FX HUB — latest published installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
-
-## Previous release: v0.8.42
-
-COMPRESSOR X v2.2 and verified individual downloads for seven available audio tools. See [v0.8.42 release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.42) and the cumulative [changelog](CHANGELOG.txt).
-
-## Earlier release: v0.8.41
-
-- **DELAY X v1.3 released:** independent Neon Ghost VST3 effect with its original logo, SHA-256 integrity verification and safe installation/removal.
-- **Expanded audio-tool catalog:** six of fourteen planned effects/tools are now available: Sidechain X, Reverse FX, Stutter FX, METER X, REVERB X and DELAY X.
-- **Install/remove all:** added DELAY X to bulk operations, individual plugin management and installation-state checks without changing the audio engines.
-- **Redesigned diagnostics:** clearer grouped results, status indicators and package-integrity information, consistent with the Neon Ghost interface.
-- **Refined operation dialogs:** improved installation/removal confirmations and final status reports for individual and bulk operations.
-- **Crash fix and faster feedback:** corrected the WPF operation-summary crash and show bulk-operation results before refreshing the product cards.
-- **Existing audio DSP preserved:** previous plugin binaries, IDs and audio-processing behavior are unchanged.
-
-**[Download DJ RUSSO FX HUB v0.8.41](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.41)** · [Latest stable installer](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
-
 ## Included tools
 
 **Nine available audio tools** are managed through one Windows application:
@@ -125,94 +106,31 @@ COMPRESSOR X v2.2 and verified individual downloads for seven available audio to
 - **DJ RUSSO COMPRESSOR X v2.2** — independent VST3 dynamics effect.
 - **DJ RUSSO EQ X v1.1.1** — independent dynamic EQ VST3.
 - **DJ RUSSO DRIVE X v1.3.3** — independent saturation VST3 with six algorithms and live spectrum.
-- **More audio tools** — visible as *Coming Soon* in the catalog, but not yet available for installation.
+- **Coming soon:** AUTO MASTER X, PITCH X, STEREO X, TRANSIENT X and VOCAL REMOVER X.
 
 The FX HUB itself is a **Windows application, not a VST3 plugin**. FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X and METER X can be installed or removed individually, or managed together with the supported bulk actions.
 
-## Previous release: v0.8.40
+## Main features
 
-- **REVERB X v1.3 is now available:** its own catalog card, original logo, independent VST3 installer, and SHA-256 package integrity verification.
-- **Safer VST3 management:** distinguish installed, externally installed and conflicting or modified files. A **Resolve Conflict** action explains what to do and can open the VST3 directory without automatically deleting or overwriting plugins.
-- **Bulk install and removal:** REVERB X is now included alongside FX SHELL and METER X, with consistent status messages.
-- **Updated diagnostics:** verify the bundled REVERB X package and display its installed state, alongside the existing tools.
-- **Improved in-app guide:** clearer typography, localized instructions, scrollbars that match the interface and a clickable official support link.
-- **Refined multilingual UI:** improved notifications, confirmation messages and status labels in English, Italian, Spanish, French and German.
-- **Existing audio processing preserved:** no changes to the DSP of the previously released VST3 effects.
+- Individual and bulk installation/removal, with protection for external or modified VST3 files.
+- Verified VST detection, separate METER X status, search and catalog filters.
+- Guided HUB updates from official GitHub releases and verified individual plugin downloads.
+- Local diagnostics, backups, VST3 folder access and an interactive user guide.
+- Five interface languages and three visual themes: Neon Ghost, Dark Professional and Light Modern.
+- Original startup music (Wave Pt. II), optional playback and mini chip player.
 
-**[Download DJ RUSSO FX HUB v0.8.40](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.40)** · [Latest stable release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+## Compatibility and security
 
-## Earlier release: v0.8.39
+- Windows x64; FL Studio is the primary tested host. Other VST3 hosts are not yet fully validated.
+- FX SHELL contains three effects in one VST3 module. Do not split or duplicate it. METER X is a standalone EXE.
+- VST3 files are installed in `C:\Program Files\Common Files\VST3`. Back up your projects and existing plugins before making changes.
+- The HUB checks official releases and can offer a user-confirmed installer download with SHA-256 integrity verification. If verification metadata is unavailable, it opens the official release in your browser. Updates are never installed silently.
+- Automatic VST3 updates are not yet enabled; use the verified individual downloads when needed.
+- SHA-256 verifies integrity, not malware safety. In Settings, the VirusTotal option lets you manually upload the official installer for analysis. Uploading shares the file with VirusTotal; review its privacy terms first. A missing report does not prove a file safe or unsafe.
 
-- **Improved theme consistency:** refined contrast, borders, buttons and text readability across **Neon Ghost**, **Dark Professional** and **Light Modern**.
-- **More readable controls:** improved dropdown presentation, plugin-update button and selected-tool panel styling.
-- **Responsive notifications:** adjusted toast positioning to remain visible across different Windows screen resolutions and taskbar layouts.
-- **Interface localization:** refined multilingual labels and update-status translations.
-- **Existing audio tools preserved:** no changes to VST3 audio DSP, plugin identities or installer paths.
+## Release history and support
 
-The v0.8.39 release introduced the theme, layout and localization refinements listed above. Versions v0.8.40 and v0.8.41 build on those improvements.
-
-For the exact version history, see [CHANGELOG.txt](CHANGELOG.txt). The download and release status are always shown on [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases).
-
-### Test the update-window preview
-
-Open the left sidebar and select **ANTEPRIMA AGGIORNAMENTO**, or use the preview control in **Settings**. This is a visual simulation, not an actual update; it does not download, install or replace any files.
-
-### VirusTotal and installer safety
-
-To scan the installer, download it from the official [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases), then choose the VirusTotal button in Settings and **manually select that downloaded EXE** on VirusTotal. A missing VirusTotal report for an SHA-256 hash is **not** evidence that the file is malicious or safe. Uploading files to VirusTotal shares them with that service; review its privacy terms before uploading.
-
-## Features
-
-- Install and remove supported DJ RUSSO tools.
-- View installation status and launch supported applications.
-- Search and filter the audio-tool catalog.
-- Choose interface language and one of three visual themes: Neon Ghost, Dark Professional or Light Modern.
-- Check GitHub Releases for newer versions, including preview releases.
-- Open diagnostics, backup tools and the VST3 directory.
-- Neon Ghost visual design, optional original startup music (Wave Pt. II) and mini chip player.
-- Interactive five-language guide and contextual vector icons.
-
-## Download and install
-
-1. Open the [latest stable GitHub release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest).
-2. Download the Windows x64 **Setup .exe** from the latest published release.
-3. Run the installer and launch **DJ RUSSO FX HUB**.
-4. Close your DAW before installing or removing VST3 effects.
-5. Open FL Studio's Plugin Manager and rescan plugins after installation.
-
-**Latest published build:** see [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases). The release link above opens the latest stable release.
-
-## Compatibility and important notes
-
-- Windows x64; developed with WPF and .NET 8.
-- FL Studio is the primary testing DAW; other VST3 hosts are not yet fully validated.
-- FX SHELL contains three effects in **one shared VST3 file**. Do not manually split or duplicate it.
-- REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 and DRIVE X v1.3.3 install as **independent VST3 effects**, separately from FX SHELL.
-- If a different or modified VST3 is detected at the destination, the HUB blocks automatic replacement and offers a **Resolve Conflict** explanation. Close your DAW and back up existing files before making manual changes.
-- Installation may require Windows administrator permission.
-- Always back up important projects and plugins before testing.
-- The HUB checks official GitHub Releases for updates. When a compatible installer includes a SHA-256 digest, it can offer a user-confirmed download, integrity check and installer launch; otherwise it opens the release in the browser. Updates are never installed silently.
-- The source project builds the HUB and bundles precompiled payloads. It does **not** build the JUCE audio DSP.
-
-## Development and release process
-
-The latest stable release link at the top of this page always opens the current stable GitHub release. See [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) for the current installer, release notes and whether a release is marked as a pre-release.
-
-GitHub Actions builds the Windows application from source. A successful build verifies compilation, **not** correct behavior on every Windows PC. Stable releases require approval after Windows testing. GitHub Actions artifacts and published GitHub Releases are separate download channels. Each release must also refresh this README, both vector badges, the download catalog and the cumulative changelog according to [the release checklist](AGENTS.md).
-
-### Update and security behavior
-
-- **HUB updates:** check official releases, offer guided installer download when supported, verify the published SHA-256 digest and request confirmation before launch.
-- **VirusTotal:** provide a link to the report for the exact published installer digest when available; this does not upload files or guarantee that a build is malware-free.
-- **Installed tools:** detect supported VST3 installations and distinguish managed files from conflicting or modified installations where verification is available.
-- **Diagnostics and backups:** offer local diagnostic and backup utilities.
-- **Plugin updates:** automatic VST3 plugin updates are not yet implemented. Do not confuse HUB application updates with plugin updates.
-
-The development branch may contain unreleased changes. For confirmed downloads and release-specific details, always refer to the [published release notes](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases).
-
-## Build from source
-
-Open `DJRussoFXHub.slnx` with Visual Studio 2022 or later and the **.NET desktop development** workload, then build for Windows x64. Keep the bundled `Payload` files alongside the published application.
+[**Latest release**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [Full changelog](CHANGELOG.txt) · [All releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) · [Report an issue](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
 ---
 
