@@ -9,7 +9,14 @@
 
 [**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.44](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.44/Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.44](docs/badges/v0.8.44/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+
+
+**Latest stable release: v0.8.44 · 9/14 audio tools available (64.3%)**
+
+![Suite development: 9 of 14 tools — 64.3%](docs/badges/v0.8.44/suite-progress.svg)
+
+**8 VST effects + 1 standalone application · 5 tools remaining**
 
 </div>
 
@@ -67,7 +74,7 @@ These real interface captures depict HUB v0.8.43.
 
 METER X is a portable standalone application; Sidechain X, Reverse FX and Stutter FX share one FX SHELL VST3 module.
 
-## What's new in v0.8.44
+## What's new in v0.8.44 — current stable release
 
 - **DRIVE X v1.3.3:** independent saturation VST3, six algorithms, 48 presets, harmonic preview and live spectrum.
 - **Nine of fourteen tools:** individual verified downloads, safe installation/removal, bulk actions and diagnostics.
@@ -90,8 +97,6 @@ METER X is a portable standalone application; Sidechain X, Reverse FX and Stutte
 - **Validation:** Windows build passed and the project owner approved the tested interface. Existing plugin binaries and DSP are unchanged.
 
 [**Download FX HUB — latest published installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
-
-![Suite development: 9 of 14 tools](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.44/Assets/suite-progress.svg)
 
 ## Previous release: v0.8.42
 
@@ -193,7 +198,7 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 
 The latest stable release link at the top of this page always opens the current stable GitHub release. See [GitHub Releases](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases) for the current installer, release notes and whether a release is marked as a pre-release.
 
-GitHub Actions builds the Windows application from source. A successful build verifies compilation, **not** correct behavior on every Windows PC. Stable releases require approval after Windows testing. GitHub Actions artifacts and published GitHub Releases are separate download channels.
+GitHub Actions builds the Windows application from source. A successful build verifies compilation, **not** correct behavior on every Windows PC. Stable releases require approval after Windows testing. GitHub Actions artifacts and published GitHub Releases are separate download channels. Each release must also refresh this README, both vector badges, the download catalog and the cumulative changelog according to [the release checklist](AGENTS.md).
 
 ### Update and security behavior
 
