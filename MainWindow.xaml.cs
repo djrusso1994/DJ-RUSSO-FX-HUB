@@ -292,6 +292,25 @@ public partial class MainWindow : Window
      ThemeHint.Text=T("theme");SettingsHint.Text=T("settingshint");StartupMusicCheck.Content=new[]{"Startup music · Wave Pt. II","Musica di avvio · Wave Pt. II","Música de inicio · Wave Pt. II","Musique de démarrage · Wave Pt. II","Startmusik · Wave Pt. II"}[Index];
      SearchCaption.Text=T("searchProducts");FilterCaption.Text=T("filterProducts");
      ProductSearch.ToolTip=T("searchTip");ProductFilter.ToolTip=T("filterTip");
+     Language=System.Windows.Markup.XmlLanguage.GetLanguage(lang switch {"it"=>"it-IT","es"=>"es-ES","fr"=>"fr-FR","de"=>"de-DE",_=>"en-US"});
+     var searchMenu=new ContextMenu();
+     void SearchAction(string[] labels,System.Windows.Input.RoutedUICommand command){searchMenu.Items.Add(new MenuItem{Header=labels[Index],Command=command,CommandTarget=ProductSearch});}
+     SearchAction(new[]{"Undo","Annulla","Deshacer","Annuler","Rückgängig"},System.Windows.Input.ApplicationCommands.Undo);
+     SearchAction(new[]{"Redo","Ripristina","Rehacer","Rétablir","Wiederholen"},System.Windows.Input.ApplicationCommands.Redo);
+     searchMenu.Items.Add(new Separator());
+     SearchAction(new[]{"Cut","Taglia","Cortar","Couper","Ausschneiden"},System.Windows.Input.ApplicationCommands.Cut);
+     SearchAction(new[]{"Copy","Copia","Copiar","Copier","Kopieren"},System.Windows.Input.ApplicationCommands.Copy);
+     SearchAction(new[]{"Paste","Incolla","Pegar","Coller","Einfügen"},System.Windows.Input.ApplicationCommands.Paste);
+     SearchAction(new[]{"Delete","Elimina","Eliminar","Supprimer","Löschen"},System.Windows.Input.ApplicationCommands.Delete);
+     SearchAction(new[]{"Select all","Seleziona tutto","Seleccionar todo","Tout sélectionner","Alles auswählen"},System.Windows.Input.ApplicationCommands.SelectAll);
+     ProductSearch.ContextMenu=searchMenu;
+     MinimizeWindowButton.ToolTip=new[]{"Minimize","Riduci a icona","Minimizar","Réduire","Minimieren"}[Index];
+     MaximizeWindowButton.ToolTip=new[]{"Maximize / Restore","Ingrandisci / Ripristina","Maximizar / Restaurar","Agrandir / Restaurer","Maximieren / Wiederherstellen"}[Index];
+     CloseWindowButton.ToolTip=new[]{"Close","Chiudi","Cerrar","Fermer","Schließen"}[Index];
+     CloseScanButton.ToolTip=CloseWindowButton.ToolTip;
+     ChipPlayButton.ToolTip=new[]{"Play / Pause","Riproduci / Pausa","Reproducir / Pausa","Lecture / Pause","Wiedergabe / Pause"}[Index];
+     ChipNextButton.ToolTip=new[]{"Next track","Traccia successiva","Siguiente pista","Piste suivante","Nächster Titel"}[Index];
+     ChipMuteButton.ToolTip=new[]{"Mute","Silenzia","Silenciar","Muet","Stummschalten"}[Index];
      // Keep filter captions synchronized with the selected UI language.
      string[][] filterLabels = {
          new[] { "All products", "Installed", "Available", "Coming soon" },
