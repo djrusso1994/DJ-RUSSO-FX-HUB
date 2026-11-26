@@ -3,7 +3,7 @@
 <img src="Assets/hub.png" alt="DJ RUSSO FX HUB logo" width="140" />
 
 # DJ RUSSO FX HUB
-### NEON GHOST · Audio Tools Manager for Windows
+### NEON GHOST
 
 **Manage DJ RUSSO audio tools in one place.**
 
@@ -17,7 +17,7 @@
   <img src="screenshots/suite-showcase.gif" alt="DJ RUSSO FX HUB and seven audio effects — interface slideshow" width="960" />
 </p>
 
-<p align="center"><em>Real interface screenshots in rotation · Neon Ghost</em></p>
+<p align="center"><em>FX HUB showcase · Real interface screenshots · Neon Ghost</em></p>
 
 ---
 
@@ -52,7 +52,7 @@ These real interface captures depict HUB v0.8.43.
 | **Diagnostics** | **Interactive guide** |
 | [![Diagnostics](screenshots/hub-diagnostics.png)](screenshots/hub-diagnostics.png) | [![Guide](screenshots/hub-guide.png)](screenshots/hub-guide.png) |
 
-## Audio tools gallery
+## FX HUB plugin gallery
 
 | SIDECHAIN X · FX SHELL v3.0.3 | REVERSE FX · FX SHELL v3.0.3 |
 |:---:|:---:|
