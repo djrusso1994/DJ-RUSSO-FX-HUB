@@ -9,7 +9,7 @@
 
 [**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.44](Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.44](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.44/Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 </div>
 
@@ -91,7 +91,7 @@ METER X is a portable standalone application; Sidechain X, Reverse FX and Stutte
 
 [**Download FX HUB — latest published installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
-![Suite development: 9 of 14 tools](Assets/suite-progress.svg)
+![Suite development: 9 of 14 tools](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/v0.8.44/Assets/suite-progress.svg)
 
 ## Previous release: v0.8.42
 
