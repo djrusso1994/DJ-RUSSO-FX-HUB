@@ -9,7 +9,7 @@
 
 [**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Windows builds**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/actions) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.43](Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.44](Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 </div>
 
@@ -23,7 +23,7 @@
 
 ## Individual downloads — no FX HUB required
 
-Prefer to download just one tool? These official Windows x64 binaries are the same payloads included in FX HUB v0.8.43.
+Prefer to download just one tool? These official Windows x64 binaries are the same payloads included in FX HUB v0.8.44.
 
 | Tool | Version | Format | Download |
 |---|---|---|---|
@@ -32,6 +32,7 @@ Prefer to download just one tool? These official Windows x64 binaries are the sa
 | **DELAY X** | 1.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a/Payload/DJ%20RUSSO%20DELAY%20X.vst3) |
 | **COMPRESSOR X** | 2.2 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/7c15ea42c603ac397ac5e39bf8fd5a8144e0e2d8/Payload/DJ%20RUSSO%20COMPRESSOR%20X.vst3) |
 | **EQ X** | 1.1.1 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/89aecc51051d3cc9c1005e62f1fa8c34278c12da/Payload/DJ%20RUSSO%20EQ%20X.vst3) |
+| **DRIVE X** | 1.3.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/f2c72c828c339c3ab81aa54f7843523c00a8c216/Payload/DJ%20RUSSO%20DRIVE%20X.vst3) |
 | **METER X** | 1.2.6 | Portable EXE | [Download EXE](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a/Payload/DJ%20RUSSO%20METER%20X.exe) |
 
 **Manual installation:** close your DAW, back up any existing plugin, then copy the downloaded `.vst3` file to `C:\Program Files\Common Files\VST3` (administrator permission may be required). Rescan your plugins in your DAW. METER X is a standalone Windows executable and does not belong in the VST3 folder.
@@ -66,7 +67,14 @@ These real interface captures depict HUB v0.8.43.
 
 METER X is a portable standalone application; Sidechain X, Reverse FX and Stutter FX share one FX SHELL VST3 module.
 
-## What's new in v0.8.43
+## What's new in v0.8.44
+
+- **DRIVE X v1.3.3:** independent saturation VST3, six algorithms, 48 presets, harmonic preview and live spectrum.
+- **Nine of fourteen tools:** individual verified downloads, safe installation/removal, bulk actions and diagnostics.
+- **Five installer languages:** English (default), Italian, Spanish, French and German; first launch uses the chosen language, existing preferences are preserved.
+- Existing audio binaries and the refreshed FX HUB showcase are preserved.
+
+## Previous release: v0.8.43
 
 - **EQ X v1.1.1:** independent dynamic EQ VST3, 16 bands, 48 factory presets, original logo and verified distribution.
 
@@ -82,7 +90,7 @@ METER X is a portable standalone application; Sidechain X, Reverse FX and Stutte
 
 [**Download FX HUB — latest published installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
-![Suite development: 8 of 14 tools](Assets/suite-progress.svg)
+![Suite development: 9 of 14 tools](Assets/suite-progress.svg)
 
 ## Previous release: v0.8.42
 
@@ -102,7 +110,7 @@ COMPRESSOR X v2.2 and verified individual downloads for seven available audio to
 
 ## Included tools
 
-**Eight available audio tools** are managed through one Windows application:
+**Nine available audio tools** are managed through one Windows application:
 
 - **DJ RUSSO METER X v1.2.6** — Windows audio monitoring application.
 - **DJ RUSSO FX SHELL v3.0.3** — one shared VST3 module containing **Sidechain X**, **Reverse FX**, and **Stutter FX**.
@@ -110,9 +118,10 @@ COMPRESSOR X v2.2 and verified individual downloads for seven available audio to
 - **DJ RUSSO DELAY X v1.3** — independent Neon Ghost VST3 delay effect with stereo delay controls, presets, and FL Studio automation support.
 - **DJ RUSSO COMPRESSOR X v2.2** — independent VST3 dynamics effect.
 - **DJ RUSSO EQ X v1.1.1** — independent dynamic EQ VST3.
+- **DJ RUSSO DRIVE X v1.3.3** — independent saturation VST3 with six algorithms and live spectrum.
 - **More audio tools** — visible as *Coming Soon* in the catalog, but not yet available for installation.
 
-The FX HUB itself is a **Windows application, not a VST3 plugin**. FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X and METER X can be installed or removed individually, or managed together with the supported bulk actions.
+The FX HUB itself is a **Windows application, not a VST3 plugin**. FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X and METER X can be installed or removed individually, or managed together with the supported bulk actions.
 
 ## Previous release: v0.8.40
 
@@ -172,7 +181,7 @@ To scan the installer, download it from the official [GitHub Releases](https://g
 - Windows x64; developed with WPF and .NET 8.
 - FL Studio is the primary testing DAW; other VST3 hosts are not yet fully validated.
 - FX SHELL contains three effects in **one shared VST3 file**. Do not manually split or duplicate it.
-- REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2 and EQ X v1.1.1 install as **independent VST3 effects**, separately from FX SHELL.
+- REVERB X v1.3, DELAY X v1.3, COMPRESSOR X v2.2, EQ X v1.1.1 and DRIVE X v1.3.3 install as **independent VST3 effects**, separately from FX SHELL.
 - If a different or modified VST3 is detected at the destination, the HUB blocks automatic replacement and offers a **Resolve Conflict** explanation. Close your DAW and back up existing files before making manual changes.
 - Installation may require Windows administrator permission.
 - Always back up important projects and plugins before testing.

@@ -1,3 +1,10 @@
+v0.8.44 - DRIVE X integration (release candidate)
+- DRIVE X v1.3.3: independent VST3 saturation, six algorithms, 48 presets, harmonic preview and live spectrum.
+- Individual verified download, installation/removal, bulk operations, conflict detection and diagnostics.
+- Five installer languages; initial HUB language follows installer for new profiles. Existing settings remain intact.
+- Nine of fourteen audio tools. Existing VST3 payloads unchanged.
+- Windows and installer language validation pending.
+
 v0.8.43 - EQ X v1.1.1 and Neon Ghost interface polish (approved for stable release, 25 November 2026)
 - Added the user-tested EQ X independent VST3, original logo, install/remove, detection, diagnostics and SHA-256 integrity validation.
 - Added pinned individual download, update catalog entry and five-language HUB labels. Eight of fourteen tools available in this build.

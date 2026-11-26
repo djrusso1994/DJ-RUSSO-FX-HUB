@@ -37,6 +37,13 @@
       "effectIds": [
         "eq-x"
       ]
+    },
+    {
+      "id": "drive-x",
+      "detector": "bundled-drive-sha256",
+      "effectIds": [
+        "drive-x"
+      ]
     }
   ]
 }
