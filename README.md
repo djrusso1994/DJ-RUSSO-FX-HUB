@@ -72,6 +72,7 @@ METER X is a portable standalone application; Sidechain X, Reverse FX and Stutte
 - **DRIVE X v1.3.3:** independent saturation VST3, six algorithms, 48 presets, harmonic preview and live spectrum.
 - **Nine of fourteen tools:** individual verified downloads, safe installation/removal, bulk actions and diagnostics.
 - **Five installer languages:** English (default), Italian, Spanish, French and German; first launch uses the chosen language, existing preferences are preserved.
+- **Refined navigation:** Settings and VST detection are mutually exclusive, with persistent selected buttons and separate METER X standalone status.
 - Existing audio binaries and the refreshed FX HUB showcase are preserved.
 
 ## Previous release: v0.8.43

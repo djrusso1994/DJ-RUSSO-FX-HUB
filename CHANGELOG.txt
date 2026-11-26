@@ -2,6 +2,7 @@ v0.8.44 - DRIVE X integration (release candidate)
 - DRIVE X v1.3.3: independent VST3 saturation, six algorithms, 48 presets, harmonic preview and live spectrum.
 - Individual verified download, installation/removal, bulk operations, conflict detection and diagnostics.
 - Five installer languages; initial HUB language follows installer for new profiles. Existing settings remain intact.
+- Mutually exclusive Settings and VST detection panels; persistent selected navigation state, close/toggle controls and separate standalone METER X status.
 - Nine of fourteen audio tools. Existing VST3 payloads unchanged.
 - Windows and installer language validation pending.
 

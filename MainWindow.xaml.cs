@@ -88,7 +88,7 @@ public partial class MainWindow : Window
   ["subtitle"]=["14 PLUGINS • ONE CREATIVE ECOSYSTEM","14 PLUGIN • UN UNICO ECOSISTEMA CREATIVO","14 PLUGINS • UN ECOSISTEMA CREATIVO","14 PLUGINS • UN ÉCOSYSTÈME CRÉATIF","14 PLUGINS • EIN KREATIVES ÖKOSYSTEM"],
   ["updates"]=["FX HUB UPDATES","AGGIORNAMENTI FX HUB","ACTUALIZACIONES FX HUB","MISES À JOUR FX HUB","FX HUB UPDATES"],
   ["folder"]=["OPEN VST3 FOLDER","APRI CARTELLA VST3","ABRIR CARPETA VST3","OUVRIR DOSSIER VST3","VST3-ORDNER ÖFFNEN"],
-  ["scan"]=["SCAN INSTALLED SOFTWARE","RILEVA SOFTWARE INSTALLATI","BUSCAR SOFTWARE INSTALADO","DÉTECTER LES LOGICIELS INSTALLÉS","INSTALLIERTE SOFTWARE SUCHEN"],
+  ["scan"]=["DETECT INSTALLED VSTs","RILEVA VST INSTALLATI","DETECTAR VST INSTALADOS","DÉTECTER LES VST INSTALLÉS","INSTALLIERTE VST ERKENNEN"],
   ["language"]=["Language","Lingua","Idioma","Langue","Sprache"],
   ["ready"]=["Ready • Local FX SHELL install available; GitHub release check enabled.","Pronto • Installazione locale FX SHELL disponibile; controllo aggiornamenti GitHub attivo.","Listo • Instalación local de FX SHELL disponible; comprobación de versiones de GitHub activa.","Prêt • Installation locale de FX SHELL disponible ; vérification des versions GitHub active.","Bereit • Lokale FX SHELL-Installation verfügbar; GitHub-Versionsprüfung aktiv."],
   ["planned"]=["COMING SOON","IN ARRIVO","PRÓXIMAMENTE","PROCHAINEMENT","DEMNÄCHST"],
@@ -308,6 +308,8 @@ public partial class MainWindow : Window
      MaximizeWindowButton.ToolTip=new[]{"Maximize / Restore","Ingrandisci / Ripristina","Maximizar / Restaurar","Agrandir / Restaurer","Maximieren / Wiederherstellen"}[Index];
      CloseWindowButton.ToolTip=new[]{"Close","Chiudi","Cerrar","Fermer","Schließen"}[Index];
      CloseScanButton.ToolTip=CloseWindowButton.ToolTip;
+     CloseSettingsButton.ToolTip=CloseWindowButton.ToolTip;
+     SettingsPanelHeading.Text=T("settings");
      ChipPlayButton.ToolTip=new[]{"Play / Pause","Riproduci / Pausa","Reproducir / Pausa","Lecture / Pause","Wiedergabe / Pause"}[Index];
      ChipNextButton.ToolTip=new[]{"Next track","Traccia successiva","Siguiente pista","Piste suivante","Nächster Titel"}[Index];
      ChipMuteButton.ToolTip=new[]{"Mute","Silenzia","Silenciar","Muet","Stummschalten"}[Index];
@@ -382,7 +384,7 @@ public partial class MainWindow : Window
      UpdateSelectedProductPanel();
      UpdateMeterUi();
  }
- private void SettingsLanguageBox_SelectionChanged(object sender,SelectionChangedEventArgs e){if(!ready||SettingsLanguageBox.SelectedItem is not ComboBoxItem item)return;lang=item.Tag?.ToString()??"en";ScanResultsPanel.Visibility=Visibility.Collapsed;try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme,startupMusic}));}catch{}Refresh();}
+ private void SettingsLanguageBox_SelectionChanged(object sender,SelectionChangedEventArgs e){if(!ready||SettingsLanguageBox.SelectedItem is not ComboBoxItem item)return;lang=item.Tag?.ToString()??"en";try{Directory.CreateDirectory(Path.GetDirectoryName(PrefPath)!);File.WriteAllText(PrefPath,JsonSerializer.Serialize(new{language=lang,theme,startupMusic}));}catch{}Refresh();}
 
  private void SettingsThemeBox_SelectionChanged(object sender,SelectionChangedEventArgs e){
   if(!ready)return;theme=SettingsThemeBox.SelectedIndex switch {1=>"dark",2=>"light",_=>"neon"};
@@ -1305,7 +1307,8 @@ public partial class MainWindow : Window
   try{File.Delete(MeterExePath);Refresh();}catch(Exception ex){NeonDialog.Show(this,ex.Message,"METER X",MessageBoxButton.OK,MessageBoxImage.Warning);}
  }
 
- private void CloseScan_Click(object sender,RoutedEventArgs e) => ScanResultsPanel.Visibility=Visibility.Collapsed;
+ private void CloseScan_Click(object sender,RoutedEventArgs e) => SetAuxiliaryPanel(AuxiliaryPanel.None);
+ private void CloseSettings_Click(object sender,RoutedEventArgs e) => SetAuxiliaryPanel(AuxiliaryPanel.None);
  private static readonly string[] ChipNames = { "Neon Wobble", "Ghoststep Rising", "Arcade Drop", "Future Skyline", "Midnight Trance", "Laser Bounce", "Pixel Rush", "Melodic Echo", "Bass Reactor", "Neon Horizon", "Glitch Runner", "Cyber Dreams", "Violet Drop", "Electric City", "Chiptune Anthem", "Retro Rave", "Wobble Reactor", "Starlight Bass", "Digital Hearts", "Ghostly Arps", "Nightdrive X", "Crystal Drop", "Voltage Rush", "Final Level" , "Neon Ghost Theme", "Cyber City", "Pixel Adventure", "Midnight Drive", "Arcade Rush", "Digital Dreams", "Space Explorer", "Bass Pulse", "Crystal Melody", "Retro Racer", "Future World", "DJ Russo Intro", "Moonlit Circuit", "Prism Runner", "Quantum Sunset", "Electric Aurora"};
  private readonly System.Windows.Threading.DispatcherTimer waveTimer=new(){Interval=TimeSpan.FromMilliseconds(50)};
  private readonly List<System.Windows.Shapes.Rectangle> waveBars=new();
@@ -1404,8 +1407,9 @@ public partial class MainWindow : Window
  {if(chipPlayer!=null)chipPlayer.Volume=chipMuted?0:e.NewValue/100.0;}
  private void Scan_Click(object sender,RoutedEventArgs e)
  {
-     // Keep the scan report visible in the main window instead of relying on a transient dialog.
-     ScanResultsPanel.Visibility=Visibility.Visible;
+     // Sidebar click toggles the view; the repeat button always rescans.
+     if(ReferenceEquals(sender,ScanButton) && auxiliaryPanel==AuxiliaryPanel.Scan){SetAuxiliaryPanel(AuxiliaryPanel.None);return;}
+     SetAuxiliaryPanel(AuxiliaryPanel.Scan);
      ScanResultsHeading.Text=new[]{"Detecting VST3 and METER X…","Rilevamento VST3 e METER X in corso…","Detectando VST3 y METER X…","Détection des VST3 et de METER X…","VST3 und METER X werden erkannt…"}[Index];
      ScanResultsDetails.Text="";
      ScanResultsDetails.Visibility=Visibility.Collapsed;
@@ -1439,14 +1443,14 @@ public partial class MainWindow : Window
          // METER X is a standalone EXE, not a VST3. Count it separately and
          // report its own installation state without implying a DAW scan.
          bool meterInstalled=File.Exists(MeterExePath);
-         int count=found.Count+(meterInstalled?1:0);
-         int total=released.Count+(plugins.Any(p=>p.id=="meter-x")?1:0);
+         int count=found.Count;
+         int total=released.Count;
          string headline=Index switch {
-             1=>$"SOFTWARE RILEVATI: {count} / {total}",
-             2=>$"SOFTWARE DETECTADO: {count} / {total}",
-             3=>$"LOGICIELS DÉTECTÉS : {count} / {total}",
-             4=>$"ERKANNTE SOFTWARE: {count} / {total}",
-             _=>$"SOFTWARE DETECTED: {count} / {total}"
+             1=>$"VST RILEVATI: {count} / {total}",
+             2=>$"VST DETECTADOS: {count} / {total}",
+             3=>$"VST DÉTECTÉS : {count} / {total}",
+             4=>$"ERKANNTE VST: {count} / {total}",
+             _=>$"VST DETECTED: {count} / {total}"
          };
          var names=plugins.Where(p=>found.Contains(p.id) && IsShellProduct(p.id)).Select(p=>p.name).ToArray();
          string vstDetail=names.Length>0
@@ -1515,7 +1519,7 @@ public partial class MainWindow : Window
    var stack=new StackPanel();stack.Children.Add(new TextBlock{Text=value,FontSize=24,FontWeight=FontWeights.Bold,Foreground=cyan});stack.Children.Add(new TextBlock{Text=label,Foreground=fg,TextWrapping=TextWrapping.Wrap});
    metrics.Children.Add(new Border{Child=stack,Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(10),Margin=new Thickness(3)});
   }
-  Metric(count+" / "+total,new[]{"Detected","Rilevati","Detectados","Détectés","Erkannt"}[Index]);
+  Metric(count+" / "+total,new[]{"VST effects detected","Effetti VST rilevati","Efectos VST detectados","Effets VST détectés","Erkannte VST-Effekte"}[Index]);
   Metric((total-count).ToString(),new[]{"Not verified","Non verificati","No verificados","Non vérifiés","Nicht verifiziert"}[Index]);
   ScanVisualResults.Children.Add(metrics);
   ScanVisualResults.Children.Add(new ProgressBar{Minimum=0,Maximum=Math.Max(1,total),Value=count,Height=7,Foreground=cyan,Background=surface,Margin=new Thickness(3,0,3,8)});
@@ -1531,7 +1535,10 @@ public partial class MainWindow : Window
   }
   Product("fx-shell","FX SHELL",found.Any(IsShellProduct),shellState is ShellInstaller.State.Conflict or ShellInstaller.State.ModifiedManaged,shellState==ShellInstaller.State.ExternalSameBinary," · "+new[]{"3 effects","3 effetti","3 efectos","3 effets","3 Effekte"}[Index]);
   foreach(var p in new[]{("reverb-x","REVERB X"),("delay-x","DELAY X"),("compressor-x","COMPRESSOR X"),("eq-x","EQ X"),("drive-x","DRIVE X")})Product(p.Item1,p.Item2,found.Contains(p.Item1),VstConflict(p.Item1),VstExternal(p.Item1));
-  Product("meter-x","METER X",meterInstalled,false,false);
+  ScanVisualResults.Children.Add(rows);
+  ScanVisualResults.Children.Add(new TextBlock{Text=new[]{"Standalone application","Applicazione standalone","Aplicación independiente","Application autonome","Eigenständige Anwendung"}[Index],Foreground=cyan,FontWeight=FontWeights.SemiBold,Margin=new Thickness(3,8,3,3)});
+  rows=new System.Windows.Controls.Primitives.UniformGrid{Columns=1};
+  Product("meter-x","METER X",meterInstalled,false,false," · EXE");
   ScanVisualResults.Children.Add(rows);
  }
 
@@ -2046,12 +2053,20 @@ public partial class MainWindow : Window
      progressWindow.Closing+=(_,e)=>{if(!!isCancelled() && cancelButton.IsEnabled){e.Cancel=true;onCancel();cancelButton.IsEnabled=false;}};
      return (progressWindow,progressStatus,progressBar,progressDetails,cancelButton);
  }
- // The button and settings panel always share the same current-view state.
+ // Single view state: at most one auxiliary panel and one selected navigation button.
+ private enum AuxiliaryPanel { None, Settings, Scan }
+ private AuxiliaryPanel auxiliaryPanel=AuxiliaryPanel.None;
+ private void SetAuxiliaryPanel(AuxiliaryPanel panel)
+ {
+  auxiliaryPanel=panel;
+  SettingsPanel.Visibility=panel==AuxiliaryPanel.Settings?Visibility.Visible:Visibility.Collapsed;
+  ScanResultsPanel.Visibility=panel==AuxiliaryPanel.Scan?Visibility.Visible:Visibility.Collapsed;
+  SettingsButton.Tag=panel==AuxiliaryPanel.Settings?"Selected":null;
+  ScanButton.Tag=panel==AuxiliaryPanel.Scan?"Selected":null;
+ }
  private void Settings_Click(object sender,RoutedEventArgs e)
  {
-  bool open = SettingsPanel.Visibility != Visibility.Visible;
-  SettingsPanel.Visibility = open ? Visibility.Visible : Visibility.Collapsed;
-  SettingsButton.Tag = open ? "Selected" : null;
+  SetAuxiliaryPanel(auxiliaryPanel==AuxiliaryPanel.Settings?AuxiliaryPanel.None:AuxiliaryPanel.Settings);
  }
 
 }
