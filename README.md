@@ -3,7 +3,7 @@
 <img src="Assets/hub.png" alt="DJ RUSSO FX HUB logo" width="140" />
 
 # DJ RUSSO FX HUB
-### NEON GHOST · Audio Tools Manager for Windows
+### NEON GHOST
 
 **Manage DJ RUSSO audio tools in one place.**
 
@@ -12,6 +12,12 @@
 ![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.43](Assets/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 </div>
+
+<p align="center">
+  <img src="screenshots/suite-showcase.gif" alt="DJ RUSSO FX HUB and seven audio effects — interface slideshow" width="960" />
+</p>
+
+<p align="center"><em>FX HUB showcase · Real interface screenshots · Neon Ghost</em></p>
 
 ---
 
@@ -34,17 +40,31 @@ FX SHELL is a single shared VST3 module containing three effects; do not split o
 
 ---
 
-## Interface gallery
+## FX HUB interface
 
-Explore the **DJ RUSSO FX HUB** interface. These screenshots illustrate earlier builds; v0.8.43 includes the additional refinements described below. Click any screenshot to view it at full resolution.
+[![FX HUB dashboard](screenshots/hub-dashboard.png)](screenshots/hub-dashboard.png)
 
-| **Main Dashboard** | **Installed Plugins** |
+These real interface captures depict HUB v0.8.43.
+
+| Bulk installation | Settings and security |
 |:---:|:---:|
-| [![DJ RUSSO FX HUB — Main Dashboard](screenshots/01-main-dashboard.png)](screenshots/01-main-dashboard.png) | [![DJ RUSSO FX HUB — Installed Plugins](screenshots/02-installed-plugins.png)](screenshots/02-installed-plugins.png) |
+| [![Bulk installation](screenshots/hub-install.png)](screenshots/hub-install.png) | [![Settings](screenshots/hub-settings.png)](screenshots/hub-settings.png) |
+| **Diagnostics** | **Interactive guide** |
+| [![Diagnostics](screenshots/hub-diagnostics.png)](screenshots/hub-diagnostics.png) | [![Guide](screenshots/hub-guide.png)](screenshots/hub-guide.png) |
 
-| **METER X Monitoring** | **Dark Professional Theme** |
+## FX HUB plugin gallery
+
+| SIDECHAIN X · FX SHELL v3.0.3 | REVERSE FX · FX SHELL v3.0.3 |
 |:---:|:---:|
-| [![DJ RUSSO METER X](screenshots/03-meter-x.png)](screenshots/03-meter-x.png) | [![DJ RUSSO FX HUB — Dark Professional](screenshots/04-dark-professional.png)](screenshots/04-dark-professional.png) |
+| [![Sidechain X](screenshots/sidechain-x.png)](screenshots/sidechain-x.png) | [![Reverse FX](screenshots/reverse-fx.png)](screenshots/reverse-fx.png) |
+| **STUTTER FX · FX SHELL v3.0.3** | **REVERB X v1.3** |
+| [![Stutter FX](screenshots/stutter-fx.png)](screenshots/stutter-fx.png) | [![Reverb X](screenshots/reverb-x.png)](screenshots/reverb-x.png) |
+| **DELAY X v1.3** | **COMPRESSOR X v2.2** |
+| [![Delay X](screenshots/delay-x.png)](screenshots/delay-x.png) | [![Compressor X](screenshots/compressor-x.png)](screenshots/compressor-x.png) |
+| **EQ X v1.1.1** | **METER X · standalone** |
+| [![EQ X](screenshots/eq-x.png)](screenshots/eq-x.png) | [![METER X — earlier interface capture](screenshots/03-meter-x.png)](screenshots/03-meter-x.png) |
+
+METER X is a portable standalone application; Sidechain X, Reverse FX and Stutter FX share one FX SHELL VST3 module.
 
 ## What's new in v0.8.43
 
