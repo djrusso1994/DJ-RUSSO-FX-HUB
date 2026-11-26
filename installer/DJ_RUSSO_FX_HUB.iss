@@ -25,10 +25,15 @@ ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=admin
 CloseApplications=yes
 RestartApplications=no
+ShowLanguageDialog=yes
+LanguageDetectionMethod=none
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "italian"; MessagesFile: "compiler:Languages\Italian.isl"
+Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
+Name: "french"; MessagesFile: "compiler:Languages\French.isl"
+Name: "german"; MessagesFile: "compiler:Languages\German.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
@@ -42,3 +47,23 @@ Name: "{autodesktop}\DJ RUSSO FX HUB"; Filename: "{app}\{#MyAppExeName}"; Tasks:
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,DJ RUSSO FX HUB}"; Flags: nowait postinstall skipifsilent
+
+[UninstallDelete]
+Type: files; Name: "{app}\initial-language.txt"
+
+[Code]
+procedure CurStepChanged(CurStep: TSetupStep);
+var
+  HubLanguage: String;
+begin
+  if CurStep = ssPostInstall then
+  begin
+    HubLanguage := 'en';
+    if ActiveLanguage = 'italian' then HubLanguage := 'it';
+    if ActiveLanguage = 'spanish' then HubLanguage := 'es';
+    if ActiveLanguage = 'french' then HubLanguage := 'fr';
+    if ActiveLanguage = 'german' then HubLanguage := 'de';
+    if not SaveStringToFile(ExpandConstant('{app}\initial-language.txt'), HubLanguage, False) then
+      Log('Could not write FX HUB initial language preference.');
+  end;
+end;
