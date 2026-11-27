@@ -1923,10 +1923,92 @@ public partial class MainWindow : Window
   guideScroll.Resources[typeof(System.Windows.Controls.Primitives.ScrollBar)]=(Style)FindResource("NeonGuideScrollBar");
   guideScroll.Resources["ScrollRailBrush"]=FindResource("ScrollRailBrush");
   guideScroll.Resources["ScrollThumbBrush"]=FindResource("ScrollThumbBrush");
+  // Floating return-to-index control. Keep the existing section navigation and guide content intact.
+  var guideOverlay=new Grid();
+  guideOverlay.Children.Add(guideScroll);
+  guideBody.Margin=new Thickness(20,18,64,20);
+  var returnLabel=new[]{"Back to contents","Torna all'indice","Volver al índice","Retour au sommaire","Zurück zum Inhaltsverzeichnis"}[Index];
+  var returnBrush=(Brush)FindResource("SecondaryBrush");
+  var returnButton=new Button{
+   Width=42,Height=42,HorizontalAlignment=HorizontalAlignment.Right,VerticalAlignment=VerticalAlignment.Bottom,
+   Margin=new Thickness(0,0,29,18),Background=(Brush)FindResource("CardFillBrush"),
+   Foreground=returnBrush,BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1),
+   ToolTip=returnLabel,Cursor=Cursors.Hand,Visibility=Visibility.Collapsed,Opacity=0,IsHitTestVisible=false,
+   RenderTransformOrigin=new Point(0.5,0.5),RenderTransform=new TranslateTransform()
+  };
+  System.Windows.Automation.AutomationProperties.SetName(returnButton,returnLabel);
+  // A vector chevron is crisp at any DPI and does not depend on a font glyph.
+  returnButton.Content=new System.Windows.Shapes.Path{
+   Data=Geometry.Parse("M 2,12 L 10,4 L 18,12"),Width=20,Height=16,Stretch=Stretch.Uniform,
+   Stroke=returnBrush,StrokeThickness=2,StrokeStartLineCap=PenLineCap.Round,StrokeEndLineCap=PenLineCap.Round,
+   StrokeLineJoin=PenLineJoin.Round
+  };
+  var returnFrame=new FrameworkElementFactory(typeof(Border));
+  returnFrame.SetValue(Border.BackgroundProperty,new TemplateBindingExtension(Button.BackgroundProperty));
+  returnFrame.SetValue(Border.BorderBrushProperty,new TemplateBindingExtension(Button.BorderBrushProperty));
+  returnFrame.SetValue(Border.BorderThicknessProperty,new TemplateBindingExtension(Button.BorderThicknessProperty));
+  returnFrame.SetValue(Border.CornerRadiusProperty,new CornerRadius(10));
+  var returnPresenter=new FrameworkElementFactory(typeof(ContentPresenter));
+  returnPresenter.SetValue(ContentPresenter.HorizontalAlignmentProperty,HorizontalAlignment.Center);
+  returnPresenter.SetValue(ContentPresenter.VerticalAlignmentProperty,VerticalAlignment.Center);
+  returnFrame.AppendChild(returnPresenter);
+  returnButton.Template=new ControlTemplate(typeof(Button)){VisualTree=returnFrame};
+  guideOverlay.Children.Add(returnButton);
+  bool returnVisible=false;
+  void RefreshReturnButton(){
+   if(!indexPanel.IsLoaded)return;
+   double indexEnd=indexPanel.TransformToAncestor(guideBody).Transform(new Point(0,0)).Y
+    +indexPanel.ActualHeight+guideBody.Margin.Top;
+   bool show=guideScroll.ScrollableHeight>0 && guideScroll.VerticalOffset>indexEnd;
+   if(show==returnVisible)return;
+   returnVisible=show;
+   returnButton.IsHitTestVisible=show;
+   returnButton.IsTabStop=show;
+   if(show)returnButton.Visibility=Visibility.Visible;
+   var fade=new System.Windows.Media.Animation.DoubleAnimation{
+    To=show?1d:0d,Duration=new Duration(TimeSpan.FromMilliseconds(160))
+   };
+   fade.Completed+=(_,_)=>{if(!returnVisible)returnButton.Visibility=Visibility.Collapsed;};
+   returnButton.BeginAnimation(UIElement.OpacityProperty,fade);
+  }
+  guideScroll.ScrollChanged+=(_,_)=>RefreshReturnButton();
+  guideScroll.Loaded+=(_,_)=>RefreshReturnButton();
+  returnButton.MouseEnter+=(_,_)=>{
+   returnButton.BorderBrush=returnBrush;
+   returnButton.Effect=new System.Windows.Media.Effects.DropShadowEffect{
+    Color=returnBrush is SolidColorBrush solid?solid.Color:Color.FromRgb(57,216,237),
+    BlurRadius=12,ShadowDepth=0,Opacity=0.65
+   };
+   var bounce=new System.Windows.Media.Animation.DoubleAnimationUsingKeyFrames();
+   foreach(var key in new[]{(0,0d),(110,-3d),(240,0d)})
+    bounce.KeyFrames.Add(new System.Windows.Media.Animation.EasingDoubleKeyFrame(key.Item2,System.Windows.Media.Animation.KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(key.Item1))));
+   returnButton.RenderTransform.BeginAnimation(TranslateTransform.YProperty,bounce);
+  };
+  returnButton.MouseLeave+=(_,_)=>{
+   returnButton.RenderTransform.BeginAnimation(TranslateTransform.YProperty,null);
+   returnButton.BorderBrush=(Brush)FindResource("AccentBrush");
+   returnButton.Effect=null;
+  };
+  var returnTimer=new System.Windows.Threading.DispatcherTimer{Interval=TimeSpan.FromMilliseconds(16)};
+  var returnClock=new Stopwatch();
+  double startOffset=0;
+  returnTimer.Tick+=(_,_)=>{
+   double progress=Math.Min(1,returnClock.Elapsed.TotalMilliseconds/350d);
+   guideScroll.ScrollToVerticalOffset(startOffset*Math.Pow(1-progress,3));
+   if(progress>=1){returnTimer.Stop();returnClock.Stop();guideScroll.ScrollToTop();}
+  };
+  void CancelReturn(){returnTimer.Stop();returnClock.Stop();}
+  guideScroll.PreviewMouseWheel+=(_,_)=>CancelReturn();
+  guideScroll.PreviewMouseDown+=(_,_)=>CancelReturn();
+  guideScroll.PreviewKeyDown+=(_,_)=>CancelReturn();
+  returnButton.Click+=(_,_)=>{
+   CancelReturn();startOffset=guideScroll.VerticalOffset;guideScroll.Focus();returnClock.Restart();returnTimer.Start();
+  };
+  dialog.Closed+=(_,_)=>CancelReturn();
   var content=new Border{
    Background=(Brush)FindResource("PanelBrush"),
    BorderBrush=(Brush)FindResource("AccentBrush"),BorderThickness=new Thickness(1),
-   CornerRadius=new CornerRadius(8),Child=guideScroll
+   CornerRadius=new CornerRadius(8),Child=guideOverlay
   };
   layout.Children.Add(content);root.Children.Add(layout);frame.Child=root;dialog.Content=frame;
   dialog.ShowDialog();
