@@ -1,0 +1,23 @@
+name: Export cumulative backup source snapshot
+on:
+  push:
+    branches: [backup/cumulative-2026-11-27]
+    paths: ['.github/workflows/export-backup-20261127.yml']
+permissions:
+  contents: read
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: 53afbd90d8290a4c3d65510ab15094e3fc974a29
+      - name: Archive exact main snapshot
+        run: |
+          git archive --format=zip --prefix=FX_HUB_v0.8.45/ --output="$RUNNER_TEMP/FX_HUB_v0.8.45_SOURCE.zip" HEAD
+          unzip -tq "$RUNNER_TEMP/FX_HUB_v0.8.45_SOURCE.zip"
+      - uses: actions/upload-artifact@v6
+        with:
+          name: FX_HUB_v0.8.45_SOURCE_SNAPSHOT
+          path: ${{ runner.temp }}/FX_HUB_v0.8.45_SOURCE.zip
+          compression-level: 0
