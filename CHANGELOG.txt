@@ -1,8 +1,9 @@
-v0.8.45 - STEREO X integration (release candidate, 27 November 2026)
+v0.8.45 - STEREO X integration (approved for stable release, 27 November 2026)
 - Integrated user-tested STEREO X v1.2.0 Professional Edition, original logo, independent safe install/remove, bulk actions, detection, diagnostics, five-language labels and pinned individual download.
 - Added floating return-to-index chevron in the guide, smooth scrolling, fade and theme-aware hover feedback.
 - Updated release badge, README and suite progress to 10/14 (71.4%). Existing audio binaries and identities unchanged.
-- STEREO X project recall and automation confirmed by owner. HUB Windows build and interactive test pending.
+- STEREO X project recall and automation confirmed by owner. Windows CI passed; owner confirmed HUB test version works.
+- Replaced the STEREO X logo-only gallery block with two real FL Studio screenshots; updated the animated showcase to ten frames.
 
 v0.8.44 - DRIVE X integration (stable release, 26 November 2026)
 - DRIVE X v1.3.3: independent VST3 saturation, six algorithms, 48 presets, harmonic preview and live spectrum.

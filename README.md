@@ -7,13 +7,11 @@
 
 **Manage DJ RUSSO audio tools in one place.**
 
-[**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Release notes**](CHANGELOG.txt) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
+[**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Release notes**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.45) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
 ![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.45](docs/badges/v0.8.45/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
-**Release candidate: v0.8.45 · 10/14 audio tools bundled (71.4%)**
-
-Current public stable release: v0.8.44. The v0.8.45 installer is pending validation.
+**Latest stable release: v0.8.45 · 10/14 audio tools available (71.4%)**
 
 ![Suite development: 10 of 14 tools — 71.4%](docs/badges/v0.8.45/suite-progress.svg)
 
@@ -22,10 +20,10 @@ Current public stable release: v0.8.44. The v0.8.45 installer is pending validat
 </div>
 
 <p align="center">
-  <img src="screenshots/suite-showcase.gif" alt="DJ RUSSO FX HUB and seven audio effects — interface slideshow" width="960" />
+  <img src="screenshots/suite-showcase.gif" alt="DJ RUSSO FX HUB showcase — ten interface slides including STEREO X" width="960" />
 </p>
 
-<p align="center"><em>FX HUB showcase · Real interface screenshots · Neon Ghost</em></p>
+<p align="center"><em>FX HUB showcase · Ten real interface slides · Neon Ghost · HUB v0.8.43 and plugin captures including STEREO X v1.2.0</em></p>
 
 ---
 
@@ -35,19 +33,19 @@ DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updati
 
 ## Download and install
 
-[**Download FX HUB v0.8.44 — Windows x64 stable installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/v0.8.44/DJ_RUSSO_FX_HUB_Setup_v0.8.44.exe) · [Latest stable release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+[**Download FX HUB v0.8.45 — Windows x64 installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/v0.8.45/DJ_RUSSO_FX_HUB_Setup_v0.8.45.exe) · [Latest stable release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 1. Download and run the official Setup EXE. Choose English, Italian, Spanish, French or German.
 2. Launch FX HUB. Close your DAW before installing or removing VST effects.
 3. Select a tool or use **Install all**. Approve administrator access when requested.
 4. Rescan your VST3 plugins in your DAW. Launch METER X directly from the HUB.
 
-## What's new in v0.8.45 — release candidate
+## What's new in v0.8.45 — current stable release
 
 - **STEREO X v1.2.0 Professional Edition:** stereo imaging, width and balance, phase analysis, presets and FL Studio automation. Owner tested project recall and automation.
 - **Ten of fourteen tools:** individual verified download, installation/removal, bulk operations and diagnostics for STEREO X.
 - **Interactive guide:** floating return-to-contents chevron, smooth scrolling, theme-aware glow and localized tooltip.
-- Existing audio binaries and plugin identities are preserved. Windows validation is required before publishing.
+- Existing audio binaries and plugin identities are preserved. Windows build passed and the developer confirmed the HUB test version works.
 
 ## Individual downloads — no FX HUB required
 
@@ -103,8 +101,6 @@ METER X is a portable standalone application; Sidechain X, Reverse FX and Stutte
 | [![STEREO X — phase monitor and spectrum](screenshots/stereo-x-phase-monitor.png)](screenshots/stereo-x-phase-monitor.png) | [![STEREO X — vectorscope and stereo analysis](screenshots/stereo-x-vectorscope.png)](screenshots/stereo-x-vectorscope.png) |
 
 Real FL Studio interface captures supplied by the developer. Click either screenshot to enlarge.
-
-<!-- Candidate branch: screenshot PNG uploads must be confirmed before merge. -->
 
 ## Included tools
 
