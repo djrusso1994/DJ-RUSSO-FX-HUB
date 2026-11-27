@@ -7,11 +7,13 @@
 
 **Manage DJ RUSSO audio tools in one place.**
 
-[**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Release notes**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.45) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
+[**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Release notes**](CHANGELOG.txt) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
 ![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.45](docs/badges/v0.8.45/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
-**Latest stable release: v0.8.45 · 10/14 audio tools available (71.4%)**
+**Release candidate: v0.8.45 · 10/14 audio tools bundled (71.4%)**
+
+Current public stable release: v0.8.44. The v0.8.45 installer is pending validation.
 
 ![Suite development: 10 of 14 tools — 71.4%](docs/badges/v0.8.45/suite-progress.svg)
 
@@ -33,14 +35,14 @@ DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updati
 
 ## Download and install
 
-[**Download FX HUB v0.8.45 — Windows x64 installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/v0.8.45/DJ_RUSSO_FX_HUB_Setup_v0.8.45.exe) · [Latest stable release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+[**Download FX HUB v0.8.44 — Windows x64 stable installer**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/download/v0.8.44/DJ_RUSSO_FX_HUB_Setup_v0.8.44.exe) · [Latest stable release](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
 1. Download and run the official Setup EXE. Choose English, Italian, Spanish, French or German.
 2. Launch FX HUB. Close your DAW before installing or removing VST effects.
 3. Select a tool or use **Install all**. Approve administrator access when requested.
 4. Rescan your VST3 plugins in your DAW. Launch METER X directly from the HUB.
 
-## What's new in v0.8.45 — current stable release
+## What's new in v0.8.45 — release candidate
 
 - **STEREO X v1.2.0 Professional Edition:** stereo imaging, width and balance, phase analysis, presets and FL Studio automation. Owner tested project recall and automation.
 - **Ten of fourteen tools:** individual verified download, installation/removal, bulk operations and diagnostics for STEREO X.
