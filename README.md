@@ -96,8 +96,15 @@ These real interface captures depict HUB v0.8.43.
 
 METER X is a portable standalone application; Sidechain X, Reverse FX and Stutter FX share one FX SHELL VST3 module.
 
-<p align="center"><img src="Assets/stereo-x.png" width="440" alt="STEREO X official logo" /></p>
-<p align="center"><em>STEREO X v1.2.0 · Official logo (not an interface screenshot)</em></p>
+### STEREO X v1.2.0 — Professional Edition
+
+| Phase monitor and live spectrum | Vectorscope and stereo analysis |
+|:---:|:---:|
+| [![STEREO X — phase monitor and spectrum](screenshots/stereo-x-phase-monitor.png)](screenshots/stereo-x-phase-monitor.png) | [![STEREO X — vectorscope and stereo analysis](screenshots/stereo-x-vectorscope.png)](screenshots/stereo-x-vectorscope.png) |
+
+Real FL Studio interface captures supplied by the developer. Click either screenshot to enlarge.
+
+<!-- Candidate branch: screenshot PNG uploads must be confirmed before merge. -->
 
 ## Included tools
 
