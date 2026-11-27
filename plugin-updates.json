@@ -107,6 +107,21 @@
         "sha256": "ea62bdc026fc03561ea6807c0cac0017b25d7af2ca806903ab0d1d426b963c6e",
         "commit": "f2c72c828c339c3ab81aa54f7843523c00a8c216"
       }
+    },
+    {
+      "id": "stereo-x",
+      "version": "1.2.0",
+      "effectIds": [
+        "stereo-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO STEREO X.vst3",
+        "sizeBytes": 12120576,
+        "sha256": "4f01afe80acd4d561e7e9db288887806b71bfac0bff1f327530ff086241ac28d",
+        "commit": "f99f2130c7893b2e391b6b870d57d2060203692a"
+      }
     }
   ]
 }
