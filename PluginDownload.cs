@@ -27,6 +27,7 @@ internal static class PluginDownload
         "compressor-x" => "DJ RUSSO COMPRESSOR X.vst3",
         "eq-x" => "DJ RUSSO EQ X.vst3",
         "drive-x" => "DJ RUSSO DRIVE X.vst3",
+        "stereo-x" => "DJ RUSSO STEREO X.vst3",
         _ => null
     };
     private static Package? ReadPackage(string json, string id)

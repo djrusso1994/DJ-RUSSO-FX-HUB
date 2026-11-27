@@ -202,7 +202,7 @@ internal static class NeonDialog
             var heading=new TextBlock{Text=new[]{"Included packages","Pacchetti interessati","Paquetes incluidos","Paquets concernés","Betroffene Pakete"}[lang],Foreground=cyan,FontSize=15,FontWeight=FontWeights.SemiBold,Margin=new Thickness(0,0,0,8)};
             content.Children.Add(heading);
             var products=new UniformGrid{Columns=2,Margin=new Thickness(0,0,0,10)};
-            foreach(var name in new[]{"FX SHELL","REVERB X","DELAY X","COMPRESSOR X","EQ X","DRIVE X","METER X"}){
+            foreach(var name in new[]{"FX SHELL","REVERB X","DELAY X","COMPRESSOR X","EQ X","DRIVE X","STEREO X","METER X"}){
                 var productRow=new StackPanel{Orientation=Orientation.Horizontal};
                 productRow.Children.Add(CreateProductIcon(name,bg,cyan));
                 productRow.Children.Add(new TextBlock{Text=name,Foreground=fg,FontSize=13,FontWeight=FontWeights.SemiBold,VerticalAlignment=VerticalAlignment.Center});
@@ -216,7 +216,7 @@ internal static class NeonDialog
         }
         else if(confirmation && product.Length>0){
             var content=new StackPanel{Margin=new Thickness(0,0,16,0)};
-            string version=product switch {"FX SHELL"=>"3.0.3","REVERB X"=>"1.3","DELAY X"=>"1.3","COMPRESSOR X"=>"2.2","EQ X"=>"1.1.1","DRIVE X"=>"1.3.3","METER X"=>"1.2.6",_=>""};
+            string version=product switch {"FX SHELL"=>"3.0.3","REVERB X"=>"1.3","DELAY X"=>"1.3","COMPRESSOR X"=>"2.2","EQ X"=>"1.1.1","DRIVE X"=>"1.3.3","STEREO X"=>"1.2.0","METER X"=>"1.2.6",_=>""};
             content.Children.Add(new TextBlock{Text=product+(version.Length>0?"  •  v"+version:""),FontSize=18,FontWeight=FontWeights.SemiBold,Foreground=cyan,Margin=new Thickness(0,0,0,10)});
             content.Children.Add(new Border{Background=surface,CornerRadius=new CornerRadius(8),Padding=new Thickness(12),Child=new TextBlock{Text=message,Foreground=fg,FontSize=14,TextWrapping=TextWrapping.Wrap,LineHeight=22}});
             messageScroll.Content=content;
@@ -339,6 +339,7 @@ internal static class NeonDialog
             Product("DELAY X")?"M2,4 V16 M7,7 V13 M12,8 V12 M17,9 V11":
             Product("COMPRESSOR X")?"M2,18 L10,10 Q12,8 14,7 L19,5 M10,3 V18":
             Product("EQ X")?"M4,2 V6 M4,10 V18 M2,6 H6 V10 H2 Z M10,2 V12 M10,16 V18 M8,12 H12 V16 H8 Z M16,2 V4 M16,8 V18 M14,4 H18 V8 H14 Z":
+            Product("STEREO X")?"M10,3 L10,17 M8,5 L2,10 L8,15 M12,5 L18,10 L12,15":
             Product("DRIVE X")?"M2,16 L6,16 Q9,16 10,10 Q11,4 14,4 H18":
             Product("METER X")?"M3,18 V10 M8,18 V4 M13,18 V8 M18,18 V2":
             Product("FL Studio")?"M2,5 H7 L9,7 H18 V17 H2 Z M2,7 H9 M9,12 L11,14 L15,10":
