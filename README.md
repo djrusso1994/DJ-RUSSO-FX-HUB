@@ -22,10 +22,10 @@ Published stable release: v0.8.45.
 </div>
 
 <p align="center">
-  <img src="screenshots/suite-showcase-v0.8.45.gif" alt="DJ RUSSO FX HUB showcase — nine interface slides including STEREO X" width="960" />
+  <img src="screenshots/suite-showcase-v0.8.46.gif" alt="DJ RUSSO FX HUB showcase — ten interface slides including AUTO MASTER X" width="960" />
 </p>
 
-<p align="center"><em>FX HUB showcase · Nine real interface slides · Neon Ghost · HUB v0.8.43 and plugin captures including STEREO X v1.2.0</em></p>
+<p align="center"><em>FX HUB showcase · Ten real interface slides · Neon Ghost · HUB v0.8.43 and plugin captures including STEREO X v1.2.0 and AUTO MASTER X v1.4.0</em></p>
 
 ---
 
