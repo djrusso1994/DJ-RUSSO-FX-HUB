@@ -28,6 +28,7 @@ internal static class PluginDownload
         "eq-x" => "DJ RUSSO EQ X.vst3",
         "drive-x" => "DJ RUSSO DRIVE X.vst3",
         "stereo-x" => "DJ RUSSO STEREO X.vst3",
+        "auto-master-x" => "DJ RUSSO AUTO MASTER X.vst3",
         _ => null
     };
     private static Package? ReadPackage(string json, string id)

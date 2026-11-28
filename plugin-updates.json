@@ -122,6 +122,21 @@
         "sha256": "4f01afe80acd4d561e7e9db288887806b71bfac0bff1f327530ff086241ac28d",
         "commit": "f99f2130c7893b2e391b6b870d57d2060203692a"
       }
+    },
+    {
+      "id": "auto-master-x",
+      "version": "1.4.0",
+      "effectIds": [
+        "auto-master-x"
+      ],
+      "downloadAvailable": false,
+      "identityPolicy": "preserve-vst3-class-ids-parameter-ids-and-state",
+      "download": {
+        "fileName": "DJ RUSSO AUTO MASTER X.vst3",
+        "sizeBytes": 12242432,
+        "sha256": "4d780ac61ac922200da453ece275bdb96869c13fc9c0546ea8c7de7948ba0227",
+        "commit": "PENDING_ASSET_COMMIT"
+      }
     }
   ]
 }

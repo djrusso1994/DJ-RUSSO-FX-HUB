@@ -27,6 +27,8 @@
 
 ---
 
+> **v0.8.46 release candidate:** AUTO MASTER X v1.4.0 integration is staged; payload verification and Windows HUB testing are pending. The published stable release remains v0.8.45.
+
 ## Overview
 
 DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updating DJ RUSSO audio tools from a single interface. It brings nine VST effects and the standalone METER X audio analyzer together in the Neon Ghost environment.
@@ -101,6 +103,18 @@ METER X is a portable standalone application; Sidechain X, Reverse FX and Stutte
 | [![STEREO X — phase monitor and spectrum](screenshots/stereo-x-phase-monitor.png)](screenshots/stereo-x-phase-monitor.png) | [![STEREO X — vectorscope and stereo analysis](screenshots/stereo-x-vectorscope.png)](screenshots/stereo-x-vectorscope.png) |
 
 Real FL Studio interface captures supplied by the developer. Click either screenshot to enlarge.
+
+### AUTO MASTER X v1.4.0 — Intelligent Mastering Engine 2.0 (release candidate)
+
+<p align="center"><img src="screenshots/auto-master-x-showcase.gif" width="960" alt="AUTO MASTER X — four real interface screenshots" /></p>
+
+| Mastering complete | Intelligent analysis |
+|:---:|:---:|
+| [![Main interface](screenshots/auto-master-x-main.png)](screenshots/auto-master-x-main.png) | [![Analysis](screenshots/auto-master-x-analysis.png)](screenshots/auto-master-x-analysis.png) |
+| **Live Glass settings** | **Reference Mastering** |
+| [![Settings](screenshots/auto-master-x-settings.png)](screenshots/auto-master-x-settings.png) | [![Reference](screenshots/auto-master-x-reference.png)](screenshots/auto-master-x-reference.png) |
+
+Automatic mastering with three analysis modes, seven-band adaptive EQ, reference audio matching, level-matched A/B, 48 presets and six plugin interface languages. Real developer-supplied screenshots. Individual download will be enabled once its immutable payload commit is verified.
 
 ## Included tools
 

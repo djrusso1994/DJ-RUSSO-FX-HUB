@@ -78,6 +78,7 @@ jobs:
           if (-not (Test-Path -LiteralPath "Assets/eq-x.png" -PathType Leaf)) { throw "EQ X approved logo missing." }
           if (-not (Test-Path -LiteralPath "Assets/drive-x.png" -PathType Leaf)) { throw "DRIVE X approved logo missing." }
           if (-not (Test-Path -LiteralPath "Assets/stereo-x.png" -PathType Leaf)) { throw "STEREO X approved logo missing." }
+          if (-not (Test-Path -LiteralPath "Assets/auto-master-x.png" -PathType Leaf)) { throw "AUTO MASTER X approved logo missing." }
           $catalog = Get-Content "publish/plugin-updates.json" -Raw | ConvertFrom-Json
           foreach ($package in $catalog.packages) {
             $p = Join-Path "publish/Payload" $package.download.fileName
@@ -85,7 +86,7 @@ jobs:
             if ((Get-Item -LiteralPath $p).Length -ne $package.download.sizeBytes) { throw "Individual package size mismatch: $p" }
             if ((Get-FileHash -LiteralPath $p -Algorithm SHA256).Hash.ToLowerInvariant() -ne $package.download.sha256) { throw "Individual package hash mismatch: $p" }
           }
-          Write-Host "All eight bundled packages and individual download metadata verified."
+          Write-Host "All nine bundled packages and individual download metadata verified."
 
       - name: Verify individual downloads from pinned GitHub commits
         shell: pwsh
@@ -137,13 +138,13 @@ jobs:
           if (-not (Test-Path $iscc)) { throw "Inno Setup compiler not found: $iscc" }
           & $iscc "installer\\DJ_RUSSO_FX_HUB.iss"
           if ($LASTEXITCODE -ne 0) { throw "Installer compilation failed." }
-          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.45.exe")) { throw "Installer output missing." }
+          if (-not (Test-Path "installer-output\\DJ_RUSSO_FX_HUB_Setup_v0.8.46.exe")) { throw "Installer output missing." }
 
       - name: Upload installer artifact
         uses: actions/upload-artifact@v6
         with:
-          name: DJ_RUSSO_FX_HUB_Setup_v0.8.45
-          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.45.exe
+          name: DJ_RUSSO_FX_HUB_Setup_v0.8.46
+          path: installer-output/DJ_RUSSO_FX_HUB_Setup_v0.8.46.exe
           if-no-files-found: error
 
       - name: Create ZIP

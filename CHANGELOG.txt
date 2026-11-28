@@ -1,3 +1,9 @@
+v0.8.46 — Release candidate (not yet published)
+- AUTO MASTER X v1.4.0: independent verified VST3 installation/removal, diagnostics, individual download and localized guide.
+- 11/14 audio tools (78.6%) after payload verification; existing binaries unchanged.
+- New screenshots, four-frame showcase GIF and versioned badges.
+- Windows HUB build and owner approval pending.
+
 v0.8.45 - STEREO X integration (approved for stable release, 27 November 2026)
 - Integrated user-tested STEREO X v1.2.0 Professional Edition, original logo, independent safe install/remove, bulk actions, detection, diagnostics, five-language labels and pinned individual download.
 - Added floating return-to-index chevron in the guide, smooth scrolling, fade and theme-aware hover feedback.

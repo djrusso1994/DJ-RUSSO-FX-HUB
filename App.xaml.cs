@@ -19,6 +19,8 @@ public partial class App : Application
             Environment.Exit(DriveInstaller.RunElevatedWorker(e.Args[0]));
         if (e.Args.Length == 1 && StereoInstaller.IsWorkerArgument(e.Args[0]))
             Environment.Exit(StereoInstaller.RunElevatedWorker(e.Args[0]));
+        if (e.Args.Length == 1 && AutoMasterInstaller.IsWorkerArgument(e.Args[0]))
+            Environment.Exit(AutoMasterInstaller.RunElevatedWorker(e.Args[0]));
         base.OnStartup(e);
     }
 }
