@@ -56,8 +56,8 @@ jobs:
       - name: Upload showcase artifact
         uses: actions/upload-artifact@v6
         with:
-          name: suite-showcase-v0.8.46
-          path: screenshots/suite-showcase-v0.8.46.gif
+          name: suite-showcase-v0.8.46-10slides
+          path: screenshots/suite-showcase-v0.8.46-10slides.gif
           if-no-files-found: error
       - name: Commit only the verified showcase and its README reference
         shell: bash
@@ -65,9 +65,9 @@ jobs:
           test "$(git branch --show-current)" = "release/v0.8.46-auto-master-x"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -- screenshots/suite-showcase-v0.8.46.gif README.md
+          git add -- screenshots/suite-showcase-v0.8.46-10slides.gif README.md
           if ! git diff --cached --quiet; then
-            git commit -m "Update suite showcase with AUTO MASTER X (10 slides)"
+            git commit -m "Correct suite showcase counters and progress to 10 slides"
             git push origin HEAD:refs/heads/release/v0.8.46-auto-master-x
           fi
 
