@@ -9,13 +9,15 @@
 
 [**Download latest stable version**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest) · [**Release notes**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/tag/v0.8.45) · [**Report an issue**](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/issues)
 
-![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Release v0.8.45](docs/badges/v0.8.45/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
+![Windows](https://img.shields.io/badge/Windows-x64-39D8ED) ![Framework](https://img.shields.io/badge/.NET-8-9B5DE5) [![Candidate v0.8.46](docs/badges/v0.8.46/release-badge.svg)](https://github.com/djrusso1994/DJ-RUSSO-FX-HUB/releases/latest)
 
-**Latest stable release: v0.8.45 · 10/14 audio tools available (71.4%)**
+**Release candidate: v0.8.46 · 11/14 audio tools bundled (78.6%)**
 
-![Suite development: 10 of 14 tools — 71.4%](docs/badges/v0.8.45/suite-progress.svg)
+Published stable release: v0.8.45.
 
-**9 VST effects + 1 standalone application · 4 tools remaining**
+![Suite development: 11 of 14 tools — 78.6%](docs/badges/v0.8.46/suite-progress.svg)
+
+**10 VST effects + 1 standalone application · 3 tools remaining in the candidate**
 
 </div>
 
@@ -27,11 +29,11 @@
 
 ---
 
-> **v0.8.46 release candidate:** AUTO MASTER X v1.4.0 integration is staged; payload verification and Windows HUB testing are pending. The published stable release remains v0.8.45.
+> **v0.8.46 release candidate:** AUTO MASTER X v1.4.0 integration is complete on this branch; Windows CI verification and HUB acceptance testing are pending. The published stable release remains v0.8.45.
 
 ## Overview
 
-DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updating DJ RUSSO audio tools from a single interface. It brings nine VST effects and the standalone METER X audio analyzer together in the Neon Ghost environment.
+DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updating DJ RUSSO audio tools from a single interface. The v0.8.46 candidate brings ten VST effects and the standalone METER X audio analyzer together in the Neon Ghost environment.
 
 ## Download and install
 
@@ -42,16 +44,16 @@ DJ RUSSO FX HUB is a Windows x64 application for installing, managing and updati
 3. Select a tool or use **Install all**. Approve administrator access when requested.
 4. Rescan your VST3 plugins in your DAW. Launch METER X directly from the HUB.
 
-## What's new in v0.8.45 — current stable release
+## What's new in v0.8.46 — release candidate
 
-- **STEREO X v1.2.0 Professional Edition:** stereo imaging, width and balance, phase analysis, presets and FL Studio automation. Owner tested project recall and automation.
-- **Ten of fourteen tools:** individual verified download, installation/removal, bulk operations and diagnostics for STEREO X.
-- **Interactive guide:** floating return-to-contents chevron, smooth scrolling, theme-aware glow and localized tooltip.
-- Existing audio binaries and plugin identities are preserved. Windows build passed and the developer confirmed the HUB test version works.
+- **AUTO MASTER X v1.4.0:** Intelligent Mastering Engine 2.0, seven-band adaptive EQ, three analysis modes, reference matching, 48 presets and level-matched A/B.
+- **Eleven of fourteen tools:** dedicated install/removal, bulk operations, detection, diagnostics and individual download for AUTO MASTER X.
+- Updated localized guide, original logo, real screenshots and versioned vector badges.
+- Existing audio binaries and plugin identities are preserved. AUTO MASTER X was tested and approved by the developer in FL Studio; Windows HUB verification is pending.
 
 ## Individual downloads — no FX HUB required
 
-Prefer to download just one tool? These official Windows x64 binaries are the same payloads included in FX HUB v0.8.45.
+Prefer to download just one tool? The existing Windows x64 binaries are unchanged from FX HUB v0.8.45. The additional AUTO MASTER X binary is the developer-approved v1.4.0, included in the v0.8.46 candidate.
 
 | Tool | Version | Format | Download |
 |---|---|---|---|
@@ -62,6 +64,7 @@ Prefer to download just one tool? These official Windows x64 binaries are the sa
 | **EQ X** | 1.1.1 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/89aecc51051d3cc9c1005e62f1fa8c34278c12da/Payload/DJ%20RUSSO%20EQ%20X.vst3) |
 | **DRIVE X** | 1.3.3 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/f2c72c828c339c3ab81aa54f7843523c00a8c216/Payload/DJ%20RUSSO%20DRIVE%20X.vst3) |
 | **STEREO X** | 1.2.0 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/f99f2130c7893b2e391b6b870d57d2060203692a/Payload/DJ%20RUSSO%20STEREO%20X.vst3) |
+| **AUTO MASTER X** | 1.4.0 | VST3 | [Download VST3](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/464a747d3ba3976bf0267c0753d4ca5b008a508d/Payload/DJ%20RUSSO%20AUTO%20MASTER%20X.vst3) |
 | **METER X** | 1.2.6 | Portable EXE | [Download EXE](https://raw.githubusercontent.com/djrusso1994/DJ-RUSSO-FX-HUB/2c6dcfef8ebd5da832bb40d1bb2bfb782e4b8d1a/Payload/DJ%20RUSSO%20METER%20X.exe) |
 
 **Manual installation:** close your DAW, back up any existing plugin, then copy the downloaded `.vst3` file to `C:\Program Files\Common Files\VST3` (administrator permission may be required). Rescan your plugins in your DAW. METER X is a standalone Windows executable and does not belong in the VST3 folder.
@@ -114,11 +117,11 @@ Real FL Studio interface captures supplied by the developer. Click either screen
 | **Live Glass settings** | **Reference Mastering** |
 | [![Settings](screenshots/auto-master-x-settings.png)](screenshots/auto-master-x-settings.png) | [![Reference](screenshots/auto-master-x-reference.png)](screenshots/auto-master-x-reference.png) |
 
-Automatic mastering with three analysis modes, seven-band adaptive EQ, reference audio matching, level-matched A/B, 48 presets and six plugin interface languages. Real developer-supplied screenshots. Individual download will be enabled once its immutable payload commit is verified.
+Automatic mastering with three analysis modes, seven-band adaptive EQ, reference audio matching, level-matched A/B, 48 presets and six plugin interface languages. Real developer-supplied screenshots. The individual download is pinned to the uploaded payload commit; the Windows workflow checks its size and SHA-256.
 
 ## Included tools
 
-**Ten available audio tools** are managed through one Windows application:
+**Eleven audio tools** are bundled in the v0.8.46 candidate:
 
 - **DJ RUSSO METER X v1.2.6** — Windows audio monitoring application.
 - **DJ RUSSO FX SHELL v3.0.3** — one shared VST3 module containing **Sidechain X**, **Reverse FX**, and **Stutter FX**.
@@ -128,9 +131,10 @@ Automatic mastering with three analysis modes, seven-band adaptive EQ, reference
 - **DJ RUSSO EQ X v1.1.1** — independent dynamic EQ VST3.
 - **DJ RUSSO DRIVE X v1.3.3** — independent saturation VST3 with six algorithms and live spectrum.
 - **DJ RUSSO STEREO X v1.2.0** — independent stereo imaging VST3 with width, balance and phase monitoring.
-- **Coming soon:** AUTO MASTER X, PITCH X, TRANSIENT X and VOCAL REMOVER X.
+- **DJ RUSSO AUTO MASTER X v1.4.0** — automatic mastering, adaptive seven-band EQ and reference mastering.
+- **Coming soon:** PITCH X, TRANSIENT X and VOCAL REMOVER X.
 
-The FX HUB itself is a **Windows application, not a VST3 plugin**. FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X, STEREO X and METER X can be installed or removed individually, or managed together with the supported bulk actions.
+The FX HUB itself is a **Windows application, not a VST3 plugin**. FX SHELL, REVERB X, DELAY X, COMPRESSOR X, EQ X, DRIVE X, STEREO X, AUTO MASTER X and METER X can be installed or removed individually, or managed together with the supported bulk actions.
 
 ## Main features
 
